@@ -36,9 +36,17 @@ Le script `scripts/vercel-build.sh` utilise **automatiquement** `POSTGRES_PRISMA
 
 ### Images (obligatoire en prod)
 
+Sans Blob, l’upload échoue sur Vercel (disque en lecture seule).
+
+1. **Storage** → **Blob** → **Create Database / Store**
+2. **Connect to Project** → Production + Preview
+3. Vercel ajoute `BLOB_READ_WRITE_TOKEN` automatiquement
+
+Sinon, ajoute manuellement :
+
 | Variable | Valeur |
 |----------|--------|
-| `BLOB_READ_WRITE_TOKEN` | Storage → **Blob** → Create → token |
+| `BLOB_READ_WRITE_TOKEN` | Token du store Blob |
 
 Coche **Production**, **Preview**, **Development** pour chaque variable.
 

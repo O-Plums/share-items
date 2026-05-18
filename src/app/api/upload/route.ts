@@ -32,16 +32,26 @@ export async function POST(req: NextRequest) {
     }
 
     const filename = `${nanoid(16)}.jpg`;
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+    const onVercel = process.env.VERCEL === "1";
 
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
+    if (blobToken) {
       const blob = await put(`items/${filename}`, processed, {
         access: "public",
-        token: process.env.BLOB_READ_WRITE_TOKEN,
+        token: blobToken,
         contentType: "image/jpeg",
       });
       return json({ url: blob.url, size: processed.length });
     }
 
+    if (onVercel) {
+      throw new ApiError(
+        "Stockage images non configuré. Ajoute BLOB_READ_WRITE_TOKEN (Vercel → Storage → Blob → Connect to Project).",
+        503,
+      );
+    }
+
+    // Dev local uniquement (filesystem modifiable)
     const uploadsDir = join(process.cwd(), "public", "uploads");
     await mkdir(uploadsDir, { recursive: true });
     await writeFile(join(uploadsDir, filename), processed);
