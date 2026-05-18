@@ -5,9 +5,10 @@ import { join } from "node:path";
 import { errorResponse, json } from "@/lib/http";
 import { ApiError } from "@/lib/auth";
 import { nanoid } from "nanoid";
+import { processImageForUpload } from "@/lib/image-process";
 
-const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
+const INPUT_MAX_BYTES = 10 * 1024 * 1024;
+const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,25 +16,36 @@ export async function POST(req: NextRequest) {
     const file = form.get("file");
     if (!(file instanceof File)) throw new ApiError("Aucun fichier", 400);
     if (file.size === 0) throw new ApiError("Fichier vide", 400);
-    if (file.size > MAX_BYTES) throw new ApiError("Image trop lourde (max 5 Mo)", 413);
-    if (!ALLOWED.has(file.type)) throw new ApiError("Format non supporté (JPEG, PNG, WebP)", 415);
+    if (file.size > INPUT_MAX_BYTES) {
+      throw new ApiError("Image trop lourde (max 10 Mo à l’envoi)", 413);
+    }
+    if (!ALLOWED.has(file.type) && !file.type.startsWith("image/")) {
+      throw new ApiError("Format non supporté (JPEG, PNG, WebP)", 415);
+    }
 
-    const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
-    const filename = `${nanoid(16)}.${ext}`;
+    const raw = Buffer.from(await file.arrayBuffer());
+    let processed: Buffer;
+    try {
+      processed = await processImageForUpload(raw);
+    } catch {
+      throw new ApiError("Impossible de traiter cette image", 422);
+    }
+
+    const filename = `${nanoid(16)}.jpg`;
 
     if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const blob = await put(`items/${filename}`, file, {
+      const blob = await put(`items/${filename}`, processed, {
         access: "public",
         token: process.env.BLOB_READ_WRITE_TOKEN,
+        contentType: "image/jpeg",
       });
-      return json({ url: blob.url });
+      return json({ url: blob.url, size: processed.length });
     }
 
     const uploadsDir = join(process.cwd(), "public", "uploads");
     await mkdir(uploadsDir, { recursive: true });
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(join(uploadsDir, filename), buffer);
-    return json({ url: `/uploads/${filename}` });
+    await writeFile(join(uploadsDir, filename), processed);
+    return json({ url: `/uploads/${filename}`, size: processed.length });
   } catch (err) {
     return errorResponse(err);
   }

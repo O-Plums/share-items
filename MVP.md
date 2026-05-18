@@ -335,7 +335,7 @@ model Match {
 ## 12. UX mobile
 
 - Touch targets ≥ 48 px (emojis, boutons, 📖).
-- Compression client si > 4 Mo ; plafond serveur 5 Mo (JPEG, PNG, WebP).
+- Upload serveur via **Sharp** : redimensionnement max **512 px**, sortie **JPEG** uniquement, cible **≤ 500 Ko** (entrée max 10 Mo).
 - `next/image` ; lazy load sur grille Matchs.
 - Safe area : footer + boutons Oui/Non au-dessus de l’accueil iOS.
 - Sheet 📖 : ≥ 50 % hauteur ; fermeture swipe down ou tap extérieur.

@@ -13,12 +13,13 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "@vercel/blob": "^0.27.0",
+    "framer-motion": "^11.11.17",
+    "nanoid": "^5.0.9",
     "next": "^15.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "nanoid": "^5.0.9",
-    "@vercel/blob": "^0.27.0",
-    "framer-motion": "^11.11.17"
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

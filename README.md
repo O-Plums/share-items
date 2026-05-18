@@ -10,6 +10,7 @@ Voir [MVP.md](./MVP.md) pour la spec complète.
 - Tailwind CSS
 - Prisma (SQLite en dev, PostgreSQL en prod)
 - Vercel Blob (production) / stockage local (`public/uploads/`) en dev
+- **Sharp** : toutes les images sont redimensionnées (max 512 px), converties en JPEG et compressées (≤ 500 Ko)
 - Framer Motion (swipe + sheet)
 
 ## Démarrer en local
