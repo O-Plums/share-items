@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useDashboardFetch } from "@/lib/client";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { PageLoader } from "@/components/ui/PageLoader";
 import { EmojiBadge } from "@/components/EmojiBadge";
 import { getListKind } from "@/lib/list-kinds";
 
@@ -87,11 +89,7 @@ export function InventoryPickModal({ listId, onClose, onDone }: Props) {
         )}
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
-          {items === null && (
-            <div className="flex justify-center py-10">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-brand-500" />
-            </div>
-          )}
+          {items === null && <PageLoader label="Inventaire…" />}
 
           {items && items.length === 0 && (
             <div className="rounded-2xl bg-neutral-50 p-6 text-center text-sm text-neutral-600">
@@ -158,18 +156,18 @@ export function InventoryPickModal({ listId, onClose, onDone }: Props) {
         </div>
 
         <div className="border-t border-neutral-100 px-5 py-4 safe-bottom">
-          <button
-            type="button"
-            disabled={selected.size === 0 || assigning}
+          <LoadingButton
+            loading={assigning}
+            loadingText="Ajout…"
+            variant="primary"
+            className="w-full rounded-2xl px-4 py-3 text-sm"
+            disabled={selected.size === 0}
             onClick={assignSelected}
-            className="w-full rounded-2xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white disabled:opacity-40"
           >
-            {assigning
-              ? "Ajout…"
-              : selected.size > 0
-                ? `Ajouter ${selected.size} objet${selected.size > 1 ? "s" : ""}`
-                : "Sélectionne des objets"}
-          </button>
+            {selected.size > 0
+              ? `Ajouter ${selected.size} objet${selected.size > 1 ? "s" : ""}`
+              : "Sélectionne des objets"}
+          </LoadingButton>
         </div>
       </div>
     </div>

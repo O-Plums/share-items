@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { errorResponse, json } from "@/lib/http";
+import { attachRoomMeta } from "@/lib/user-room";
 
 export async function GET(req: NextRequest) {
   try {
@@ -28,20 +29,19 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return json({
-      items: items.map((item) => ({
-        id: item.id,
-        listId: item.listId,
-        listTitle: item.list?.title ?? null,
-        listKind: item.list?.kind ?? null,
-        imageUrl: item.imageUrl,
-        label: item.label,
-        room: item.room,
-        category: item.category,
-        createdAt: item.createdAt,
-        tags: item.tags.map((t) => ({ id: t.userTag.id, label: t.userTag.label })),
-      })),
-    });
+    const rows = items.map((item) => ({
+      id: item.id,
+      listId: item.listId,
+      listTitle: item.list?.title ?? null,
+      listKind: item.list?.kind ?? null,
+      imageUrl: item.imageUrl,
+      label: item.label,
+      room: item.room,
+      category: item.category,
+      createdAt: item.createdAt,
+      tags: item.tags.map((t) => ({ id: t.userTag.id, label: t.userTag.label })),
+    }));
+    return json({ items: await attachRoomMeta(user.id, rows) });
   } catch (err) {
     return errorResponse(err);
   }

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ApiError } from "@/lib/auth";
 import { errorResponse, json } from "@/lib/http";
+import { attachRoomMeta } from "@/lib/user-room";
 
 type Ctx = { params: Promise<{ slug: string }> };
 
@@ -20,9 +21,8 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
       },
     });
     if (!list) throw new ApiError("Liste introuvable", 404);
-    return json({
-      list: { id: list.id, slug: list.slug, title: list.title, kind: list.kind },
-      items: list.items.map((it) => ({
+    const ownerId = list.userId ?? list.items.find((it) => it.userId)?.userId ?? null;
+    const mapped = list.items.map((it) => ({
         id: it.id,
         imageUrl: it.imageUrl,
         label: it.label,
@@ -30,7 +30,11 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
         category: it.category,
         sortOrder: it.sortOrder,
         tags: it.tags.map((t) => ({ id: t.userTag.id, label: t.userTag.label })),
-      })),
+      }));
+    const items = ownerId ? await attachRoomMeta(ownerId, mapped) : mapped;
+    return json({
+      list: { id: list.id, slug: list.slug, title: list.title, kind: list.kind },
+      items,
     });
   } catch (err) {
     return errorResponse(err);

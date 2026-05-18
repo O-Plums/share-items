@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDashboardFetch } from "@/lib/client";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { Spinner } from "@/components/ui/Spinner";
 import { getListKind } from "@/lib/list-kinds";
 
 type SimpleList = { id: string; title: string; kind: string };
@@ -19,6 +22,7 @@ export function AssignDialog({ itemIds, onClose, onDone }: Props) {
   const [lists, setLists] = useState<SimpleList[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [assigning, setAssigning] = useState(false);
+  const [assigningListId, setAssigningListId] = useState<string | null>(null);
 
   useEffect(() => {
     authedFetch<{ lists: SimpleList[] }>("/api/lists")
@@ -28,6 +32,7 @@ export function AssignDialog({ itemIds, onClose, onDone }: Props) {
 
   async function assign(listId: string) {
     setAssigning(true);
+    setAssigningListId(listId);
     setError(null);
     try {
       await authedFetch("/api/inventory/assign", {
@@ -38,6 +43,7 @@ export function AssignDialog({ itemIds, onClose, onDone }: Props) {
     } catch (e) {
       setError((e as Error).message);
       setAssigning(false);
+      setAssigningListId(null);
     }
   }
 
@@ -58,11 +64,7 @@ export function AssignDialog({ itemIds, onClose, onDone }: Props) {
         )}
 
         <div className="mt-4 max-h-[50vh] space-y-2 overflow-y-auto">
-          {lists === null && (
-            <div className="flex justify-center py-6">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-brand-500" />
-            </div>
-          )}
+          {lists === null && <PageLoader label="Listes…" className="py-6" />}
 
           {lists && lists.length === 0 && (
             <div className="rounded-2xl bg-neutral-50 p-4 text-sm text-neutral-600">
@@ -82,7 +84,11 @@ export function AssignDialog({ itemIds, onClose, onDone }: Props) {
               >
                 <span className="text-xl">{k.emoji}</span>
                 <span className="flex-1 truncate font-medium">{l.title}</span>
-                <span className={`rounded-full px-2 py-0.5 text-xs ring-1 ${k.color}`}>{k.label}</span>
+                {assigningListId === l.id ? (
+                  <Spinner size="sm" />
+                ) : (
+                  <span className={`rounded-full px-2 py-0.5 text-xs ring-1 ${k.color}`}>{k.label}</span>
+                )}
               </button>
             );
           })}

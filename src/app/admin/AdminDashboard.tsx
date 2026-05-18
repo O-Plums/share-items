@@ -16,6 +16,8 @@ import {
 import { useDashboardFetch } from "@/lib/client";
 import type { AdminStats } from "@/lib/admin-stats";
 import { getListKind } from "@/lib/list-kinds";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 
 type Preset = "7d" | "30d" | "90d" | "custom";
 
@@ -160,13 +162,15 @@ export function AdminDashboard() {
               className="mt-1 block rounded-xl border border-neutral-300 px-3 py-2 text-sm"
             />
           </label>
-          <button
-            type="button"
+          <LoadingButton
+            loading={loading}
+            loadingText="Chargement…"
+            variant="primary"
+            className="rounded-xl px-4 py-2 text-sm"
             onClick={load}
-            className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white"
           >
             Appliquer
-          </button>
+          </LoadingButton>
         </div>
       )}
 
@@ -180,11 +184,7 @@ export function AdminDashboard() {
         <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
-      {loading && (
-        <div className="flex justify-center py-16">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-brand-500" />
-        </div>
-      )}
+      {loading && <PageLoader label="Statistiques…" className="py-16" />}
 
       {!loading && stats && (
         <>

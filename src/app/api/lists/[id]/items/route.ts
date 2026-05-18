@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ApiError, requireUser } from "@/lib/auth";
 import { errorResponse, json } from "@/lib/http";
-import { isValidCategory, isValidRoom } from "@/lib/taxonomies";
+import { isValidCategory } from "@/lib/taxonomies";
+import { assertUserRoomKey } from "@/lib/user-room";
 
 const MAX_TAGS_PER_ITEM = 3;
 
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
     const tagIds = Array.isArray(body.tagIds) ? body.tagIds.slice(0, MAX_TAGS_PER_ITEM) : [];
 
     if (!imageUrl) throw new ApiError("Photo manquante", 400);
-    if (!isValidRoom(room)) throw new ApiError("Pièce invalide", 400);
+    await assertUserRoomKey(user.id, room);
     if (!isValidCategory(category)) throw new ApiError("Catégorie invalide", 400);
     if (label && label.length > 60) throw new ApiError("Libellé trop long", 400);
 

@@ -11,6 +11,7 @@ type Match = {
     imageUrl: string;
     label: string | null;
     room: string;
+    roomMeta?: { emoji: string; label: string };
     category: string;
   };
 };
@@ -57,7 +58,7 @@ export function MatchesView({ matches }: { matches: Match[] }) {
               <div className="space-y-1 p-2.5">
                 {m.item.label && <p className="truncate text-sm font-medium">{m.item.label}</p>}
                 <div className="flex flex-wrap gap-1">
-                  <EmojiBadge kind="room" value={m.item.room} />
+                  <EmojiBadge kind="room" value={m.item.room} roomMeta={m.item.roomMeta} />
                   <EmojiBadge kind="category" value={m.item.category} />
                 </div>
               </div>

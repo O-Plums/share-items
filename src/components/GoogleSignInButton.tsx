@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+
 type Props = {
   callbackUrl: string;
   label?: string;
@@ -9,15 +12,20 @@ type Props = {
 export function GoogleSignInButton({
   callbackUrl,
   label = "Continuer avec Google",
-  className = "flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-base font-semibold text-neutral-900 ring-1 ring-neutral-200 transition active:bg-neutral-50",
+  className = "flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-base font-semibold text-neutral-900 ring-1 ring-neutral-200 transition active:bg-neutral-50 disabled:opacity-60",
 }: Props) {
-  const href = `/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+  const [loading, setLoading] = useState(false);
+
+  function handleClick() {
+    setLoading(true);
+    void signIn("google", { redirectTo: callbackUrl });
+  }
 
   return (
-    <a href={href} className={className}>
+    <button type="button" onClick={handleClick} disabled={loading} className={className}>
       <GoogleLogo />
-      {label}
-    </a>
+      {loading ? "Redirection…" : label}
+    </button>
   );
 }
 

@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { signOut, useSession } from "next-auth/react";
 import { useIdentity } from "@/lib/identity";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 
 type Props = {
   open: boolean;
@@ -20,6 +21,7 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
   const { identity, setDisplayName, reset } = useIdentity();
   const [nameDraft, setNameDraft] = useState(identity?.displayName ?? "");
   const [saving, setSaving] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
     if (open) setNameDraft(identity?.displayName ?? "");
@@ -30,15 +32,20 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
     typeof window !== "undefined" ? `${window.location.origin}/l/${slug}` : `/l/${slug}`;
 
   async function handleSignOut() {
+    setSigningOut(true);
     reset();
-    if (session) {
-      await signOut({ redirectTo: `/l/${slug}` });
-    } else {
-      onClose();
+    try {
+      if (session) {
+        await signOut({ redirectTo: `/l/${slug}` });
+      } else {
+        onClose();
+      }
+    } finally {
+      setSigningOut(false);
     }
   }
 
-  function handleSaveName() {
+  async function handleSaveName() {
     const trimmed = nameDraft.trim();
     if (trimmed.length < 1) return;
     setSaving(true);
@@ -104,13 +111,15 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
                       <p className="mt-1 text-xs text-emerald-700">Connecté avec Google</p>
                     </div>
                   </div>
-                  <button
-                    type="button"
+                  <LoadingButton
+                    loading={signingOut}
+                    loadingText="Déconnexion…"
+                    variant="secondary"
+                    className="w-full rounded-2xl px-4 py-3 text-sm"
                     onClick={handleSignOut}
-                    className="w-full rounded-2xl bg-neutral-100 px-4 py-3 text-sm font-semibold text-neutral-800 active:bg-neutral-200"
                   >
                     Se déconnecter
-                  </button>
+                  </LoadingButton>
                 </div>
               ) : (
                 <div className="mt-5 space-y-4">
@@ -125,14 +134,16 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
                     maxLength={30}
                     className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
                   />
-                  <button
-                    type="button"
-                    disabled={saving || nameDraft.trim().length < 1}
+                  <LoadingButton
+                    loading={saving}
+                    loadingText="Enregistrement…"
+                    variant="primary"
+                    className="w-full rounded-2xl px-4 py-3 text-sm"
+                    disabled={nameDraft.trim().length < 1}
                     onClick={handleSaveName}
-                    className="w-full rounded-2xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
                   >
                     Enregistrer
-                  </button>
+                  </LoadingButton>
                   {googleEnabled && (
                     <>
                       <div className="relative flex items-center gap-3 py-1">

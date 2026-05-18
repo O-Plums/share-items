@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { EmojiBadge } from "@/components/EmojiBadge";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { Spinner } from "@/components/ui/Spinner";
 
 type Vote = {
   itemId: string;
@@ -14,6 +16,7 @@ type Vote = {
     imageUrl: string;
     label: string | null;
     room: string;
+    roomMeta?: { emoji: string; label: string };
     category: string;
   };
 };
@@ -26,10 +29,21 @@ type Props = {
   votes: Vote[];
   onToggle: (itemId: string, currentValue: "YES" | "NO") => void | Promise<void>;
   onClearAll: () => void | Promise<void>;
+  clearingAll?: boolean;
 };
 
-export function HistorySheet({ open, onClose, votes, onToggle, onClearAll }: Props) {
+export function HistorySheet({ open, onClose, votes, onToggle, onClearAll, clearingAll }: Props) {
   const [filter, setFilter] = useState<Filter>("all");
+  const [pendingId, setPendingId] = useState<string | null>(null);
+
+  async function handleToggle(itemId: string, current: "YES" | "NO") {
+    setPendingId(itemId);
+    try {
+      await onToggle(itemId, current);
+    } finally {
+      setPendingId(null);
+    }
+  }
 
   const filtered = votes.filter((v) =>
     filter === "all" ? true : filter === "yes" ? v.value === "YES" : v.value === "NO",
@@ -100,8 +114,9 @@ export function HistorySheet({ open, onClose, votes, onToggle, onClearAll }: Pro
                       <li key={vote.itemId}>
                         <button
                           type="button"
-                          onClick={() => onToggle(vote.itemId, vote.value)}
-                          className="flex w-full items-center gap-3 rounded-2xl bg-neutral-50 p-2 text-left transition active:bg-neutral-100"
+                          disabled={!!pendingId || clearingAll}
+                          onClick={() => handleToggle(vote.itemId, vote.value)}
+                          className="flex w-full items-center gap-3 rounded-2xl bg-neutral-50 p-2 text-left transition active:bg-neutral-100 disabled:opacity-50"
                         >
                           <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-neutral-200">
                             <Image
@@ -117,19 +132,27 @@ export function HistorySheet({ open, onClose, votes, onToggle, onClearAll }: Pro
                               <p className="truncate text-sm font-medium">{vote.item.label}</p>
                             )}
                             <div className="mt-0.5 flex flex-wrap gap-1">
-                              <EmojiBadge kind="room" value={vote.item.room} />
+                              <EmojiBadge
+                                kind="room"
+                                value={vote.item.room}
+                                roomMeta={vote.item.roomMeta}
+                              />
                               <EmojiBadge kind="category" value={vote.item.category} />
                             </div>
                           </div>
-                          <span
-                            className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${
-                              vote.value === "YES"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : "bg-rose-100 text-rose-700"
-                            }`}
-                          >
-                            {vote.value === "YES" ? "✓" : "✗"}
-                          </span>
+                          {pendingId === vote.itemId ? (
+                            <Spinner size="sm" />
+                          ) : (
+                            <span
+                              className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${
+                                vote.value === "YES"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : "bg-rose-100 text-rose-700"
+                              }`}
+                            >
+                              {vote.value === "YES" ? "✓" : "✗"}
+                            </span>
+                          )}
                         </button>
                       </li>
                     ))}
@@ -139,13 +162,15 @@ export function HistorySheet({ open, onClose, votes, onToggle, onClearAll }: Pro
 
               {votes.length > 0 && (
                 <div className="border-t border-neutral-100 px-5 py-3">
-                  <button
-                    type="button"
-                    onClick={onClearAll}
+                  <LoadingButton
+                    loading={clearingAll}
+                    loadingText="Effacement…"
+                    variant="ghost"
                     className="w-full rounded-xl py-2 text-sm font-medium text-neutral-500 hover:text-red-600"
+                    onClick={onClearAll}
                   >
                     Effacer tous mes votes
-                  </button>
+                  </LoadingButton>
                 </div>
               )}
             </div>

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useDashboardFetch } from "@/lib/client";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { Spinner } from "@/components/ui/Spinner";
 import { getListKind } from "@/lib/list-kinds";
 
 type SimpleList = { id: string; title: string; kind: string };
@@ -17,6 +19,7 @@ export function MoveDialog({ itemId, currentListId, onClose, onDone }: Props) {
   const authedFetch = useDashboardFetch();
   const [lists, setLists] = useState<SimpleList[] | null>(null);
   const [busy, setBusy] = useState(false);
+  const [busyTarget, setBusyTarget] = useState<string | "inventory" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -28,6 +31,7 @@ export function MoveDialog({ itemId, currentListId, onClose, onDone }: Props) {
   async function move(listId: string | null) {
     if (!confirm("Déplacer cet objet ? Les votes et le match sur cette liste seront supprimés.")) return;
     setBusy(true);
+    setBusyTarget(listId ?? "inventory");
     setError(null);
     try {
       await authedFetch("/api/inventory/move", {
@@ -38,6 +42,7 @@ export function MoveDialog({ itemId, currentListId, onClose, onDone }: Props) {
     } catch (e) {
       setError((e as Error).message);
       setBusy(false);
+      setBusyTarget(null);
     }
   }
 
@@ -62,13 +67,10 @@ export function MoveDialog({ itemId, currentListId, onClose, onDone }: Props) {
           >
             <span className="text-xl">📦</span>
             <span className="flex-1 truncate font-medium">Retirer de la liste (inventaire)</span>
+            {busyTarget === "inventory" && <Spinner size="sm" />}
           </button>
 
-          {lists === null && (
-            <div className="flex justify-center py-6">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-brand-500" />
-            </div>
-          )}
+          {lists === null && <PageLoader label="Listes…" className="py-6" />}
           {lists?.length === 0 && (
             <p className="rounded-2xl bg-neutral-50 p-3 text-sm text-neutral-600">
               Aucune autre liste.
@@ -86,7 +88,11 @@ export function MoveDialog({ itemId, currentListId, onClose, onDone }: Props) {
               >
                 <span className="text-xl">{k.emoji}</span>
                 <span className="flex-1 truncate font-medium">{l.title}</span>
-                <span className={`rounded-full px-2 py-0.5 text-xs ring-1 ${k.color}`}>{k.label}</span>
+                {busyTarget === l.id ? (
+                  <Spinner size="sm" />
+                ) : (
+                  <span className={`rounded-full px-2 py-0.5 text-xs ring-1 ${k.color}`}>{k.label}</span>
+                )}
               </button>
             );
           })}

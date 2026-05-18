@@ -7,8 +7,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useDashboardFetch } from "@/lib/client";
 import { CATEGORIES, ROOMS } from "@/lib/taxonomies";
 import { EmojiBadge } from "@/components/EmojiBadge";
+import { useUserRooms } from "@/components/UserRoomsProvider";
+import type { RoomMeta } from "@/lib/user-room";
 import { getListKind } from "@/lib/list-kinds";
 import { AssignDialog } from "./AssignDialog";
+import { InventoryEditSheet } from "./InventoryEditSheet";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 type InventoryItem = {
   id: string;
@@ -18,6 +23,7 @@ type InventoryItem = {
   imageUrl: string;
   label: string | null;
   room: string;
+  roomMeta?: RoomMeta;
   category: string;
   tags: { id: string; label: string }[];
 };
@@ -29,6 +35,7 @@ export default function InventoryPage() {
   const search = useSearchParams();
   const assignTargetListId = search.get("assign");
   const authedFetch = useDashboardFetch();
+  const { rooms: customRooms } = useUserRooms();
   const [items, setItems] = useState<InventoryItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>(assignTargetListId ? "unassigned" : "all");
@@ -38,6 +45,8 @@ export default function InventoryPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [showAssign, setShowAssign] = useState(false);
   const [assigningToList, setAssigningToList] = useState(false);
+  const [bulkAction, setBulkAction] = useState<"unassign" | "delete" | null>(null);
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -70,6 +79,7 @@ export default function InventoryPage() {
   async function unassign() {
     if (selected.size === 0) return;
     if (!confirm(`Retirer ${selected.size} objet(s) de leur liste ? Les votes et matchs seront perdus.`)) return;
+    setBulkAction("unassign");
     try {
       await authedFetch("/api/inventory/unassign", {
         method: "POST",
@@ -80,6 +90,8 @@ export default function InventoryPage() {
       await refresh();
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setBulkAction(null);
     }
   }
 
@@ -102,6 +114,7 @@ export default function InventoryPage() {
   async function deleteSelected() {
     if (selected.size === 0) return;
     if (!confirm(`Supprimer ${selected.size} objet(s) définitivement ?`)) return;
+    setBulkAction("delete");
     try {
       await Promise.all(
         [...selected].map((id) => authedFetch(`/api/items/${id}`, { method: "DELETE" })),
@@ -111,6 +124,8 @@ export default function InventoryPage() {
       await refresh();
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setBulkAction(null);
     }
   }
 
@@ -192,6 +207,15 @@ export default function InventoryPage() {
                     {r.emoji} {r.label}
                   </FilterChip>
                 ))}
+                {customRooms.map((r) => (
+                  <FilterChip
+                    key={r.id}
+                    active={roomFilter === r.id}
+                    onClick={() => setRoomFilter(r.id)}
+                  >
+                    {r.emoji} {r.label}
+                  </FilterChip>
+                ))}
               </div>
             </div>
             <div>
@@ -234,11 +258,7 @@ export default function InventoryPage() {
           <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
         )}
 
-        {items === null && (
-          <div className="mt-10 flex justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-brand-500" />
-          </div>
-        )}
+        {items === null && <PageLoader label="Inventaire…" className="mt-10" />}
 
         {items && items.length === 0 && (
           <div className="mt-10 rounded-2xl bg-white p-6 text-center ring-1 ring-neutral-200">
@@ -276,12 +296,13 @@ export default function InventoryPage() {
                       <ItemCardInner item={item} kind={k} selected={isSelected} />
                     </button>
                   ) : (
-                    <Link
-                      href={`/dashboard/inventory/${item.id}/edit`}
-                      className="block overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-200 transition active:scale-[0.98]"
+                    <button
+                      type="button"
+                      onClick={() => setEditingItem(item)}
+                      className="block w-full overflow-hidden rounded-2xl bg-white text-left ring-1 ring-neutral-200 transition active:scale-[0.98]"
                     >
                       <ItemCardInner item={item} kind={k} />
-                    </Link>
+                    </button>
                   )}
                 </li>
               );
@@ -295,45 +316,58 @@ export default function InventoryPage() {
           <div className="mx-auto w-full max-w-md px-3">
             <div className="space-y-2 rounded-2xl bg-white p-3 shadow-lg ring-1 ring-neutral-200">
               {assignTargetListId ? (
-                <button
-                  type="button"
-                  disabled={assigningToList}
+                <LoadingButton
+                  loading={assigningToList}
+                  loadingText="Ajout…"
+                  variant="primary"
+                  className="w-full rounded-xl px-3 py-2.5 text-sm"
                   onClick={assignToTargetList}
-                  className="w-full rounded-xl bg-brand-500 px-3 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
                 >
-                  {assigningToList
-                    ? "Ajout…"
-                    : `Ajouter ${selected.size} objet${selected.size > 1 ? "s" : ""} → liste`}
-                </button>
+                  {`Ajouter ${selected.size} objet${selected.size > 1 ? "s" : ""} → liste`}
+                </LoadingButton>
               ) : (
-                <button
-                  type="button"
+                <LoadingButton
+                  variant="primary"
+                  className="w-full rounded-xl px-3 py-2.5 text-sm"
                   onClick={() => setShowAssign(true)}
-                  className="w-full rounded-xl bg-brand-500 px-3 py-2.5 text-sm font-semibold text-white"
+                  disabled={!!bulkAction}
                 >
                   Ajouter à une liste ({selected.size})
-                </button>
+                </LoadingButton>
               )}
               <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
+                <LoadingButton
+                  loading={bulkAction === "unassign"}
+                  loadingText="…"
+                  variant="secondary"
+                  className="rounded-xl px-3 py-2 text-sm font-medium"
                   onClick={unassign}
-                  className="rounded-xl bg-neutral-100 px-3 py-2 text-sm font-medium text-neutral-700"
+                  disabled={!!bulkAction && bulkAction !== "unassign"}
                 >
                   Retirer des listes
-                </button>
-                <button
-                  type="button"
+                </LoadingButton>
+                <LoadingButton
+                  loading={bulkAction === "delete"}
+                  loadingText="…"
+                  variant="danger"
+                  className="rounded-xl px-3 py-2 text-sm font-medium"
                   onClick={deleteSelected}
-                  className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-700"
+                  disabled={!!bulkAction && bulkAction !== "delete"}
                 >
                   Supprimer
-                </button>
+                </LoadingButton>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <InventoryEditSheet
+        itemId={editingItem?.id ?? null}
+        preview={editingItem}
+        onClose={() => setEditingItem(null)}
+        onSaved={refresh}
+      />
 
       {showAssign && (
         <AssignDialog
@@ -407,7 +441,7 @@ function ItemCardInner({
       <div className="space-y-1 p-2.5">
         {item.label && <p className="truncate text-sm font-medium">{item.label}</p>}
         <div className="flex flex-wrap gap-1">
-          <EmojiBadge kind="room" value={item.room} />
+          <EmojiBadge kind="room" value={item.room} roomMeta={item.roomMeta} />
           <EmojiBadge kind="category" value={item.category} />
         </div>
         {item.tags.length > 0 && (

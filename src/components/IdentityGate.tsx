@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { useIdentity } from "@/lib/identity";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import { AppLogo } from "./AppLogo";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 type Props = {
   children: React.ReactNode;
@@ -40,7 +42,7 @@ export function IdentityGate({
   if (!ready || status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-brand-500" />
+        <PageLoader />
       </div>
     );
   }
@@ -72,13 +74,14 @@ export function IdentityGate({
             maxLength={30}
             className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-lg text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
           />
-          <button
+          <LoadingButton
             type="submit"
+            variant="primary"
+            className="w-full rounded-2xl px-4 py-3 text-lg"
             disabled={name.trim().length < 1}
-            className="w-full rounded-2xl bg-brand-500 px-4 py-3 text-lg font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
           >
             C’est parti
-          </button>
+          </LoadingButton>
 
           {googleEnabled && (
             <>

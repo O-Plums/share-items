@@ -4,9 +4,12 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDashboardFetch, uploadImage } from "@/lib/client";
-import { CATEGORIES, ROOMS } from "@/lib/taxonomies";
+import { CATEGORIES } from "@/lib/taxonomies";
 import { EmojiGrid } from "./EmojiGrid";
+import { RoomPicker } from "./RoomPicker";
 import { TagPicker } from "./TagPicker";
+import { ImageUploadOverlay } from "@/components/ui/ImageUploadOverlay";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 
 type Mode =
   | { kind: "inventory" }
@@ -60,6 +63,7 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
   }
 
   function openSource(source: "camera" | "gallery") {
+    if (uploading) return;
     setPermissionDenied(null);
     const ref = source === "camera" ? cameraInputRef : galleryInputRef;
     const input = ref.current;
@@ -74,10 +78,7 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
 
   function onInputChange(source: "camera" | "gallery", e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
-    if (!f) {
-      // user dismissed picker — could be permission denied on mobile
-      return;
-    }
+    if (!f) return;
     setPermissionDenied(null);
     onFile(f);
   }
@@ -137,9 +138,14 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
   const canSave = !!imageUrl && !!room && !!category;
 
   return (
-    <main className="min-h-screen safe-top safe-bottom">
-      <div className="mx-auto w-full max-w-md px-5 pb-24 pt-6">
-        <button type="button" onClick={goBack} className="text-sm text-neutral-500">
+    <main className="safe-bottom">
+      <div className="mx-auto w-full max-w-md px-5 pb-10 pt-2">
+        <button
+          type="button"
+          onClick={goBack}
+          className="text-sm text-neutral-500"
+          disabled={uploading || saving}
+        >
           ← Retour
         </button>
 
@@ -149,7 +155,7 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
               key={s}
               className={`h-1.5 flex-1 rounded-full transition ${
                 s <= step ? "bg-brand-500" : "bg-neutral-200"
-              }`}
+              } ${uploading && s === 1 ? "loader-shimmer" : ""}`}
             />
           ))}
         </div>
@@ -182,24 +188,24 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
             />
 
             <div className="mt-6 space-y-3">
-              <button
-                type="button"
-                disabled={uploading}
+              <LoadingButton
+                loading={uploading}
+                loadingText="Envoi…"
+                variant="primary"
+                className="w-full rounded-2xl px-4 py-4 text-lg"
                 onClick={() => openSource("camera")}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-500 px-4 py-4 text-lg font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
               >
-                <span>📸</span>
-                <span>Prendre une photo</span>
-              </button>
-              <button
-                type="button"
-                disabled={uploading}
+                <span aria-hidden>📸</span> Prendre une photo
+              </LoadingButton>
+              <LoadingButton
+                loading={uploading}
+                loadingText="Envoi…"
+                variant="secondary"
+                className="w-full rounded-2xl px-4 py-4 text-lg"
                 onClick={() => openSource("gallery")}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-4 text-lg font-semibold text-neutral-900 ring-1 ring-neutral-200 transition disabled:opacity-40 active:bg-neutral-50"
               >
-                <span>🖼️</span>
-                <span>Choisir dans la galerie</span>
-              </button>
+                <span aria-hidden>🖼️</span> Choisir dans la galerie
+              </LoadingButton>
 
               {permissionDenied && (
                 <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -209,26 +215,26 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
                 </div>
               )}
 
-              {uploading && (
-                <div className="rounded-xl bg-neutral-100 px-4 py-3 text-sm text-neutral-700">
-                  Envoi de la photo…
+              {(uploading || imageUrl) && (
+                <div className="relative mt-3 aspect-square overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-200">
+                  {imageUrl ? (
+                    <Image src={imageUrl} alt="" fill sizes="100vw" className="object-cover" />
+                  ) : (
+                    <div className="absolute inset-0 loader-shimmer" />
+                  )}
+                  <ImageUploadOverlay active={uploading} />
                 </div>
               )}
 
-              {imageUrl && (
-                <>
-                  <div className="relative mt-3 aspect-square overflow-hidden rounded-2xl bg-neutral-100">
-                    <Image src={imageUrl} alt="" fill sizes="100vw" className="object-cover" />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={next}
-                    disabled={!canNextFrom1}
-                    className="w-full rounded-2xl bg-brand-500 px-4 py-3 text-base font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
-                  >
-                    Continuer →
-                  </button>
-                </>
+              {imageUrl && !uploading && (
+                <LoadingButton
+                  variant="primary"
+                  className="mt-4 w-full rounded-2xl px-4 py-3 text-base"
+                  disabled={!canNextFrom1}
+                  onClick={next}
+                >
+                  Continuer →
+                </LoadingButton>
               )}
             </div>
           </section>
@@ -237,18 +243,18 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
         {step === 2 && imageUrl && (
           <section className="mt-6">
             <h1 className="text-2xl font-bold">Où se trouve l’objet&nbsp;?</h1>
-            <p className="mt-1 text-neutral-600">Choisis une pièce.</p>
+            <p className="mt-1 text-neutral-600">Choisis une pièce ou crée la tienne.</p>
             <div className="mt-6">
-              <EmojiGrid items={ROOMS} selected={room} onSelect={(k) => setRoom(k)} />
+              <RoomPicker selected={room} onSelect={(k) => setRoom(k)} />
             </div>
-            <button
-              type="button"
+            <LoadingButton
+              variant="primary"
+              className="mt-8 w-full rounded-2xl px-4 py-4 text-lg"
               disabled={!canNextFrom2}
               onClick={next}
-              className="mt-8 w-full rounded-2xl bg-brand-500 px-4 py-4 text-lg font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
             >
               Suivant
-            </button>
+            </LoadingButton>
           </section>
         )}
 
@@ -281,21 +287,21 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="Ex. Frigo Samsung"
                 maxLength={60}
-                className="mt-1 w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                enterKeyHint="done"
+                disabled={saving}
+                className="mt-1 w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 disabled:opacity-60"
               />
             </div>
-            <button
-              type="button"
-              disabled={!canSave || saving}
+            <LoadingButton
+              loading={saving}
+              loadingText="Enregistrement…"
+              variant="primary"
+              className="mt-8 w-full rounded-2xl px-4 py-4 text-lg"
+              disabled={!canSave}
               onClick={save}
-              className="mt-8 w-full rounded-2xl bg-brand-500 px-4 py-4 text-lg font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
             >
-              {saving
-                ? "Enregistrement…"
-                : mode.kind === "edit"
-                  ? "Mettre à jour"
-                  : "Enregistrer"}
-            </button>
+              {mode.kind === "edit" ? "Mettre à jour" : "Enregistrer"}
+            </LoadingButton>
           </section>
         )}
       </div>

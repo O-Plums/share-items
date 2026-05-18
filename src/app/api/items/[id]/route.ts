@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ApiError, requireUser } from "@/lib/auth";
 import { errorResponse, json } from "@/lib/http";
-import { isValidCategory, isValidRoom } from "@/lib/taxonomies";
+import { isValidCategory } from "@/lib/taxonomies";
+import { assertUserRoomKey } from "@/lib/user-room";
 
 const MAX_TAGS_PER_ITEM = 3;
 
@@ -60,7 +61,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
       data.imageUrl = body.imageUrl.trim();
     }
     if (typeof body.room === "string") {
-      if (!isValidRoom(body.room)) throw new ApiError("Pièce invalide", 400);
+      await assertUserRoomKey(user.id, body.room);
       data.room = body.room;
     }
     if (typeof body.category === "string") {

@@ -4,12 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { EmojiBadge } from "@/components/EmojiBadge";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { Spinner } from "@/components/ui/Spinner";
 
 type Item = {
   id: string;
   imageUrl: string;
   label: string | null;
   room: string;
+  roomMeta?: { emoji: string; label: string };
   category: string;
   tags?: { id: string; label: string }[];
 };
@@ -83,22 +86,24 @@ export function SwipeView({ remaining, total, totalDone, onVote }: Props) {
 
       <div className="safe-bottom px-5 pb-4 pt-2">
         <div className="mx-auto flex w-full max-w-md gap-3">
-          <button
-            type="button"
-            disabled={!!pendingId}
+          <LoadingButton
+            loading={!!pendingId}
+            loadingText="Envoi…"
+            variant="secondary"
+            className="flex-1 rounded-2xl py-4 text-lg"
             onClick={() => handle("NO")}
-            className="flex-1 rounded-2xl bg-white py-4 text-lg font-semibold text-neutral-700 ring-1 ring-neutral-200 transition disabled:opacity-50 active:bg-neutral-100"
           >
             ✕ Non
-          </button>
-          <button
-            type="button"
-            disabled={!!pendingId}
+          </LoadingButton>
+          <LoadingButton
+            loading={!!pendingId}
+            loadingText="Envoi…"
+            variant="success"
+            className="flex-1 rounded-2xl py-4 text-lg"
             onClick={() => handle("YES")}
-            className="flex-1 rounded-2xl bg-emerald-500 py-4 text-lg font-semibold text-white transition disabled:opacity-50 active:bg-emerald-600"
           >
             ✓ Oui
-          </button>
+          </LoadingButton>
         </div>
       </div>
     </div>
@@ -136,6 +141,11 @@ function SwipeCard({
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="absolute inset-0 touch-pan-y select-none overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-neutral-200"
     >
+      {disabled && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+          <Spinner size="lg" label="Enregistrement du vote" />
+        </div>
+      )}
       <div className="relative h-full w-full">
         <Image
           src={item.imageUrl}
@@ -163,7 +173,7 @@ function SwipeCard({
             <p className="text-2xl font-bold text-white drop-shadow">{item.label}</p>
           )}
           <div className="mt-2 flex flex-wrap gap-1.5">
-            <EmojiBadge kind="room" value={item.room} />
+            <EmojiBadge kind="room" value={item.room} roomMeta={item.roomMeta} />
             <EmojiBadge kind="category" value={item.category} />
             {item.tags?.map((t) => (
               <span

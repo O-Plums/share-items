@@ -23,6 +23,7 @@ model User {
   lists    List[]
   items    Item[]
   tags     UserTag[]
+  rooms    UserRoom[]
 }
 
 model Account {
@@ -113,6 +114,19 @@ model UserTag {
 
   user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   items ItemTag[]
+
+  @@unique([userId, label])
+  @@index([userId])
+}
+
+model UserRoom {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String
+  emoji     String   @default("🏠")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, label])
   @@index([userId])

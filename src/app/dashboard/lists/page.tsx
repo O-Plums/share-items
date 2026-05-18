@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useDashboardFetch } from "@/lib/client";
 import { getListKind } from "@/lib/list-kinds";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 type ListSummary = {
   id: string;
@@ -59,9 +60,7 @@ export default function ListsPage() {
         <section className="mt-6">
           <p className="text-sm font-medium text-neutral-700">Mes listes</p>
           {lists === null ? (
-            <div className="mt-6 flex justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-brand-500" />
-            </div>
+            <PageLoader label="Listes…" className="mt-6" />
           ) : lists.length === 0 ? (
             <div className="mt-3 rounded-2xl bg-white p-6 text-center ring-1 ring-neutral-200">
               <p className="text-3xl">📭</p>

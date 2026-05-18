@@ -8,12 +8,16 @@ import { SwipeView } from "./SwipeView";
 import { HistorySheet } from "./HistorySheet";
 import { MatchesView } from "./MatchesView";
 import { VoterAccountModal } from "./VoterAccountModal";
+import { PageLoader } from "@/components/ui/PageLoader";
+
+type RoomMeta = { emoji: string; label: string };
 
 type Item = {
   id: string;
   imageUrl: string;
   label: string | null;
   room: string;
+  roomMeta?: RoomMeta;
   category: string;
   sortOrder: number;
   tags?: { id: string; label: string }[];
@@ -62,6 +66,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
   const [tab, setTab] = useState<Tab>("swipe");
   const [historyOpen, setHistoryOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [clearingVotes, setClearingVotes] = useState(false);
 
   const loadList = useCallback(async () => {
     try {
@@ -129,12 +134,15 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
 
   async function clearMyVotes() {
     if (!confirm("Effacer tous tes votes sur cette liste ? Tes matchs sur ces objets seront aussi annulés.")) return;
+    setClearingVotes(true);
     try {
       await authedFetch(`/api/lists/by-slug/${slug}/my-votes`, { method: "DELETE" });
       await Promise.all([loadVotes(), loadMatches()]);
       setHistoryOpen(false);
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setClearingVotes(false);
     }
   }
 
@@ -144,7 +152,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
         {error ? (
           <p className="px-6 text-center text-red-700">{error}</p>
         ) : (
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-brand-500" />
+          <PageLoader />
         )}
       </main>
     );
@@ -224,6 +232,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
         votes={votes}
         onToggle={(itemId, currentValue) => submitVote(itemId, currentValue === "YES" ? "NO" : "YES")}
         onClearAll={clearMyVotes}
+        clearingAll={clearingVotes}
       />
 
       <VoterAccountModal

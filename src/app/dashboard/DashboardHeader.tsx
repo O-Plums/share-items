@@ -29,7 +29,7 @@ export function DashboardHeader({ name, image, signOutAction }: Props) {
   }, []);
 
   return (
-    <div className="fixed right-3 top-3 z-30 safe-top" ref={wrapRef}>
+    <div ref={wrapRef} className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

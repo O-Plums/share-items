@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useDashboardFetch } from "@/lib/client";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 import { getListKind, isValidListKind } from "@/lib/list-kinds";
 
 const DEFAULT_TITLES: Record<string, string> = {
@@ -102,13 +103,16 @@ export default function NewListPage() {
           {error && (
             <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
           )}
-          <button
+          <LoadingButton
             type="submit"
-            disabled={loading || !title.trim()}
-            className="w-full rounded-2xl bg-brand-500 px-4 py-4 text-lg font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
+            loading={loading}
+            loadingText="Création…"
+            variant="primary"
+            className="w-full rounded-2xl px-4 py-4 text-lg"
+            disabled={!title.trim()}
           >
-            {loading ? "Création…" : "Créer"}
-          </button>
+            Créer
+          </LoadingButton>
         </form>
       </div>
     </main>

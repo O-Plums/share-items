@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
@@ -9,6 +10,8 @@ import { EmojiBadge } from "@/components/EmojiBadge";
 import { getListKind, LIST_KINDS } from "@/lib/list-kinds";
 import { MoveDialog } from "./MoveDialog";
 import { InventoryPickModal } from "./InventoryPickModal";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { Spinner } from "@/components/ui/Spinner";
 
 type Item = {
   id: string;
@@ -43,6 +46,7 @@ export default function ListDetailPage() {
   const [showInventoryPick, setShowInventoryPick] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState("");
+  const [pending, setPending] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -71,6 +75,8 @@ export default function ListDetailPage() {
   }
 
   async function createMatch(itemId: string, visitorId: string) {
+    const key = `match:${itemId}:${visitorId}`;
+    setPending(key);
     try {
       await authedFetch(`/api/matches`, {
         method: "POST",
@@ -79,40 +85,54 @@ export default function ListDetailPage() {
       await refresh();
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setPending(null);
     }
   }
 
   async function deleteMatch(itemId: string) {
+    const key = `unmatch:${itemId}`;
+    setPending(key);
     try {
       await authedFetch(`/api/matches/${itemId}`, { method: "DELETE" });
       await refresh();
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setPending(null);
     }
   }
 
   async function deleteItem(itemId: string) {
     if (!confirm("Supprimer cet objet ? Les votes et le match associés seront perdus.")) return;
+    const key = `deleteItem:${itemId}`;
+    setPending(key);
     try {
       await authedFetch(`/api/items/${itemId}`, { method: "DELETE" });
       await refresh();
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setPending(null);
     }
   }
 
   async function deleteList() {
     if (!data) return;
     if (!confirm(`Supprimer définitivement « ${data.list.title} » ?`)) return;
+    setPending("deleteList");
     try {
       await authedFetch(`/api/lists/${params.listId}`, { method: "DELETE" });
       router.replace("/dashboard/lists");
     } catch (e) {
       setError((e as Error).message);
+      setPending(null);
     }
   }
 
   async function setKind(kind: string) {
+    const key = `kind:${kind}`;
+    setPending(key);
     try {
       await authedFetch(`/api/lists/${params.listId}`, {
         method: "PATCH",
@@ -121,6 +141,8 @@ export default function ListDetailPage() {
       await refresh();
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setPending(null);
     }
   }
 
@@ -130,6 +152,7 @@ export default function ListDetailPage() {
       setEditingTitle(false);
       return;
     }
+    setPending("saveTitle");
     try {
       await authedFetch(`/api/lists/${params.listId}`, {
         method: "PATCH",
@@ -139,6 +162,8 @@ export default function ListDetailPage() {
       await refresh();
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setPending(null);
     }
   }
 
@@ -154,7 +179,7 @@ export default function ListDetailPage() {
         {error ? (
           <p className="px-6 text-center text-red-700">{error}</p>
         ) : (
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-brand-500" />
+          <PageLoader />
         )}
       </main>
     );
@@ -189,13 +214,15 @@ export default function ListDetailPage() {
                 maxLength={80}
                 className="flex-1 rounded-xl border border-neutral-300 bg-white px-3 py-1.5 text-lg font-bold text-neutral-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
               />
-              <button
-                type="button"
+              <LoadingButton
+                loading={pending === "saveTitle"}
+                loadingText="…"
+                variant="primary"
+                className="rounded-xl px-3 py-1.5 text-sm"
                 onClick={saveTitle}
-                className="rounded-xl bg-brand-500 px-3 py-1.5 text-sm font-semibold text-white"
               >
                 OK
-              </button>
+              </LoadingButton>
             </div>
           ) : (
             <h1
@@ -208,10 +235,11 @@ export default function ListDetailPage() {
           <button
             type="button"
             onClick={deleteList}
-            className="shrink-0 rounded-xl px-2 py-1 text-sm text-neutral-500 hover:text-red-600"
+            disabled={!!pending}
+            className="shrink-0 rounded-xl px-2 py-1 text-sm text-neutral-500 hover:text-red-600 disabled:opacity-40"
             aria-label="Supprimer la liste"
           >
-            🗑
+            {pending === "deleteList" ? <Spinner size="sm" /> : "🗑"}
           </button>
         </div>
 
@@ -222,11 +250,13 @@ export default function ListDetailPage() {
               <button
                 key={k.key}
                 type="button"
+                disabled={!!pending}
                 onClick={() => setKind(k.key)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition ${
+                className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition disabled:opacity-50 ${
                   active ? `${k.color}` : "bg-white text-neutral-500 ring-neutral-200"
                 }`}
               >
+                {pending === `kind:${k.key}` ? <Spinner size="sm" /> : null}
                 {k.emoji} {k.label}
               </button>
             );
@@ -274,12 +304,18 @@ export default function ListDetailPage() {
           <ItemsTab
             listId={params.listId}
             items={data.items}
+            pending={pending}
             onDelete={deleteItem}
             onMove={(id) => setMoveItemId(id)}
           />
         )}
         {tabParam === "results" && (
-          <ResultsTab items={data.items} onMatch={createMatch} onUnmatch={deleteMatch} />
+          <ResultsTab
+            items={data.items}
+            pending={pending}
+            onMatch={createMatch}
+            onUnmatch={deleteMatch}
+          />
         )}
         {tabParam === "share" && (
           <ShareTab
@@ -321,11 +357,13 @@ export default function ListDetailPage() {
 function ItemsTab({
   listId,
   items,
+  pending,
   onDelete,
   onMove,
 }: {
   listId: string;
   items: Item[];
+  pending: string | null;
   onDelete: (itemId: string) => void;
   onMove: (itemId: string) => void;
 }) {
@@ -371,16 +409,19 @@ function ItemsTab({
           <div className="grid grid-cols-2 border-t border-neutral-100 text-xs">
             <button
               type="button"
+              disabled={!!pending}
               onClick={() => onMove(item.id)}
-              className="py-2 text-neutral-600 hover:text-brand-500"
+              className="inline-flex items-center justify-center gap-1 py-2 text-neutral-600 hover:text-brand-500 disabled:opacity-40"
             >
               Déplacer
             </button>
             <button
               type="button"
+              disabled={!!pending}
               onClick={() => onDelete(item.id)}
-              className="border-l border-neutral-100 py-2 text-neutral-500 hover:text-red-600"
+              className="inline-flex items-center justify-center gap-1 border-l border-neutral-100 py-2 text-neutral-500 hover:text-red-600 disabled:opacity-40"
             >
+              {pending === `deleteItem:${item.id}` ? <Spinner size="sm" /> : null}
               Supprimer
             </button>
           </div>
@@ -392,10 +433,12 @@ function ItemsTab({
 
 function ResultsTab({
   items,
+  pending,
   onMatch,
   onUnmatch,
 }: {
   items: Item[];
+  pending: string | null;
   onMatch: (itemId: string, visitorId: string) => void;
   onUnmatch: (itemId: string) => void;
 }) {
@@ -448,9 +491,11 @@ function ResultsTab({
                 </p>
                 <button
                   type="button"
+                  disabled={!!pending}
                   onClick={() => onUnmatch(item.id)}
-                  className="rounded-lg px-2 py-1 text-xs font-medium text-neutral-700 hover:text-red-600"
+                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-neutral-700 hover:text-red-600 disabled:opacity-40"
                 >
+                  {pending === `unmatch:${item.id}` ? <Spinner size="sm" /> : null}
                   Annuler
                 </button>
               </div>
@@ -467,9 +512,13 @@ function ResultsTab({
                     {!item.match && (
                       <button
                         type="button"
+                        disabled={!!pending}
                         onClick={() => onMatch(item.id, v.visitorId)}
-                        className="shrink-0 rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-white active:bg-brand-600"
+                        className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-white active:bg-brand-600 disabled:opacity-50"
                       >
+                        {pending === `match:${item.id}:${v.visitorId}` ? (
+                          <Spinner size="sm" tone="white" />
+                        ) : null}
                         Matcher
                       </button>
                     )}
@@ -541,15 +590,16 @@ function ShareTab({
       <div className="break-all rounded-2xl bg-white p-4 font-mono text-sm ring-1 ring-neutral-200">
         {shareUrl}
       </div>
-      <button
-        type="button"
-        disabled={sharing || !shareUrl}
+      <LoadingButton
+        loading={sharing}
+        loadingText="Ouverture…"
+        variant="primary"
+        className="w-full rounded-2xl px-4 py-3.5 text-lg"
+        disabled={!shareUrl}
         onClick={onNativeShare}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-500 px-4 py-3.5 text-lg font-semibold text-white transition disabled:opacity-50 active:bg-brand-600"
       >
-        <span aria-hidden>📤</span>
-        {sharing ? "Ouverture…" : "Partager"}
-      </button>
+        <span aria-hidden>📤</span> Partager
+      </LoadingButton>
       {canNativeShare && (
         <p className="text-center text-xs text-neutral-500">
           Ouvre le menu de partage de ton téléphone (apps installées).
