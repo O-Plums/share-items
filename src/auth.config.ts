@@ -1,6 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import Apple from "next-auth/providers/apple";
+import { NextResponse } from "next/server";
+import { isAdminEmail } from "@/lib/admin-access";
 
 const providers: NextAuthConfig["providers"] = [];
 
@@ -22,7 +24,19 @@ export const authConfig = {
     authorized({ auth, request }) {
       const isLoggedIn = !!auth?.user;
       const { pathname } = request.nextUrl;
-      if (pathname.startsWith("/dashboard")) return isLoggedIn;
+
+      if (pathname.startsWith("/admin")) {
+        if (!isLoggedIn) return false;
+        if (!isAdminEmail(auth.user?.email)) {
+          return NextResponse.redirect(new URL("/dashboard/lists", request.nextUrl));
+        }
+        return true;
+      }
+
+      if (pathname.startsWith("/dashboard")) {
+        return isLoggedIn;
+      }
+
       return true;
     },
   },
