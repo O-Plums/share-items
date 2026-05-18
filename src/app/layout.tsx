@@ -1,4 +1,5 @@
 import type { Viewport } from "next";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { IdentityProvider } from "@/lib/identity";
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <IdentityProvider>{children}</IdentityProvider>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
