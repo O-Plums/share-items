@@ -1,0 +1,64 @@
+// Share Items — schéma MVP
+// SQLite en dev (simple). Pour Vercel : changer provider en "postgresql" et fournir DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model List {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  title            String
+  creatorVisitorId String
+  createdAt        DateTime @default(now())
+  items            Item[]
+
+  @@index([creatorVisitorId])
+}
+
+model Item {
+  id        String   @id @default(cuid())
+  listId    String
+  list      List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  imageUrl  String
+  label     String?
+  room      String
+  category  String
+  sortOrder Int
+  createdAt DateTime @default(now())
+  votes     Vote[]
+  match     Match?
+
+  @@index([listId, sortOrder])
+}
+
+// VoteValue: "YES" | "NO" (SQLite n'a pas d'enum, validation au niveau API)
+model Vote {
+  id          String   @id @default(cuid())
+  itemId      String
+  item        Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  visitorId   String
+  displayName String
+  value       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([itemId, visitorId])
+  @@index([visitorId])
+}
+
+model Match {
+  id          String   @id @default(cuid())
+  itemId      String   @unique
+  item        Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  visitorId   String
+  displayName String
+  createdAt   DateTime @default(now())
+
+  @@index([visitorId])
+}
