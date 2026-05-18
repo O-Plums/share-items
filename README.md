@@ -1,96 +1,188 @@
 # Share Items
 
-App Next.js mobile-first pour lister, faire voter et attribuer des objets de la maison (débarras, dons, ventes). Pas de compte : un prénom + un identifiant local, c'est tout.
+<p align="center">
+  <a href="https://share-items.vercel.app/">
+    <img src="public/logo.png" width="120" alt="Share Items — logo" />
+  </a>
+</p>
 
-Voir [MVP.md](./MVP.md) pour la spec complète.
+<p align="center">
+  <strong>Démo en ligne : <a href="https://share-items.vercel.app/">share-items.vercel.app</a></strong>
+</p>
+
+App **Next.js** mobile-first pour lister des objets, faire voter tes proches façon **Tinder**, et attribuer chaque chose à la bonne personne (débarras, dons, ventes).
+
+- **Organisateur** : compte Google/Apple (Auth.js), listes par type, inventaire perso réutilisable, tags, partage natif (WhatsApp, Messenger…).
+- **Votant** : prénom suffit ; connexion Google optionnelle pour plus de sécurité. Swipe, historique, matchs.
+
+Specs : [MVP-v2.md](./MVP-v2.md) (actuel) · [MVP.md](./MVP.md) (v1 historique).
+
+---
+
+## Aperçu
+
+<p align="center">
+  <img src="promo/1.jpg" width="45%" alt="Share Items — présentation 1" />
+  <img src="promo/2.jpg" width="45%" alt="Share Items — présentation 2" />
+</p>
+<p align="center">
+  <img src="promo/3.jpg" width="45%" alt="Share Items — présentation 3" />
+  <img src="promo/4.jpg" width="45%" alt="Share Items — présentation 4" />
+</p>
+<p align="center">
+  <img src="promo/5.jpg" width="45%" alt="Share Items — présentation 5" />
+</p>
+
+> Images haute résolution dans le dossier [`promo/`](./promo/) (`1.jpg` … `5.jpg`).
+
+---
 
 ## Stack
 
-- Next.js 15 (App Router) + TypeScript
-- Tailwind CSS
-- Prisma (SQLite en dev, PostgreSQL en prod)
-- Vercel Blob (production) / stockage local (`public/uploads/`) en dev
-- **Sharp** : toutes les images sont redimensionnées (max 512 px), converties en JPEG et compressées (≤ 500 Ko)
-- Framer Motion (swipe + sheet)
+| Couche | Techno |
+|--------|--------|
+| Framework | Next.js 15 (App Router) + TypeScript |
+| UI | Tailwind CSS, Framer Motion (swipe + modales) |
+| Base | Prisma + **PostgreSQL** |
+| Auth organisateur | Auth.js v5 (NextAuth) — Google, Apple |
+| Images | Sharp (512 px, JPEG ≤ 500 Ko) · Vercel Blob (prod) · `public/uploads/` (dev local) |
+
+---
 
 ## Démarrer en local
 
+### Prérequis
+
+- Node.js 20+
+- PostgreSQL (Docker, Neon, Supabase ou Postgres.app)
+
+### Installation
+
 ```bash
+git clone https://github.com/<ton-org>/share-items.git
+cd share-items
 npm install
-npx prisma db push
+cp .env.example .env
+# Édite .env : DATABASE_URL, AUTH_SECRET, AUTH_GOOGLE_* (voir ci-dessous)
+npx prisma migrate dev
 npm run dev
 ```
 
-L'app tourne sur http://localhost:3000.
+L’app tourne sur **http://localhost:3000**.
 
-Le fichier SQLite est créé automatiquement dans `prisma/dev.db`. Les images uploadées vont dans `public/uploads/` (ignoré par git).
+En dev, sans `BLOB_READ_WRITE_TOKEN`, les photos sont enregistrées dans `public/uploads/` (dossier ignoré par git).
+
+---
 
 ## Parcours
 
-- `/` — landing
-- `/dashboard` — mes listes (organisateur)
-- `/dashboard/new` — créer une liste
-- `/dashboard/[listId]` — onglets **Objets** / **Résultats** / **Lien**
-- `/dashboard/[listId]/items/new` — wizard photo → pièce → type
-- `/l/[slug]` — votant : **Swipe** · **📖 historique** · **Matchs**
+### Organisateur (connecté)
 
-## Règles métier (R1–R10)
+| Route | Rôle |
+|-------|------|
+| `/login` | Connexion Google / Apple |
+| `/dashboard/lists` | **Listes** — accueil, créer une campagne (à garder / donner / vendre / autre) |
+| `/dashboard/[listId]` | Détail liste : **Objets** · **Résultats** · **Partager** (lien + menu natif) |
+| `/dashboard/inventory` | Bibliothèque d’objets (photos réutilisables entre listes) |
+| `/dashboard/inventory/new` | Wizard **Nouvel objet** (caméra ou galerie) |
 
-Voir `MVP.md` §9. Résumé :
+### Votant (lien public `/l/[slug]`)
 
-- 1 vote par objet par votant (upsert).
-- 1 match par objet, posé par l'organisateur sur quelqu'un qui a voté **Oui**.
-- Si le votant repasse en **Non**, son match est supprimé automatiquement.
+| Écran | Rôle |
+|-------|------|
+| Gate | Prénom **ou** « Continuer avec Google » |
+| Swipe | Oui / Non sur chaque objet |
+| 📖 | Historique des votes (modifier / tout effacer) |
+| 👤 | Compte : changer de prénom, Google + déconnexion, lien vers le dashboard |
+| Matchs | Objets que l’organisateur t’a attribués |
+
+### Landing
+
+- [https://share-items.vercel.app/](https://share-items.vercel.app/) — présentation + liens dashboard / exemple
+
+---
+
+## Règles métier (résumé)
+
+- **1 vote** par objet et par votant (modifiable).
+- **1 match** par objet, posé par l’organisateur sur un votant qui a dit **Oui**.
+- Déplacer ou retirer un objet d’une liste **supprime** votes et matchs sur cette liste.
+- Inventaire : objet sans liste (`listId` null) jusqu’à assignation.
+
+Détail : [MVP-v2.md](./MVP-v2.md) §13.
+
+---
+
+## Variables d’environnement
+
+Copie [`.env.example`](./.env.example) vers `.env` — **ne commite jamais** `.env`.
+
+| Variable | Obligatoire | Usage |
+|----------|-------------|-------|
+| `DATABASE_URL` | Oui | PostgreSQL (`postgresql://…`) |
+| `AUTH_SECRET` | Oui | Secret session Auth.js (`openssl rand -base64 32`) |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Recommandé | Login organisateur + option votant |
+| `AUTH_APPLE_ID` / `AUTH_APPLE_SECRET` | Optionnel | Sign in with Apple |
+| `BLOB_READ_WRITE_TOKEN` | Prod Vercel | Upload images (Blob) |
+| `AUTH_URL` | Optionnel | URL publique si proxy / domaine custom |
+
+Redirect OAuth : `{ORIGIN}/api/auth/callback/google` (et `/apple`).
+
+---
 
 ## Déploiement Vercel
 
-Guide pas à pas : **[DEPLOY.md](./DEPLOY.md)**
+Guide détaillé : **[DEPLOY.md](./DEPLOY.md)**
 
-Résumé :
+1. Base **PostgreSQL** + variables ci-dessus sur le projet Vercel.
+2. **Blob** connecté au projet (`BLOB_READ_WRITE_TOKEN`).
+3. Import du repo — le build exécute `prisma migrate deploy` (`vercel.json` / `scripts/vercel-build.sh`).
 
-1. Créer une base **PostgreSQL** (Vercel Postgres, Neon ou Supabase).
-2. Sur Vercel : `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`.
-3. Importer le repo GitHub — le build exécute `prisma migrate deploy` automatiquement (`vercel.json`).
+---
 
-### Variables d'env
-
-| Nom | Obligatoire | Usage |
-|-----|-------------|-------|
-| `DATABASE_URL` | Oui | Connexion PostgreSQL |
-| `BLOB_READ_WRITE_TOKEN` | Prod | Vercel Blob pour les photos |
-
-## Scripts
+## Scripts npm
 
 | Commande | Action |
 |----------|--------|
-| `npm run dev` | Serveur de dev |
-| `npm run build` | Build production (génère Prisma + Next) |
+| `npm run dev` | Serveur de développement |
+| `npm run build` | Prisma generate + migrate deploy + build Next |
 | `npm start` | Sert le build production |
-| `npm run db:push` | Pousse le schéma vers la DB |
-| `npm run db:studio` | Ouvre Prisma Studio |
+| `npm run db:migrate` | Migration Prisma en dev |
+| `npm run db:studio` | Prisma Studio |
 
-## Structure
+---
+
+## Structure du projet
 
 ```
+promo/                    # Captures d’écran pour README / présentation
 src/
   app/
-    api/                # routes API (lists, items, votes, matches, upload)
-    dashboard/          # organisateur
-    l/[slug]/           # votant (swipe + historique + matchs)
-    layout.tsx
-    page.tsx            # landing
+    api/
+      auth/               # Auth.js + claim listes v1
+      inventory/          # CRUD inventaire, assign, move
+      tags/               # Tags perso organisateur
+      lists/              # Listes + résultats + slug public
+      votes/ matches/ upload/
+    dashboard/            # Espace organisateur
+    l/[slug]/             # Expérience votant (swipe)
+    login/
   components/
-    EmojiGrid.tsx       # sélection emoji (sans clavier)
-    EmojiBadge.tsx
-    IdentityGate.tsx    # onboarding prénom
-    ItemWizard.tsx      # photo → pièce → type
+    ItemWizard.tsx        # Photo (caméra / galerie) → pièce → type → tags
+    IdentityGate.tsx      # Prénom + Google (votant)
+    TagPicker.tsx
   lib/
-    prisma.ts
-    taxonomies.ts       # pièces + types (config unique)
-    identity.ts         # hook localStorage
-    client.ts           # fetch avec visitor id
-    auth.ts             # contrôle visiteur côté API
-    slug.ts             # nanoid 8 caractères
+    identity.tsx          # visitorId localStorage (votant)
+    list-kinds.ts         # keep | donate | sell | custom
+    auth.ts               # requireUser / requireVisitor
 prisma/
-  schema.prisma         # List, Item, Vote, Match
+  schema.prisma
+  migrations/
+MVP-v2.md                 # Spécification produit v2
 ```
+
+---
+
+## Licence
+
+Projet open source — voir le dépôt pour la licence applicable.

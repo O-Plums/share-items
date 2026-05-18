@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signIn } from "@/auth";
+import { AppLogo } from "@/components/AppLogo";
 
 type SearchParams = Promise<{ callbackUrl?: string; error?: string }>;
 
@@ -28,13 +29,10 @@ export default async function LoginPage({
     <main className="flex min-h-screen flex-col safe-top safe-bottom">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-10">
         <header className="text-center">
-          <Link
-            href="/"
-            className="text-xs uppercase tracking-widest text-neutral-500"
-          >
-            Share Items
-          </Link>
-          <h1 className="mt-3 text-3xl font-bold leading-tight text-neutral-900">
+          <div className="flex justify-center">
+            <AppLogo size={72} href="/" />
+          </div>
+          <h1 className="mt-4 text-3xl font-bold leading-tight text-neutral-900">
             Connexion
           </h1>
           <p className="mt-2 text-neutral-600">

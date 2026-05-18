@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
+import { AppLogo } from "@/components/AppLogo";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardNav } from "./DashboardNav";
 import { ClaimVisitorListsTrigger } from "./ClaimVisitorListsTrigger";
+
+export const metadata: Metadata = {
+  title: "Tableau de bord",
+};
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -14,6 +20,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <>
+      <div className="fixed left-3 top-3 z-30 safe-top">
+        <AppLogo size={40} href="/dashboard/lists" />
+      </div>
       <DashboardHeader
         name={user.name ?? user.email ?? "Toi"}
         image={user.image ?? null}

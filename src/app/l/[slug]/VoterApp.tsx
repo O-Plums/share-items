@@ -7,6 +7,7 @@ import { useAuthedFetch } from "@/lib/client";
 import { SwipeView } from "./SwipeView";
 import { HistorySheet } from "./HistorySheet";
 import { MatchesView } from "./MatchesView";
+import { VoterAccountModal } from "./VoterAccountModal";
 
 type Item = {
   id: string;
@@ -38,18 +39,20 @@ type Match = {
 
 type Tab = "swipe" | "matches";
 
-export function VoterApp({ slug }: { slug: string }) {
+type VoterAppProps = {
+  slug: string;
+  googleEnabled?: boolean;
+};
+
+export function VoterApp({ slug, googleEnabled = false }: VoterAppProps) {
   return (
-    <IdentityGate
-      title="Avant de commencer"
-      description="Donne-nous ton prénom pour que la personne qui partage la liste te reconnaisse."
-    >
-      <VoterInner slug={slug} />
+    <IdentityGate slug={slug} googleEnabled={googleEnabled}>
+      <VoterInner slug={slug} googleEnabled={googleEnabled} />
     </IdentityGate>
   );
 }
 
-function VoterInner({ slug }: { slug: string }) {
+function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: boolean }) {
   const { identity } = useIdentity();
   const authedFetch = useAuthedFetch();
   const [list, setList] = useState<ListResponse | null>(null);
@@ -58,6 +61,7 @@ function VoterInner({ slug }: { slug: string }) {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("swipe");
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
 
   const loadList = useCallback(async () => {
     try {
@@ -167,14 +171,24 @@ function VoterInner({ slug }: { slug: string }) {
               </span>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setHistoryOpen(true)}
-            aria-label="Mon historique"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-2xl ring-1 ring-neutral-200 active:bg-neutral-100"
-          >
-            📖
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setAccountOpen(true)}
+              aria-label="Mon compte"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-xl ring-1 ring-neutral-200 active:bg-neutral-100"
+            >
+              👤
+            </button>
+            <button
+              type="button"
+              onClick={() => setHistoryOpen(true)}
+              aria-label="Mon historique"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-2xl ring-1 ring-neutral-200 active:bg-neutral-100"
+            >
+              📖
+            </button>
+          </div>
         </div>
       </header>
 
@@ -210,6 +224,13 @@ function VoterInner({ slug }: { slug: string }) {
         votes={votes}
         onToggle={(itemId, currentValue) => submitVote(itemId, currentValue === "YES" ? "NO" : "YES")}
         onClearAll={clearMyVotes}
+      />
+
+      <VoterAccountModal
+        open={accountOpen}
+        onClose={() => setAccountOpen(false)}
+        slug={slug}
+        googleEnabled={googleEnabled}
       />
     </main>
   );

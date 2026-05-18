@@ -1,11 +1,10 @@
-import type { Metadata, Viewport } from "next";
+import type { Viewport } from "next";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
 import { IdentityProvider } from "@/lib/identity";
+import { rootMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Share Items",
-  description: "Partage et fais voter sur les objets dont tu veux te débarrasser.",
-};
+export const metadata = rootMetadata;
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -18,7 +17,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body className="min-h-screen">
-        <IdentityProvider>{children}</IdentityProvider>
+        <Providers>
+          <IdentityProvider>{children}</IdentityProvider>
+        </Providers>
       </body>
     </html>
   );

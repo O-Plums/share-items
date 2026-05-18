@@ -1,0 +1,97 @@
+import type { Metadata } from "next";
+
+export const SITE_NAME = "Share Items";
+export const SITE_SHORT_NAME = "Share";
+export const SITE_TAGLINE = "Tes objets, les bonnes mains.";
+export const SITE_DESCRIPTION =
+  "Photographie ce dont tu veux te débarrasser, fais voter tes proches façon Tinder, et attribue chaque objet à la personne qui le récupèrera.";
+
+/** URL publique (OG, partage). Définir NEXT_PUBLIC_SITE_URL ou AUTH_URL en prod. */
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+  process.env.AUTH_URL?.replace(/\/$/, "") ||
+  "https://share-items.vercel.app";
+
+export const LOGO_PATH = "/logo.png";
+
+export function absoluteUrl(path: string): string {
+  return new URL(path.startsWith("/") ? path : `/${path}`, SITE_URL).toString();
+}
+
+const ogImage = {
+  url: LOGO_PATH,
+  width: 1024,
+  height: 1024,
+  alt: SITE_NAME,
+};
+
+export const rootMetadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_NAME,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  keywords: [
+    "débarras",
+    "don",
+    "vente",
+    "objets",
+    "vote",
+    "swipe",
+    "liste",
+    "partage",
+  ],
+  icons: {
+    icon: [{ url: LOGO_PATH, type: "image/png" }],
+    apple: [{ url: LOGO_PATH, type: "image/png", sizes: "1024x1024" }],
+  },
+  manifest: "/manifest.webmanifest",
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [LOGO_PATH],
+  },
+  appleWebApp: {
+    capable: true,
+    title: SITE_SHORT_NAME,
+    statusBarStyle: "default",
+  },
+};
+
+export function listShareMetadata(listTitle: string, slug: string): Metadata {
+  const title = `Vote : ${listTitle}`;
+  const description = `Swipe oui ou non sur « ${listTitle} » — ${SITE_TAGLINE}`;
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: absoluteUrl(`/l/${slug}`),
+      siteName: SITE_NAME,
+      type: "website",
+      locale: "fr_FR",
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [LOGO_PATH],
+    },
+  };
+}

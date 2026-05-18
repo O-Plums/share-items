@@ -15,12 +15,16 @@ const STORAGE_KEY = "share-items-identity";
 export type Identity = {
   visitorId: string;
   displayName: string;
+  /** `google` = identité liée au compte OAuth (visitorId = user.id) */
+  source?: "name" | "google";
 };
 
 type IdentityContextValue = {
   identity: Identity | null;
   ready: boolean;
   setDisplayName: (name: string) => void;
+  /** Lie l’identité votant à un compte Google (id stable entre appareils). */
+  setIdentityFromAuth: (visitorId: string, displayName: string) => void;
   reset: () => void;
 };
 
@@ -79,10 +83,23 @@ export function IdentityProvider({ children }: { children: ReactNode }) {
       const next: Identity = {
         visitorId: current?.visitorId ?? newVisitorId(),
         displayName: trimmed,
+        source: current?.source === "google" ? "google" : "name",
       };
       writeIdentity(next);
       return next;
     });
+  }, []);
+
+  const setIdentityFromAuth = useCallback((visitorId: string, displayName: string) => {
+    const trimmed = displayName.trim();
+    if (!visitorId || trimmed.length < 1 || trimmed.length > 30) return;
+    const next: Identity = {
+      visitorId,
+      displayName: trimmed,
+      source: "google",
+    };
+    writeIdentity(next);
+    setIdentity(next);
   }, []);
 
   const reset = useCallback(() => {
@@ -91,8 +108,8 @@ export function IdentityProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ identity, ready, setDisplayName, reset }),
-    [identity, ready, setDisplayName, reset],
+    () => ({ identity, ready, setDisplayName, setIdentityFromAuth, reset }),
+    [identity, ready, setDisplayName, setIdentityFromAuth, reset],
   );
 
   return <IdentityContext.Provider value={value}>{children}</IdentityContext.Provider>;
