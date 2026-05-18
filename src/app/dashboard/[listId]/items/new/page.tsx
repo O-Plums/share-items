@@ -5,5 +5,5 @@ import { ItemWizard } from "@/components/ItemWizard";
 
 export default function NewItemPage() {
   const { listId } = useParams<{ listId: string }>();
-  return <ItemWizard listId={listId} />;
+  return <ItemWizard mode={{ kind: "list", listId }} redirectTo={`/dashboard/${listId}?tab=items`} />;
 }

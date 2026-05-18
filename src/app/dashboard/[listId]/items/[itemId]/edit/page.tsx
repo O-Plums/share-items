@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ItemWizard } from "@/components/ItemWizard";
-import { useAuthedFetch } from "@/lib/client";
+import { useDashboardFetch } from "@/lib/client";
 
 type Item = {
   id: string;
@@ -11,28 +11,24 @@ type Item = {
   room: string;
   category: string;
   label: string | null;
+  tags: { id: string; label: string }[];
 };
 
 export default function EditItemPage() {
   const { listId, itemId } = useParams<{ listId: string; itemId: string }>();
-  const authedFetch = useAuthedFetch();
+  const authedFetch = useDashboardFetch();
   const [item, setItem] = useState<Item | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
-    authedFetch<{ list: { items: Item[] } }>(`/api/lists/${listId}`)
-      .then((data) => {
-        if (!alive) return;
-        const found = data.list.items.find((i) => i.id === itemId);
-        if (!found) setError("Objet introuvable");
-        else setItem(found);
-      })
+    authedFetch<{ item: Item }>(`/api/items/${itemId}`)
+      .then((d) => alive && setItem(d.item))
       .catch((e: Error) => alive && setError(e.message));
     return () => {
       alive = false;
     };
-  }, [authedFetch, listId, itemId]);
+  }, [authedFetch, itemId]);
 
   if (error) {
     return (
@@ -50,13 +46,14 @@ export default function EditItemPage() {
   }
   return (
     <ItemWizard
-      listId={listId}
-      itemId={itemId}
+      mode={{ kind: "edit", itemId }}
+      redirectTo={`/dashboard/${listId}?tab=items`}
       initial={{
         imageUrl: item.imageUrl,
         room: item.room,
         category: item.category,
         label: item.label,
+        tagIds: item.tags.map((t) => t.id),
       }}
     />
   );

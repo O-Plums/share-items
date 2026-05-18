@@ -3,52 +3,83 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useIdentity } from "@/lib/identity";
-import { useAuthedFetch, uploadImage } from "@/lib/client";
+import { useDashboardFetch, uploadImage } from "@/lib/client";
 import { CATEGORIES, ROOMS } from "@/lib/taxonomies";
 import { EmojiGrid } from "./EmojiGrid";
+import { TagPicker } from "./TagPicker";
+
+type Mode =
+  | { kind: "inventory" }
+  | { kind: "list"; listId: string }
+  | { kind: "edit"; itemId: string };
 
 type Props = {
-  listId: string;
-  itemId?: string;
+  mode: Mode;
   initial?: {
     imageUrl: string;
     room: string;
     category: string;
     label: string | null;
+    tagIds?: string[];
   };
+  redirectTo?: string;
 };
 
 type Step = 1 | 2 | 3;
 
-export function ItemWizard({ listId, itemId, initial }: Props) {
-  const router = useRouter();
-  const { identity } = useIdentity();
-  const authedFetch = useAuthedFetch();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+type PermissionError = "camera" | "gallery" | null;
 
-  const [step, setStep] = useState<Step>(initial ? 3 : 1);
+export function ItemWizard({ mode, initial, redirectTo }: Props) {
+  const router = useRouter();
+  const authedFetch = useDashboardFetch();
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  const [step, setStep] = useState<Step>(initial ? 2 : 1);
   const [imageUrl, setImageUrl] = useState<string | null>(initial?.imageUrl ?? null);
   const [uploading, setUploading] = useState(false);
   const [room, setRoom] = useState<string | null>(initial?.room ?? null);
   const [category, setCategory] = useState<string | null>(initial?.category ?? null);
   const [label, setLabel] = useState(initial?.label ?? "");
+  const [tagIds, setTagIds] = useState<string[]>(initial?.tagIds ?? []);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [permissionDenied, setPermissionDenied] = useState<PermissionError>(null);
 
   async function onFile(file: File) {
-    if (!identity) return;
     setError(null);
     setUploading(true);
     try {
-      const url = await uploadImage(file, identity.visitorId);
+      const url = await uploadImage(file);
       setImageUrl(url);
-      setStep(2);
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setUploading(false);
     }
+  }
+
+  function openSource(source: "camera" | "gallery") {
+    setPermissionDenied(null);
+    const ref = source === "camera" ? cameraInputRef : galleryInputRef;
+    const input = ref.current;
+    if (!input) return;
+    try {
+      input.value = "";
+      input.click();
+    } catch {
+      setPermissionDenied(source);
+    }
+  }
+
+  function onInputChange(source: "camera" | "gallery", e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) {
+      // user dismissed picker — could be permission denied on mobile
+      return;
+    }
+    setPermissionDenied(null);
+    onFile(f);
   }
 
   async function save() {
@@ -61,36 +92,54 @@ export function ItemWizard({ listId, itemId, initial }: Props) {
         room,
         category,
         label: label.trim() || null,
+        tagIds,
       };
-      if (itemId) {
-        await authedFetch(`/api/items/${itemId}`, {
+      if (mode.kind === "edit") {
+        await authedFetch(`/api/items/${mode.itemId}`, {
           method: "PATCH",
           body: JSON.stringify(body),
         });
+      } else if (mode.kind === "list") {
+        await authedFetch(`/api/lists/${mode.listId}/items`, {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
       } else {
-        await authedFetch(`/api/lists/${listId}/items`, {
+        await authedFetch(`/api/inventory/items`, {
           method: "POST",
           body: JSON.stringify(body),
         });
       }
-      router.replace(`/dashboard/${listId}?tab=items`);
+      const dest =
+        redirectTo ??
+        (mode.kind === "list"
+          ? `/dashboard/${mode.listId}?tab=items`
+          : "/dashboard/inventory");
+      router.replace(dest);
     } catch (e) {
       setError((e as Error).message);
       setSaving(false);
     }
   }
 
+  function goBack() {
+    if (step === 1) router.back();
+    else setStep(((step - 1) as Step) || 1);
+  }
+
+  function next() {
+    if (step === 1 && imageUrl) setStep(2);
+    else if (step === 2 && room) setStep(3);
+  }
+
+  const canNextFrom1 = !!imageUrl;
+  const canNextFrom2 = !!room;
+  const canSave = !!imageUrl && !!room && !!category;
+
   return (
     <main className="min-h-screen safe-top safe-bottom">
       <div className="mx-auto w-full max-w-md px-5 pb-24 pt-6">
-        <button
-          type="button"
-          onClick={() => {
-            if (step === 1) router.back();
-            else setStep(((step - 1) as Step) || 1);
-          }}
-          className="text-sm text-neutral-500"
-        >
+        <button type="button" onClick={goBack} className="text-sm text-neutral-500">
           ← Retour
         </button>
 
@@ -112,42 +161,74 @@ export function ItemWizard({ listId, itemId, initial }: Props) {
         {step === 1 && (
           <section className="mt-6">
             <h1 className="text-2xl font-bold">Une photo de l’objet</h1>
-            <p className="mt-1 text-neutral-600">Prends une photo ou choisis-en une.</p>
+            <p className="mt-1 text-neutral-600">
+              Prends une photo ou choisis-en une dans ta galerie.
+            </p>
 
             <input
-              ref={fileInputRef}
+              ref={cameraInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
               capture="environment"
               hidden
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) onFile(f);
-              }}
+              onChange={(e) => onInputChange("camera", e)}
+            />
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+              hidden
+              onChange={(e) => onInputChange("gallery", e)}
             />
 
             <div className="mt-6 space-y-3">
               <button
                 type="button"
                 disabled={uploading}
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full rounded-2xl bg-brand-500 px-4 py-4 text-lg font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
+                onClick={() => openSource("camera")}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-500 px-4 py-4 text-lg font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
               >
-                {uploading ? "Envoi…" : "📸 Prendre / choisir une photo"}
+                <span>📸</span>
+                <span>Prendre une photo</span>
               </button>
-              {imageUrl && (
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="w-full rounded-2xl bg-white px-4 py-3 text-base font-medium ring-1 ring-neutral-200 active:bg-neutral-50"
-                >
-                  Garder la photo actuelle →
-                </button>
-              )}
-              {imageUrl && (
-                <div className="relative mt-3 aspect-square overflow-hidden rounded-2xl bg-neutral-100">
-                  <Image src={imageUrl} alt="" fill sizes="100vw" className="object-cover" />
+              <button
+                type="button"
+                disabled={uploading}
+                onClick={() => openSource("gallery")}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-4 text-lg font-semibold text-neutral-900 ring-1 ring-neutral-200 transition disabled:opacity-40 active:bg-neutral-50"
+              >
+                <span>🖼️</span>
+                <span>Choisir dans la galerie</span>
+              </button>
+
+              {permissionDenied && (
+                <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {permissionDenied === "camera"
+                    ? "L’accès à la caméra a été refusé. Autorise la caméra pour ce site dans les réglages du navigateur, puis réessaie."
+                    : "L’accès aux photos a été refusé. Autorise l’accès aux photos pour ce site dans les réglages du navigateur, puis réessaie."}
                 </div>
+              )}
+
+              {uploading && (
+                <div className="rounded-xl bg-neutral-100 px-4 py-3 text-sm text-neutral-700">
+                  Envoi de la photo…
+                </div>
+              )}
+
+              {imageUrl && (
+                <>
+                  <div className="relative mt-3 aspect-square overflow-hidden rounded-2xl bg-neutral-100">
+                    <Image src={imageUrl} alt="" fill sizes="100vw" className="object-cover" />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={next}
+                    disabled={!canNextFrom1}
+                    className="w-full rounded-2xl bg-brand-500 px-4 py-3 text-base font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
+                  >
+                    Continuer →
+                  </button>
+                </>
               )}
             </div>
           </section>
@@ -162,8 +243,8 @@ export function ItemWizard({ listId, itemId, initial }: Props) {
             </div>
             <button
               type="button"
-              disabled={!room}
-              onClick={() => setStep(3)}
+              disabled={!canNextFrom2}
+              onClick={next}
               className="mt-8 w-full rounded-2xl bg-brand-500 px-4 py-4 text-lg font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
             >
               Suivant
@@ -178,6 +259,17 @@ export function ItemWizard({ listId, itemId, initial }: Props) {
             <div className="mt-6">
               <EmojiGrid items={CATEGORIES} selected={category} onSelect={(k) => setCategory(k)} />
             </div>
+
+            <div className="mt-6">
+              <p className="text-sm font-medium text-neutral-600">Tags perso (optionnel)</p>
+              <p className="text-xs text-neutral-500">
+                Pour t’y retrouver : « bureau Florian », « cave », etc.
+              </p>
+              <div className="mt-3">
+                <TagPicker selected={tagIds} onChange={setTagIds} />
+              </div>
+            </div>
+
             <div className="mt-6">
               <label htmlFor="label" className="text-sm font-medium text-neutral-600">
                 Nom (optionnel)
@@ -194,11 +286,15 @@ export function ItemWizard({ listId, itemId, initial }: Props) {
             </div>
             <button
               type="button"
-              disabled={!category || saving}
+              disabled={!canSave || saving}
               onClick={save}
               className="mt-8 w-full rounded-2xl bg-brand-500 px-4 py-4 text-lg font-semibold text-white transition disabled:opacity-40 active:bg-brand-600"
             >
-              {saving ? "Enregistrement…" : itemId ? "Mettre à jour" : "Enregistrer"}
+              {saving
+                ? "Enregistrement…"
+                : mode.kind === "edit"
+                  ? "Mettre à jour"
+                  : "Enregistrer"}
             </button>
           </section>
         )}

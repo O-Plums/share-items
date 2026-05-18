@@ -4,8 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { useAuthedFetch } from "@/lib/client";
+import { useDashboardFetch } from "@/lib/client";
 import { EmojiBadge } from "@/components/EmojiBadge";
+import { getListKind, LIST_KINDS } from "@/lib/list-kinds";
+import { MoveDialog } from "./MoveDialog";
+import { InventoryPickModal } from "./InventoryPickModal";
 
 type Item = {
   id: string;
@@ -14,13 +17,14 @@ type Item = {
   room: string;
   category: string;
   sortOrder: number;
+  tags: { id: string; label: string }[];
   votesYes: { visitorId: string; displayName: string }[];
   votesNo: { visitorId: string; displayName: string }[];
   match: { visitorId: string; displayName: string } | null;
 };
 
 type ResultsResponse = {
-  list: { id: string; slug: string; title: string };
+  list: { id: string; slug: string; title: string; kind: string };
   items: Item[];
 };
 
@@ -31,15 +35,20 @@ export default function ListDetailPage() {
   const params = useParams<{ listId: string }>();
   const searchParams = useSearchParams();
   const tabParam = (searchParams.get("tab") as Tab | null) ?? "items";
-  const authedFetch = useAuthedFetch();
+  const authedFetch = useDashboardFetch();
   const [data, setData] = useState<ResultsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [moveItemId, setMoveItemId] = useState<string | null>(null);
+  const [showInventoryPick, setShowInventoryPick] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleDraft, setTitleDraft] = useState("");
 
   const refresh = useCallback(async () => {
     try {
       const res = await authedFetch<ResultsResponse>(`/api/lists/${params.listId}/results`);
       setData(res);
+      setTitleDraft(res.list.title);
     } catch (e) {
       setError((e as Error).message);
     }
@@ -97,7 +106,37 @@ export default function ListDetailPage() {
     if (!confirm(`Supprimer définitivement « ${data.list.title} » ?`)) return;
     try {
       await authedFetch(`/api/lists/${params.listId}`, { method: "DELETE" });
-      router.replace("/dashboard");
+      router.replace("/dashboard/lists");
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function setKind(kind: string) {
+    try {
+      await authedFetch(`/api/lists/${params.listId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ kind }),
+      });
+      await refresh();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function saveTitle() {
+    if (!titleDraft.trim() || !data) return;
+    if (titleDraft.trim() === data.list.title) {
+      setEditingTitle(false);
+      return;
+    }
+    try {
+      await authedFetch(`/api/lists/${params.listId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ title: titleDraft.trim() }),
+      });
+      setEditingTitle(false);
+      await refresh();
     } catch (e) {
       setError((e as Error).message);
     }
@@ -121,14 +160,51 @@ export default function ListDetailPage() {
     );
   }
 
+  const kind = getListKind(data.list.kind);
+
   return (
     <main className="min-h-screen safe-top safe-bottom">
-      <div className="mx-auto w-full max-w-md px-5 pb-32 pt-6">
-        <Link href="/dashboard" className="text-sm text-neutral-500">
+      <div className="mx-auto w-full max-w-md px-5 pb-8 pt-6">
+        <Link href="/dashboard/lists" className="text-sm text-neutral-500">
           ← Mes listes
         </Link>
         <div className="mt-2 flex items-start justify-between gap-3">
-          <h1 className="text-2xl font-bold leading-tight">{data.list.title}</h1>
+          {editingTitle ? (
+            <div className="flex flex-1 gap-2">
+              <input
+                type="text"
+                value={titleDraft}
+                onChange={(e) => setTitleDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    saveTitle();
+                  }
+                  if (e.key === "Escape") {
+                    setEditingTitle(false);
+                    setTitleDraft(data.list.title);
+                  }
+                }}
+                autoFocus
+                maxLength={80}
+                className="flex-1 rounded-xl border border-neutral-300 bg-white px-3 py-1.5 text-lg font-bold text-neutral-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+              />
+              <button
+                type="button"
+                onClick={saveTitle}
+                className="rounded-xl bg-brand-500 px-3 py-1.5 text-sm font-semibold text-white"
+              >
+                OK
+              </button>
+            </div>
+          ) : (
+            <h1
+              className="cursor-pointer text-2xl font-bold leading-tight"
+              onClick={() => setEditingTitle(true)}
+            >
+              {data.list.title}
+            </h1>
+          )}
           <button
             type="button"
             onClick={deleteList}
@@ -137,6 +213,24 @@ export default function ListDetailPage() {
           >
             🗑
           </button>
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {LIST_KINDS.map((k) => {
+            const active = k.key === data.list.kind;
+            return (
+              <button
+                key={k.key}
+                type="button"
+                onClick={() => setKind(k.key)}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition ${
+                  active ? `${k.color}` : "bg-white text-neutral-500 ring-neutral-200"
+                }`}
+              >
+                {k.emoji} {k.label}
+              </button>
+            );
+          })}
         </div>
 
         <nav className="mt-5 grid grid-cols-3 gap-1 rounded-2xl bg-neutral-200/60 p-1">
@@ -149,10 +243,28 @@ export default function ListDetailPage() {
                 tabParam === t ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-600"
               }`}
             >
-              {t === "items" ? "Objets" : t === "results" ? "Résultats" : "Lien"}
+              {t === "items" ? "Objets" : t === "results" ? "Résultats" : "Partager"}
             </button>
           ))}
         </nav>
+
+        {tabParam === "items" && (
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <Link
+              href={`/dashboard/${params.listId}/items/new`}
+              className="rounded-2xl bg-brand-500 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm"
+            >
+              + Nouvel objet
+            </Link>
+            <button
+              type="button"
+              onClick={() => setShowInventoryPick(true)}
+              className="rounded-2xl bg-white px-4 py-3 text-center text-sm font-semibold text-neutral-900 ring-1 ring-neutral-200 shadow-sm"
+            >
+              📦 Inventaire
+            </button>
+          </div>
+        )}
 
         {error && (
           <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
@@ -163,27 +275,44 @@ export default function ListDetailPage() {
             listId={params.listId}
             items={data.items}
             onDelete={deleteItem}
+            onMove={(id) => setMoveItemId(id)}
           />
         )}
         {tabParam === "results" && (
           <ResultsTab items={data.items} onMatch={createMatch} onUnmatch={deleteMatch} />
         )}
         {tabParam === "share" && (
-          <ShareTab shareUrl={shareUrl} copied={copied} onCopy={copy} />
+          <ShareTab
+            shareUrl={shareUrl}
+            listTitle={data.list.title}
+            copied={copied}
+            onCopy={copy}
+            kindLabel={kind.label}
+          />
         )}
       </div>
 
-      {tabParam === "items" && (
-        <div className="fixed inset-x-0 bottom-0 safe-bottom">
-          <div className="mx-auto w-full max-w-md px-5 pb-3">
-            <Link
-              href={`/dashboard/${params.listId}/items/new`}
-              className="block w-full rounded-2xl bg-brand-500 px-4 py-4 text-center text-lg font-semibold text-white shadow-lg shadow-brand-500/20 transition active:bg-brand-600"
-            >
-              + Ajouter un objet
-            </Link>
-          </div>
-        </div>
+      {showInventoryPick && (
+        <InventoryPickModal
+          listId={params.listId}
+          onClose={() => setShowInventoryPick(false)}
+          onDone={() => {
+            setShowInventoryPick(false);
+            refresh();
+          }}
+        />
+      )}
+
+      {moveItemId && (
+        <MoveDialog
+          itemId={moveItemId}
+          currentListId={params.listId}
+          onClose={() => setMoveItemId(null)}
+          onDone={() => {
+            setMoveItemId(null);
+            refresh();
+          }}
+        />
       )}
     </main>
   );
@@ -193,10 +322,12 @@ function ItemsTab({
   listId,
   items,
   onDelete,
+  onMove,
 }: {
   listId: string;
   items: Item[];
   onDelete: (itemId: string) => void;
+  onMove: (itemId: string) => void;
 }) {
   if (items.length === 0) {
     return (
@@ -204,7 +335,7 @@ function ItemsTab({
         <p className="text-4xl">📸</p>
         <h2 className="mt-3 font-semibold">Pas encore d’objets</h2>
         <p className="mt-1 text-sm text-neutral-600">
-          Ajoute une photo + 2 emojis et c’est parti.
+          Ajoute depuis l’inventaire ou crée un nouvel objet.
         </p>
       </div>
     );
@@ -223,15 +354,36 @@ function ItemsTab({
                 <EmojiBadge kind="room" value={item.room} />
                 <EmojiBadge kind="category" value={item.category} />
               </div>
+              {(item.tags ?? []).length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {(item.tags ?? []).map((t) => (
+                    <span
+                      key={t.id}
+                      className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-medium text-brand-700"
+                    >
+                      {t.label}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </Link>
-          <button
-            type="button"
-            onClick={() => onDelete(item.id)}
-            className="block w-full border-t border-neutral-100 py-2 text-xs text-neutral-500 hover:text-red-600"
-          >
-            Supprimer
-          </button>
+          <div className="grid grid-cols-2 border-t border-neutral-100 text-xs">
+            <button
+              type="button"
+              onClick={() => onMove(item.id)}
+              className="py-2 text-neutral-600 hover:text-brand-500"
+            >
+              Déplacer
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete(item.id)}
+              className="border-l border-neutral-100 py-2 text-neutral-500 hover:text-red-600"
+            >
+              Supprimer
+            </button>
+          </div>
         </li>
       ))}
     </ul>
@@ -339,28 +491,80 @@ function ResultsTab({
 
 function ShareTab({
   shareUrl,
+  listTitle,
   copied,
   onCopy,
+  kindLabel,
 }: {
   shareUrl: string;
+  listTitle: string;
   copied: boolean;
   onCopy: () => void;
+  kindLabel: string;
 }) {
+  const [sharing, setSharing] = useState(false);
+  const [shareError, setShareError] = useState<string | null>(null);
+  const canNativeShare =
+    typeof navigator !== "undefined" && typeof navigator.share === "function";
+
+  async function onNativeShare() {
+    if (!shareUrl) return;
+    setShareError(null);
+
+    if (!canNativeShare) {
+      onCopy();
+      return;
+    }
+
+    setSharing(true);
+    try {
+      await navigator.share({
+        title: listTitle,
+        text: `Vote sur ma liste « ${listTitle} » (${kindLabel.toLowerCase()})`,
+        url: shareUrl,
+      });
+    } catch (e) {
+      const err = e as Error;
+      if (err.name !== "AbortError") {
+        setShareError("Partage impossible. Copie le lien ci-dessous.");
+      }
+    } finally {
+      setSharing(false);
+    }
+  }
+
   return (
     <div className="mt-6 space-y-4">
       <p className="text-sm text-neutral-600">
-        Partage ce lien à tes proches. Pas besoin de compte, ils saisissent juste leur prénom.
+        Envoie le lien de ta liste <strong>{kindLabel.toLowerCase()}</strong> par WhatsApp, Messenger, SMS… Les votants n’ont pas besoin de compte, juste leur prénom.
       </p>
       <div className="break-all rounded-2xl bg-white p-4 font-mono text-sm ring-1 ring-neutral-200">
         {shareUrl}
       </div>
       <button
         type="button"
+        disabled={sharing || !shareUrl}
+        onClick={onNativeShare}
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-500 px-4 py-3.5 text-lg font-semibold text-white transition disabled:opacity-50 active:bg-brand-600"
+      >
+        <span aria-hidden>📤</span>
+        {sharing ? "Ouverture…" : "Partager"}
+      </button>
+      {canNativeShare && (
+        <p className="text-center text-xs text-neutral-500">
+          Ouvre le menu de partage de ton téléphone (apps installées).
+        </p>
+      )}
+      <button
+        type="button"
         onClick={onCopy}
-        className="w-full rounded-2xl bg-brand-500 px-4 py-3 text-lg font-semibold text-white transition active:bg-brand-600"
+        className="w-full rounded-2xl bg-white px-4 py-3 text-base font-semibold text-neutral-900 ring-1 ring-neutral-200 transition active:bg-neutral-50"
       >
         {copied ? "Lien copié ✓" : "Copier le lien"}
       </button>
+      {shareError && (
+        <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">{shareError}</p>
+      )}
       <p className="text-center text-xs text-neutral-500">
         Ajoute cette page à tes favoris pour retrouver les résultats.
       </p>

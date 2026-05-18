@@ -7,11 +7,17 @@ dist
 *.log
 .DS_Store
 
+# Secrets & env (never commit — only .env.example with placeholders)
 .env
-.env.local
-.env*.local
+.env.*
+!.env.example
 
 prisma/*.db
 prisma/*.db-journal
 
+# Local dev uploads (user photos)
 public/uploads/
+
+# Build artifacts
+tsconfig.tsbuildinfo
+.vercel

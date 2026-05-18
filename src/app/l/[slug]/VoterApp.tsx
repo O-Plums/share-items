@@ -15,10 +15,11 @@ type Item = {
   room: string;
   category: string;
   sortOrder: number;
+  tags?: { id: string; label: string }[];
 };
 
 type ListResponse = {
-  list: { id: string; slug: string; title: string };
+  list: { id: string; slug: string; title: string; kind?: string };
   items: Item[];
 };
 

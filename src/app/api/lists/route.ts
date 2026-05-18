@@ -1,14 +1,15 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ApiError, requireVisitor } from "@/lib/auth";
+import { ApiError, requireUser } from "@/lib/auth";
 import { errorResponse, json } from "@/lib/http";
 import { generateSlug } from "@/lib/slug";
+import { isValidListKind } from "@/lib/list-kinds";
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
-    const visitorId = requireVisitor(req);
+    const user = await requireUser();
     const lists = await prisma.list.findMany({
-      where: { creatorVisitorId: visitorId },
+      where: { userId: user.id },
       orderBy: { createdAt: "desc" },
       include: {
         _count: { select: { items: true } },
@@ -23,12 +24,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const visitorId = requireVisitor(req);
-    const body = (await req.json()) as { title?: string };
+    const user = await requireUser();
+    const body = (await req.json()) as { title?: string; kind?: string };
     const title = body.title?.trim();
     if (!title || title.length < 1 || title.length > 80) {
       throw new ApiError("Titre invalide (1–80 caractères)", 400);
     }
+    const kind = body.kind && isValidListKind(body.kind) ? body.kind : "custom";
 
     let slug = generateSlug();
     for (let i = 0; i < 5; i++) {
@@ -38,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
 
     const list = await prisma.list.create({
-      data: { title, slug, creatorVisitorId: visitorId },
+      data: { title, slug, kind, userId: user.id },
     });
     return json({ list }, { status: 201 });
   } catch (err) {

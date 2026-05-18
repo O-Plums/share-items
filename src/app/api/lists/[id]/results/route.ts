@@ -1,13 +1,13 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ApiError, requireVisitor } from "@/lib/auth";
+import { ApiError, requireUser } from "@/lib/auth";
 import { errorResponse, json } from "@/lib/http";
 
 type Ctx = { params: Promise<{ id: string }> };
 
 export async function GET(req: NextRequest, { params }: Ctx) {
   try {
-    const visitorId = requireVisitor(req);
+    const user = await requireUser();
     const { id } = await params;
     const { searchParams } = new URL(req.url);
     const room = searchParams.get("room") ?? undefined;
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, { params }: Ctx) {
 
     const list = await prisma.list.findUnique({ where: { id } });
     if (!list) throw new ApiError("Liste introuvable", 404);
-    if (list.creatorVisitorId !== visitorId) throw new ApiError("Accès refusé", 403);
+    if (list.userId !== user.id) throw new ApiError("Accès refusé", 403);
 
     const items = await prisma.item.findMany({
       where: {
@@ -27,6 +27,7 @@ export async function GET(req: NextRequest, { params }: Ctx) {
       include: {
         votes: { orderBy: { updatedAt: "desc" } },
         match: true,
+        tags: { include: { userTag: { select: { id: true, label: true } } } },
       },
     });
 
@@ -40,6 +41,7 @@ export async function GET(req: NextRequest, { params }: Ctx) {
         room: item.room,
         category: item.category,
         sortOrder: item.sortOrder,
+        tags: item.tags.map((t) => ({ id: t.userTag.id, label: t.userTag.label })),
         votesYes: yes.map((v) => ({ visitorId: v.visitorId, displayName: v.displayName })),
         votesNo: no.map((v) => ({ visitorId: v.visitorId, displayName: v.displayName })),
         match: item.match
@@ -48,7 +50,10 @@ export async function GET(req: NextRequest, { params }: Ctx) {
       };
     });
 
-    return json({ list: { id: list.id, slug: list.slug, title: list.title }, items: results });
+    return json({
+      list: { id: list.id, slug: list.slug, title: list.title, kind: list.kind },
+      items: results,
+    });
   } catch (err) {
     return errorResponse(err);
   }

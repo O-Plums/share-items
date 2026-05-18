@@ -3,7 +3,7 @@ import { put } from "@vercel/blob";
 import { writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { errorResponse, json } from "@/lib/http";
-import { ApiError } from "@/lib/auth";
+import { ApiError, requireUser } from "@/lib/auth";
 import { nanoid } from "nanoid";
 import { processImageForUpload } from "@/lib/image-process";
 
@@ -12,6 +12,8 @@ const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", 
 
 export async function POST(req: NextRequest) {
   try {
+    await requireUser();
+
     const form = await req.formData();
     const file = form.get("file");
     if (!(file instanceof File)) throw new ApiError("Aucun fichier", 400);

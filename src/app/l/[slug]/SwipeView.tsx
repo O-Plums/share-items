@@ -11,6 +11,7 @@ type Item = {
   label: string | null;
   room: string;
   category: string;
+  tags?: { id: string; label: string }[];
 };
 
 type Props = {
@@ -164,6 +165,14 @@ function SwipeCard({
           <div className="mt-2 flex flex-wrap gap-1.5">
             <EmojiBadge kind="room" value={item.room} />
             <EmojiBadge kind="category" value={item.category} />
+            {item.tags?.map((t) => (
+              <span
+                key={t.id}
+                className="rounded-full bg-white/90 px-2 py-0.5 text-xs font-medium text-neutral-700"
+              >
+                {t.label}
+              </span>
+            ))}
           </div>
         </div>
       </div>

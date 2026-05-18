@@ -414,14 +414,17 @@ model Match {
 
 ---
 
-## 18. Évolutions v2
+## 18. Évolutions — voir MVP v2
 
-- Plusieurs photos, carrousel
-- Notification « tu as été matché »
-- Refus / acceptation du match par le votant
-- QR code, export CSV
-- États objet : réservé, parti
-- Mode « je vide la cuisine » (filtre pièce pré-appliqué)
+**Spécification complète :** [MVP-v2.md](./MVP-v2.md)
+
+Résumé v2 :
+- **Dashboard** : compte **Google** ou **Apple** (inventaire sync)
+- **Vote** (`/l/[slug]`) : **sans compte** — prénom + `visitorId` (comme v1)
+- **Inventaire perso** : photographier d’abord, assigner aux listes ensuite
+- **Tags perso**, **listes par intention** (garder / donner / vendre), **déplacer** entre listes
+
+Post-v2 : carrousel photos, notifications, QR code, export CSV.
 
 ---
 

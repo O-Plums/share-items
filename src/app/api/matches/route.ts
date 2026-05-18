@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ApiError, requireVisitor } from "@/lib/auth";
+import { ApiError, requireUser } from "@/lib/auth";
 import { errorResponse, json } from "@/lib/http";
 
 export async function POST(req: NextRequest) {
   try {
-    const creatorVisitorId = requireVisitor(req);
+    const user = await requireUser();
     const body = (await req.json()) as { itemId?: string; visitorId?: string };
     const itemId = body.itemId?.trim();
     const targetVisitorId = body.visitorId?.trim();
@@ -14,10 +14,11 @@ export async function POST(req: NextRequest) {
 
     const item = await prisma.item.findUnique({
       where: { id: itemId },
-      include: { list: true, match: true },
+      include: { match: true },
     });
     if (!item) throw new ApiError("Objet introuvable", 404);
-    if (item.list.creatorVisitorId !== creatorVisitorId) throw new ApiError("Accès refusé", 403);
+    if (item.userId !== user.id) throw new ApiError("Accès refusé", 403);
+    if (!item.listId) throw new ApiError("Objet pas encore dans une liste", 400);
     if (item.match) throw new ApiError("Cet objet a déjà un match", 409);
 
     const vote = await prisma.vote.findUnique({

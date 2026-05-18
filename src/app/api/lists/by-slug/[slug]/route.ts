@@ -13,14 +13,24 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
       include: {
         items: {
           orderBy: { sortOrder: "asc" },
-          select: { id: true, imageUrl: true, label: true, room: true, category: true, sortOrder: true },
+          include: {
+            tags: { include: { userTag: { select: { id: true, label: true } } } },
+          },
         },
       },
     });
     if (!list) throw new ApiError("Liste introuvable", 404);
     return json({
-      list: { id: list.id, slug: list.slug, title: list.title },
-      items: list.items,
+      list: { id: list.id, slug: list.slug, title: list.title, kind: list.kind },
+      items: list.items.map((it) => ({
+        id: it.id,
+        imageUrl: it.imageUrl,
+        label: it.label,
+        room: it.room,
+        category: it.category,
+        sortOrder: it.sortOrder,
+        tags: it.tags.map((t) => ({ id: t.userTag.id, label: t.userTag.label })),
+      })),
     });
   } catch (err) {
     return errorResponse(err);
