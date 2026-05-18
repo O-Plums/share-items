@@ -35,3 +35,6 @@ npx prisma migrate deploy
 
 echo "→ next build"
 npx next build
+
+echo "→ serwist build"
+npx serwist build serwist.config.mjs

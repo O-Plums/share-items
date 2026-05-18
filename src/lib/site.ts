@@ -13,6 +13,12 @@ export const SITE_URL =
   "https://share-items.vercel.app";
 
 export const LOGO_PATH = "/logo.png";
+export const PWA_ICONS = {
+  icon192: "/icons/icon-192.png",
+  icon512: "/icons/icon-512.png",
+  maskable512: "/icons/icon-maskable-512.png",
+  apple: "/icons/apple-touch-icon.png",
+} as const;
 
 export function absoluteUrl(path: string): string {
   return new URL(path.startsWith("/") ? path : `/${path}`, SITE_URL).toString();
@@ -46,10 +52,16 @@ export const rootMetadata: Metadata = {
     "partage",
   ],
   icons: {
-    icon: [{ url: LOGO_PATH, type: "image/png" }],
-    apple: [{ url: LOGO_PATH, type: "image/png", sizes: "1024x1024" }],
+    icon: [
+      { url: PWA_ICONS.icon192, sizes: "192x192", type: "image/png" },
+      { url: PWA_ICONS.icon512, sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: PWA_ICONS.apple, sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
   openGraph: {
     type: "website",
     locale: "fr_FR",
@@ -68,7 +80,11 @@ export const rootMetadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: SITE_SHORT_NAME,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
+    startupImage: [],
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 

@@ -21,3 +21,7 @@ public/uploads/
 # Build artifacts
 tsconfig.tsbuildinfo
 .vercel
+
+# Serwist (generated service worker)
+public/sw.js
+public/sw.js.map
