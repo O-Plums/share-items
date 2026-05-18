@@ -12,16 +12,35 @@ Choisis **une** option :
 
 Récupère les URLs de connexion.
 
-## 2. Variables d’environnement sur Vercel
+## 2. Base + variables sur Vercel
 
-Projet → **Settings** → **Environment Variables** :
+### Option A — Vercel Postgres (recommandé)
+
+1. Projet → **Storage** → **Create Database** → **Postgres**
+2. **Connect to Project** → coche Production (et Preview)
+3. Vercel crée souvent `POSTGRES_PRISMA_URL`, `POSTGRES_URL`, etc.
+
+Le script `scripts/vercel-build.sh` utilise **automatiquement** `POSTGRES_PRISMA_URL` si `DATABASE_URL` est absente.
+
+**Optionnel mais clair :** ajoute aussi manuellement :
 
 | Variable | Valeur |
 |----------|--------|
-| `DATABASE_URL` | URL Postgres (Vercel Storage → Postgres, ou Neon « connection string »). Si `migrate deploy` échoue avec Neon pooled, utilise l’URL **Direct connection**. |
-| `BLOB_READ_WRITE_TOKEN` | Storage → Blob → Create → copier le token |
+| `DATABASE_URL` | Copie la valeur de `POSTGRES_PRISMA_URL` |
 
-Coche **Production**, **Preview**, **Development**.
+### Option B — Neon / Supabase
+
+| Variable | Valeur |
+|----------|--------|
+| `DATABASE_URL` | URL `postgresql://...?sslmode=require` |
+
+### Images (obligatoire en prod)
+
+| Variable | Valeur |
+|----------|--------|
+| `BLOB_READ_WRITE_TOKEN` | Storage → **Blob** → Create → token |
+
+Coche **Production**, **Preview**, **Development** pour chaque variable.
 
 ## 3. Importer le repo GitHub
 
@@ -55,7 +74,8 @@ npm run dev
 
 | Erreur | Solution |
 |--------|----------|
-| `Can't reach database` | Vérifier `DATABASE_URL` / SSL (`?sslmode=require`) |
-| `migrate deploy` échoue | Vérifier `DIRECT_URL` (connexion non poolée) |
+| `Prisma schema validation` / `get-config wasm` | **`DATABASE_URL` absente** → Storage Postgres + Connect, ou copier `POSTGRES_PRISMA_URL` → `DATABASE_URL` |
+| `Can't reach database` | Vérifier URL / SSL (`?sslmode=require`) |
+| `migrate deploy` échoue (Neon pooled) | Utiliser l’URL **Direct connection** comme `DATABASE_URL` |
 | Images 404 en prod | Ajouter `BLOB_READ_WRITE_TOKEN` |
 | Sharp / image | Déjà inclus ; pas d’action |
