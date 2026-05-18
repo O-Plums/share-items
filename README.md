@@ -44,18 +44,20 @@ Voir `MVP.md` §9. Résumé :
 
 ## Déploiement Vercel
 
-1. Pousser sur GitHub, importer le repo dans Vercel.
-2. Ajouter une base PostgreSQL (Vercel Postgres / Neon / Supabase) → `DATABASE_URL`.
-3. Modifier `prisma/schema.prisma` : `provider = "postgresql"`.
-4. Activer Vercel Blob → `BLOB_READ_WRITE_TOKEN`.
-5. Sur Vercel : `Build Command` = `prisma migrate deploy && next build` (ou `prisma db push && next build` pour le MVP).
+Guide pas à pas : **[DEPLOY.md](./DEPLOY.md)**
+
+Résumé :
+
+1. Créer une base **PostgreSQL** (Vercel Postgres, Neon ou Supabase).
+2. Sur Vercel : `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`.
+3. Importer le repo GitHub — le build exécute `prisma migrate deploy` automatiquement (`vercel.json`).
 
 ### Variables d'env
 
-| Nom | Usage |
-|-----|-------|
-| `DATABASE_URL` | Connexion Prisma (SQLite en dev, Postgres en prod) |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob (si absent → stockage `public/uploads/` local) |
+| Nom | Obligatoire | Usage |
+|-----|-------------|-------|
+| `DATABASE_URL` | Oui | Connexion PostgreSQL |
+| `BLOB_READ_WRITE_TOKEN` | Prod | Vercel Blob pour les photos |
 
 ## Scripts
 
