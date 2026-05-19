@@ -6,6 +6,7 @@ import { UserRoomsProvider } from "@/components/UserRoomsProvider";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardNav } from "./DashboardNav";
 import { ClaimVisitorListsTrigger } from "./ClaimVisitorListsTrigger";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 
 export const metadata: Metadata = {
   title: "Tableau de bord",
@@ -37,6 +38,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <DashboardNav />
       </div>
       <ClaimVisitorListsTrigger />
+      <PwaInstallPrompt />
     </UserRoomsProvider>
   );
 }

@@ -97,6 +97,20 @@
     "signOut": "Sign out",
     "accountMenu": "Account menu"
   },
+  "pwa": {
+    "title": "Add the app to your home screen",
+    "subtitle": "One tap to open — like a real app, without going through the browser each time.",
+    "iosStep1": "Open Share Items in Safari (not Chrome or a messaging app).",
+    "iosStep2": "Tap the Share button at the bottom (square icon with an arrow pointing up).",
+    "iosStep3": "Choose “Add to Home Screen”, then confirm with “Add”.",
+    "iosHint": "You’ll find {name} as an app on your phone.",
+    "androidStep1": "Open the ⋮ menu at the top right in Chrome.",
+    "androidStep2": "Choose “Install app” or “Add to Home screen”.",
+    "androidStep3": "Confirm — the icon will appear on your home screen.",
+    "install": "Install app",
+    "installing": "Installing…",
+    "later": "Later"
+  },
   "lists": {
     "title": "Your campaigns",
     "subtitle": "Create a list, add items, share the link.",

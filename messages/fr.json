@@ -97,6 +97,20 @@
     "signOut": "Se déconnecter",
     "accountMenu": "Menu compte"
   },
+  "pwa": {
+    "title": "Ajoute l’app sur ton écran d’accueil",
+    "subtitle": "Accès en un tap, comme une vraie application — sans repasser par le navigateur.",
+    "iosStep1": "Ouvre Share Items dans Safari (pas dans Chrome ni dans une app de messagerie).",
+    "iosStep2": "Tape le bouton Partager en bas de l’écran (icône carré avec une flèche vers le haut).",
+    "iosStep3": "Choisis « Sur l’écran d’accueil », puis confirme avec « Ajouter ».",
+    "iosHint": "Tu retrouveras {name} comme une app sur ton téléphone.",
+    "androidStep1": "Ouvre le menu ⋮ en haut à droite de Chrome.",
+    "androidStep2": "Choisis « Installer l’application » ou « Ajouter à l’écran d’accueil ».",
+    "androidStep3": "Confirme — l’icône apparaîtra sur ton écran d’accueil.",
+    "install": "Installer l’application",
+    "installing": "Installation…",
+    "later": "Plus tard"
+  },
   "lists": {
     "title": "Tes campagnes",
     "subtitle": "Crée une liste, ajoute des objets, partage le lien.",
