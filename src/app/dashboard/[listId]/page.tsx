@@ -15,6 +15,8 @@ import { PageLoader } from "@/components/ui/PageLoader";
 import { AnimateIn } from "@/components/ui/AnimateIn";
 import { BackButton } from "@/components/ui/BackButton";
 import { Spinner } from "@/components/ui/Spinner";
+import { FirstListTour } from "@/components/onboarding/FirstListTour";
+import { WELCOME_QUERY_PARAM } from "@/lib/first-list-tour";
 
 type Item = {
   id: string;
@@ -41,6 +43,7 @@ export default function ListDetailPage() {
   const params = useParams<{ listId: string }>();
   const searchParams = useSearchParams();
   const tabParam = (searchParams.get("tab") as Tab | null) ?? "items";
+  const isWelcome = searchParams.get(WELCOME_QUERY_PARAM) === "1";
   const tList = useTranslations("listDetail");
   const authedFetch = useDashboardFetch();
   const [data, setData] = useState<ResultsResponse | null>(null);
@@ -171,11 +174,14 @@ export default function ListDetailPage() {
     }
   }
 
-  function setTab(tab: Tab) {
-    const url = new URL(window.location.href);
-    url.searchParams.set("tab", tab);
-    router.replace(url.pathname + url.search);
-  }
+  const setTab = useCallback(
+    (tab: Tab) => {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tab);
+      router.replace(url.pathname + url.search);
+    },
+    [router],
+  );
 
   if (!data) {
     return (
@@ -228,6 +234,7 @@ export default function ListDetailPage() {
             </div>
           ) : (
             <h1
+              data-tour="list-title"
               className="cursor-pointer text-2xl font-bold leading-tight"
               onClick={() => setEditingTitle(true)}
             >
@@ -265,7 +272,10 @@ export default function ListDetailPage() {
           })}
         </AnimateIn>
 
-        <nav className="mt-5 grid grid-cols-3 gap-2 rounded-2xl bg-neutral-100 p-1.5 ring-2 ring-neutral-200">
+        <nav
+          data-tour="list-tabs"
+          className="mt-5 grid grid-cols-3 gap-2 rounded-2xl bg-neutral-100 p-1.5 ring-2 ring-neutral-200"
+        >
           {(["items", "results", "share"] as Tab[]).map((tab) => (
             <button
               key={tab}
@@ -287,7 +297,7 @@ export default function ListDetailPage() {
         </nav>
 
         {tabParam === "items" && (
-          <div className="mt-4 grid grid-cols-2 gap-2">
+          <div data-tour="add-items" className="mt-4 grid grid-cols-2 gap-2">
             <Link
               href={`/dashboard/${params.listId}/items/new`}
               className="rounded-2xl bg-brand-500 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm"
@@ -318,23 +328,34 @@ export default function ListDetailPage() {
           />
         )}
         {tabParam === "results" && (
-          <ResultsTab
-            items={data.items}
-            pending={pending}
-            onMatch={createMatch}
-            onUnmatch={deleteMatch}
-          />
+          <div data-tour="results-panel">
+            <ResultsTab
+              items={data.items}
+              pending={pending}
+              onMatch={createMatch}
+              onUnmatch={deleteMatch}
+            />
+          </div>
         )}
         {tabParam === "share" && (
-          <ShareTab
-            shareUrl={shareUrl}
-            listTitle={data.list.title}
-            copied={copied}
-            onCopy={copy}
-            kindLabel={kind.label}
-          />
+          <div data-tour="share-panel">
+            <ShareTab
+              shareUrl={shareUrl}
+              listTitle={data.list.title}
+              copied={copied}
+              onCopy={copy}
+              kindLabel={kind.label}
+            />
+          </div>
         )}
       </div>
+
+      <FirstListTour
+        listId={params.listId}
+        ready={!!data}
+        welcome={isWelcome}
+        onTabChange={setTab}
+      />
 
       {showInventoryPick && (
         <InventoryPickModal

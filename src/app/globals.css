@@ -1,3 +1,5 @@
+@import "driver.js/dist/driver.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -67,4 +69,38 @@
     background-size: 200% 100%;
     animation: loader-shimmer 1.2s ease-in-out infinite;
   }
+}
+
+/* Driver.js — visite première liste */
+.share-items-tour-popover.driver-popover {
+  @apply max-w-[min(100vw-2rem,22rem)] rounded-2xl border-0 bg-white text-neutral-900 shadow-xl;
+}
+
+.share-items-tour-popover .driver-popover-title {
+  @apply text-lg font-bold leading-snug text-neutral-900;
+}
+
+.share-items-tour-popover .driver-popover-description {
+  @apply mt-1 text-sm leading-relaxed text-neutral-600;
+}
+
+.share-items-tour-popover .driver-popover-progress-text {
+  @apply text-xs font-medium text-neutral-500;
+}
+
+.share-items-tour-popover .driver-popover-footer button {
+  @apply rounded-xl px-3 py-2 text-sm font-semibold shadow-sm;
+}
+
+.share-items-tour-popover .driver-popover-next-btn,
+.share-items-tour-popover .driver-popover-done-btn {
+  @apply bg-brand-500 text-white;
+}
+
+.share-items-tour-popover .driver-popover-prev-btn {
+  @apply bg-neutral-100 text-neutral-800;
+}
+
+.share-items-tour-popover .driver-popover-close-btn {
+  @apply text-neutral-400;
 }

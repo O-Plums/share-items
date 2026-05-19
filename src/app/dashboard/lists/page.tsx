@@ -8,6 +8,7 @@ import { useDashboardFetch } from "@/lib/client";
 import { useTranslatedListKinds } from "@/lib/i18n-labels";
 import { AnimateIn } from "@/components/ui/AnimateIn";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { clearFirstListTourDone } from "@/lib/first-list-tour";
 
 type ListSummary = {
   id: string;
@@ -39,6 +40,10 @@ export default function ListsPage() {
       alive = false;
     };
   }, [authedFetch]);
+
+  useEffect(() => {
+    if (lists?.length === 0) clearFirstListTourDone();
+  }, [lists]);
 
   return (
     <main className="min-h-screen safe-top safe-bottom">

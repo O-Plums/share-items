@@ -10,6 +10,8 @@ import { EmojiGrid } from "./EmojiGrid";
 import { RoomPicker } from "./RoomPicker";
 import { TagPicker } from "./TagPicker";
 import { ImageUploadOverlay } from "@/components/ui/ImageUploadOverlay";
+import { ItemWizardTour } from "@/components/onboarding/ItemWizardTour";
+import { BackButton } from "@/components/ui/BackButton";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 
 type Mode =
@@ -27,13 +29,15 @@ type Props = {
     tagIds?: string[];
   };
   redirectTo?: string;
+  /** Guided Driver.js tour (first item after list onboarding). */
+  guidedTour?: boolean;
 };
 
 type Step = 1 | 2 | 3;
 
 type PermissionError = "camera" | "gallery" | null;
 
-export function ItemWizard({ mode, initial, redirectTo }: Props) {
+export function ItemWizard({ mode, initial, redirectTo, guidedTour = false }: Props) {
   const router = useRouter();
   const tWizard = useTranslations("wizard");
   const tCommon = useTranslations("common");
@@ -145,14 +149,9 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
   return (
     <main className="safe-bottom">
       <div className="mx-auto w-full max-w-md px-5 pb-10 pt-2">
-        <button
-          type="button"
-          onClick={goBack}
-          className="text-sm text-neutral-500"
-          disabled={uploading || saving}
-        >
+        <BackButton onClick={goBack} disabled={uploading || saving}>
           {tCommon("back")}
-        </button>
+        </BackButton>
 
         <div className="mt-4 flex items-center gap-2">
           {[1, 2, 3].map((s) => (
@@ -170,7 +169,7 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
         )}
 
         {step === 1 && (
-          <section className="mt-6">
+          <section className="mt-6" data-tour="wizard-photo">
             <h1 className="text-2xl font-bold">{tWizard("photoTitle")}</h1>
             <p className="mt-1 text-neutral-600">{tWizard("photoSubtitle")}</p>
 
@@ -242,7 +241,7 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
         )}
 
         {step === 2 && imageUrl && (
-          <section className="mt-6">
+          <section className="mt-6" data-tour="wizard-room">
             <h1 className="text-2xl font-bold">{tWizard("roomTitle")}</h1>
             <p className="mt-1 text-neutral-600">{tWizard("roomSubtitle")}</p>
             <div className="mt-6">
@@ -261,13 +260,15 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
 
         {step === 3 && imageUrl && (
           <section className="mt-6">
-            <h1 className="text-2xl font-bold">{tWizard("categoryTitle")}</h1>
-            <p className="mt-1 text-neutral-600">{tWizard("categorySubtitle")}</p>
-            <div className="mt-6">
-              <EmojiGrid items={categories} selected={category} onSelect={(k) => setCategory(k)} />
+            <div data-tour="wizard-category">
+              <h1 className="text-2xl font-bold">{tWizard("categoryTitle")}</h1>
+              <p className="mt-1 text-neutral-600">{tWizard("categorySubtitle")}</p>
+              <div className="mt-6">
+                <EmojiGrid items={categories} selected={category} onSelect={(k) => setCategory(k)} />
+              </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-6" data-tour="wizard-tags">
               <p className="text-sm font-medium text-neutral-600">{tWizard("tagsTitle")}</p>
               <p className="text-xs text-neutral-500">{tWizard("tagsHint")}</p>
               <div className="mt-3">
@@ -291,17 +292,28 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
                 className="mt-1 w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 disabled:opacity-60"
               />
             </div>
-            <LoadingButton
-              loading={saving}
-              loadingText={tCommon("saving")}
-              variant="primary"
-              className="mt-8 w-full rounded-2xl px-4 py-4 text-lg"
-              disabled={!canSave}
-              onClick={save}
-            >
-              {mode.kind === "edit" ? tWizard("update") : tInventory("editSave")}
-            </LoadingButton>
+            <div data-tour="wizard-save">
+              <LoadingButton
+                loading={saving}
+                loadingText={tCommon("saving")}
+                variant="primary"
+                className="mt-8 w-full rounded-2xl px-4 py-4 text-lg"
+                disabled={!canSave}
+                onClick={save}
+              >
+                {mode.kind === "edit" ? tWizard("update") : tInventory("editSave")}
+              </LoadingButton>
+            </div>
           </section>
+        )}
+
+        {guidedTour && mode.kind === "list" && (
+          <ItemWizardTour
+            active={guidedTour}
+            wizardStep={step}
+            hasImage={!!imageUrl}
+            onWizardStepChange={setStep}
+          />
         )}
       </div>
     </main>

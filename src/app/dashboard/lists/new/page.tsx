@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { BackButton } from "@/components/ui/BackButton";
 import { useTranslations, useLocale } from "next-intl";
 import { useDashboardFetch } from "@/lib/client";
 import { LoadingButton } from "@/components/ui/LoadingButton";
@@ -56,7 +57,7 @@ export default function NewListPage() {
           body: JSON.stringify({ itemIds: presetItems, listId: list.id }),
         });
       }
-      router.replace(`/dashboard/${list.id}`);
+      router.replace(`/dashboard/${list.id}?welcome=1`);
     } catch (e) {
       setError((e as Error).message);
       setLoading(false);
@@ -66,9 +67,9 @@ export default function NewListPage() {
   return (
     <main className="min-h-screen safe-top safe-bottom">
       <div className="mx-auto w-full max-w-md px-5 pt-6">
-        <Link href={fromInventory ? "/dashboard/inventory" : "/dashboard/lists"} className="text-sm text-neutral-500">
+        <BackButton href={fromInventory ? "/dashboard/inventory" : "/dashboard/lists"}>
           {tCommon("back")}
-        </Link>
+        </BackButton>
         <h1 className="mt-4 text-2xl font-bold">{t("newTitle")}</h1>
         <p className="mt-1 text-neutral-600">
           {presetItems.length > 0 ? t("itemsCount", { count: presetItems.length }) : t("newSubtitle")}
