@@ -12,6 +12,8 @@ import { getListKind, LIST_KINDS } from "@/lib/list-kinds";
 import { MoveDialog } from "./MoveDialog";
 import { InventoryPickModal } from "./InventoryPickModal";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { AnimateIn } from "@/components/ui/AnimateIn";
+import { BackButton } from "@/components/ui/BackButton";
 import { Spinner } from "@/components/ui/Spinner";
 
 type Item = {
@@ -192,9 +194,7 @@ export default function ListDetailPage() {
   return (
     <main className="min-h-screen safe-top safe-bottom">
       <div className="mx-auto w-full max-w-md px-5 pb-8 pt-6">
-        <Link href="/dashboard/lists" className="text-sm text-neutral-500">
-          ← Mes listes
-        </Link>
+        <BackButton href="/dashboard/lists">{tList("backToLists")}</BackButton>
         <div className="mt-2 flex items-start justify-between gap-3">
           {editingTitle ? (
             <div className="flex flex-1 gap-2">
@@ -245,7 +245,7 @@ export default function ListDetailPage() {
           </button>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2">
+        <AnimateIn className="mt-3 flex flex-wrap gap-2">
           {LIST_KINDS.map((k) => {
             const active = k.key === data.list.kind;
             return (
@@ -254,8 +254,8 @@ export default function ListDetailPage() {
                 type="button"
                 disabled={!!pending}
                 onClick={() => setKind(k.key)}
-                className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition disabled:opacity-50 ${
-                  active ? `${k.color}` : "bg-white text-neutral-500 ring-neutral-200"
+                className={`inline-flex min-h-11 items-center gap-1 rounded-2xl px-4 py-2.5 text-sm font-semibold shadow-sm ring-2 transition active:scale-[0.98] disabled:opacity-50 ${
+                  active ? `${k.color} ring-transparent` : "bg-white text-neutral-800 ring-neutral-200 active:bg-neutral-50"
                 }`}
               >
                 {pending === `kind:${k.key}` ? <Spinner size="sm" /> : null}
@@ -263,16 +263,18 @@ export default function ListDetailPage() {
               </button>
             );
           })}
-        </div>
+        </AnimateIn>
 
-        <nav className="mt-5 grid grid-cols-3 gap-1 rounded-2xl bg-neutral-200/60 p-1">
+        <nav className="mt-5 grid grid-cols-3 gap-2 rounded-2xl bg-neutral-100 p-1.5 ring-2 ring-neutral-200">
           {(["items", "results", "share"] as Tab[]).map((tab) => (
             <button
               key={tab}
               type="button"
               onClick={() => setTab(tab)}
-              className={`rounded-xl py-2 text-sm font-medium transition ${
-                tabParam === tab ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-600"
+              className={`min-h-11 rounded-xl py-2.5 text-sm font-semibold transition active:scale-[0.98] ${
+                tabParam === tab
+                  ? "bg-white text-neutral-900 shadow-sm ring-2 ring-neutral-200"
+                  : "text-neutral-600 active:bg-neutral-200/80"
               }`}
             >
               {tab === "items"
@@ -385,7 +387,7 @@ function ItemsTab({
     );
   }
   return (
-    <ul className="mt-5 grid grid-cols-2 gap-3">
+    <AnimateIn as="ul" className="mt-5 grid grid-cols-2 gap-3">
       {items.map((item) => (
         <li key={item.id} className="overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-200">
           <Link href={`/dashboard/${listId}/items/${item.id}/edit`} className="block">
@@ -433,7 +435,7 @@ function ItemsTab({
           </div>
         </li>
       ))}
-    </ul>
+    </AnimateIn>
   );
 }
 
@@ -448,19 +450,20 @@ function ResultsTab({
   onMatch: (itemId: string, visitorId: string) => void;
   onUnmatch: (itemId: string) => void;
 }) {
+  const t = useTranslations("listDetail");
   const totalVotes = items.reduce((sum, it) => sum + it.votesYes.length + it.votesNo.length, 0);
 
   if (items.length === 0) {
     return (
       <div className="mt-8 rounded-2xl bg-white p-6 text-center ring-1 ring-neutral-200">
         <p className="text-4xl">📊</p>
-        <p className="mt-3 text-sm text-neutral-600">Ajoute des objets pour voir les résultats.</p>
+        <p className="mt-3 text-sm text-neutral-600">{t("resultsEmpty")}</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-5 space-y-4">
+    <AnimateIn className="mt-5 space-y-4">
       <p className="text-sm text-neutral-500">
         {items.length} objet{items.length > 1 ? "s" : ""} · {totalVotes} vote{totalVotes > 1 ? "s" : ""}
       </p>
@@ -493,16 +496,16 @@ function ResultsTab({
             {item.match && (
               <div className="flex items-center justify-between gap-2 border-t border-neutral-100 bg-brand-50 px-3 py-2">
                 <p className="text-sm">
-                  🤝 Matché à <span className="font-semibold">{item.match.displayName}</span>
+                  {t("assignedTo", { name: item.match.displayName })}
                 </p>
                 <button
                   type="button"
                   disabled={!!pending}
                   onClick={() => onUnmatch(item.id)}
-                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-neutral-700 hover:text-red-600 disabled:opacity-40"
+                  className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-white px-3 py-1.5 text-xs font-semibold text-neutral-800 ring-2 ring-neutral-200 active:bg-neutral-50 disabled:opacity-40"
                 >
                   {pending === `unmatch:${item.id}` ? <Spinner size="sm" /> : null}
-                  Annuler
+                  {t("unmatch")}
                 </button>
               </div>
             )}
@@ -520,17 +523,17 @@ function ResultsTab({
                         type="button"
                         disabled={!!pending}
                         onClick={() => onMatch(item.id, v.visitorId)}
-                        className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-white active:bg-brand-600 disabled:opacity-50"
+                        className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-xl bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm ring-2 ring-brand-600 active:scale-[0.98] active:bg-brand-600 disabled:opacity-50"
                       >
                         {pending === `match:${item.id}:${v.visitorId}` ? (
                           <Spinner size="sm" tone="white" />
                         ) : null}
-                        Matcher
+                        {t("match")}
                       </button>
                     )}
                     {item.match && item.match.visitorId === v.visitorId && (
-                      <span className="shrink-0 rounded-lg bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
-                        ✓ matché
+                      <span className="shrink-0 rounded-xl bg-brand-100 px-3 py-1.5 text-xs font-semibold text-brand-800 ring-1 ring-brand-200">
+                        ✓ {t("assignedBadge")}
                       </span>
                     )}
                   </div>
@@ -540,7 +543,7 @@ function ResultsTab({
           </div>
         );
       })}
-    </div>
+    </AnimateIn>
   );
 }
 

@@ -6,6 +6,7 @@ import { AppLogo } from "@/components/AppLogo";
 import { PublicLanguageBar } from "@/components/PublicLanguageBar";
 import { HomeStep } from "@/components/home/HomeStep";
 import { Reveal } from "@/components/home/Reveal";
+import { AnimateIn } from "@/components/ui/AnimateIn";
 import type { HomeCopy } from "@/components/home/types";
 import { easeOut, fadeUp, fadeUpReduced } from "@/components/home/motion";
 
@@ -144,7 +145,7 @@ export function HomeLandingClient({ copy }: Props) {
             </p>
           </Reveal>
 
-          <ol className="mt-10 space-y-16 sm:space-y-20">
+          <AnimateIn as="ol" className="mt-10 space-y-16 sm:space-y-20">
             {copy.steps.map((step, i) => (
               <HomeStep
                 key={step.step}
@@ -162,7 +163,7 @@ export function HomeLandingClient({ copy }: Props) {
                 }
               />
             ))}
-          </ol>
+          </AnimateIn>
         </section>
 
         {/* Share spotlight */}

@@ -85,12 +85,15 @@ export function SwipeView({ remaining, total, totalDone: _totalDone, onVote }: P
       </div>
 
       <div className="safe-bottom px-5 pb-4 pt-2">
+        <p className="mx-auto mb-3 max-w-md text-center text-sm font-medium text-neutral-600">
+          {tVoter("voteHint")}
+        </p>
         <div className="mx-auto flex w-full max-w-md gap-3">
           <LoadingButton
             loading={!!pendingId}
             loadingText={tCommon("saving")}
             variant="secondary"
-            className="flex-1 rounded-2xl py-4 text-lg"
+            className="min-h-14 flex-1 rounded-2xl py-4 text-lg font-bold shadow-sm ring-2 ring-neutral-300"
             onClick={() => handle("NO")}
           >
             ✕ {tVoter("voteNo")}
@@ -99,7 +102,7 @@ export function SwipeView({ remaining, total, totalDone: _totalDone, onVote }: P
             loading={!!pendingId}
             loadingText={tCommon("saving")}
             variant="success"
-            className="flex-1 rounded-2xl py-4 text-lg"
+            className="min-h-14 flex-1 rounded-2xl py-4 text-lg font-bold shadow-sm ring-2 ring-emerald-700"
             onClick={() => handle("YES")}
           >
             ✓ {tVoter("voteYes")}

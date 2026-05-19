@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
+    "@bprogress/next": "^3.2.12",
+    "@formkit/auto-animate": "^0.9.0",
     "@prisma/client": "^5.22.0",
     "@serwist/next": "^9.5.11",
     "@vercel/analytics": "^2.0.1",

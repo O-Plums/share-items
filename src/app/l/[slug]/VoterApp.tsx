@@ -136,7 +136,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
   );
 
   async function clearMyVotes() {
-    if (!confirm("Effacer tous tes votes sur cette liste ? Tes matchs sur ces objets seront aussi annulés.")) return;
+    if (!confirm(t("clearVotesConfirm"))) return;
     setClearingVotes(true);
     try {
       await authedFetch(`/api/lists/by-slug/${slug}/my-votes`, { method: "DELETE" });
@@ -188,17 +188,23 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
               type="button"
               onClick={() => setAccountOpen(true)}
               aria-label={t("account")}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-xl ring-1 ring-neutral-200 active:bg-neutral-100"
+              className="flex min-h-11 min-w-[3.25rem] flex-col items-center justify-center gap-0.5 rounded-2xl bg-white px-2 py-1.5 text-center shadow-sm ring-2 ring-neutral-200 active:scale-[0.98] active:bg-neutral-50"
             >
-              👤
+              <span className="text-lg leading-none" aria-hidden>
+                👤
+              </span>
+              <span className="text-[10px] font-semibold leading-tight text-neutral-700">{t("account")}</span>
             </button>
             <button
               type="button"
               onClick={() => setHistoryOpen(true)}
               aria-label={t("history")}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-2xl ring-1 ring-neutral-200 active:bg-neutral-100"
+              className="flex min-h-11 min-w-[3.25rem] flex-col items-center justify-center gap-0.5 rounded-2xl bg-white px-2 py-1.5 text-center shadow-sm ring-2 ring-neutral-200 active:scale-[0.98] active:bg-neutral-50"
             >
-              📖
+              <span className="text-lg leading-none" aria-hidden>
+                📖
+              </span>
+              <span className="text-[10px] font-semibold leading-tight text-neutral-700">{t("history")}</span>
             </button>
           </div>
         </div>
@@ -218,16 +224,16 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
         )}
       </section>
 
-      <footer className="safe-bottom border-t border-neutral-200 bg-white">
-        <div className="mx-auto grid w-full max-w-md grid-cols-2">
-          <TabButton active={tab === "swipe"} onClick={() => setTab("swipe")} label={t("tabSwipe")} icon="🔥" />
+      <footer className="safe-bottom border-t-2 border-neutral-200 bg-white">
+        <div className="mx-auto grid w-full max-w-md grid-cols-2 gap-2 p-2">
+          <TabButton active={tab === "swipe"} onClick={() => setTab("swipe")} label={t("tabVote")} icon="👀" />
           <TabButton
             active={tab === "matches"}
             onClick={() => setTab("matches")}
             label={
-              matches.length > 0 ? `${t("tabMatches")} (${matches.length})` : t("tabMatches")
+              matches.length > 0 ? `${t("tabForMe")} (${matches.length})` : t("tabForMe")
             }
-            icon="🤝"
+            icon="🎁"
           />
         </div>
       </footer>
@@ -266,12 +272,16 @@ function TabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex flex-col items-center gap-0.5 py-3 transition ${
-        active ? "text-brand-600" : "text-neutral-500"
+      className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl py-2.5 text-center shadow-sm ring-2 transition active:scale-[0.98] ${
+        active
+          ? "bg-brand-500 text-white ring-brand-600"
+          : "bg-neutral-50 text-neutral-700 ring-neutral-200 active:bg-neutral-100"
       }`}
     >
-      <span className="text-xl">{icon}</span>
-      <span className="text-xs font-medium">{label}</span>
+      <span className="text-xl leading-none" aria-hidden>
+        {icon}
+      </span>
+      <span className="text-xs font-semibold leading-tight">{label}</span>
     </button>
   );
 }

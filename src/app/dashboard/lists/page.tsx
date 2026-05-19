@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useDashboardFetch } from "@/lib/client";
 import { useTranslatedListKinds } from "@/lib/i18n-labels";
+import { AnimateIn } from "@/components/ui/AnimateIn";
 import { PageLoader } from "@/components/ui/PageLoader";
 
 type ListSummary = {
@@ -72,7 +73,7 @@ export default function ListsPage() {
               </p>
             </div>
           ) : (
-            <ul className="mt-3 space-y-3">
+            <AnimateIn as="ul" className="mt-3 space-y-3">
               {lists.map((list) => {
                 const kind = translatedKinds.find((k) => k.key === list.kind) ?? translatedKinds[3];
                 return (
@@ -112,7 +113,7 @@ export default function ListsPage() {
                   </li>
                 );
               })}
-            </ul>
+            </AnimateIn>
           )}
         </section>
 

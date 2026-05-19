@@ -26,7 +26,7 @@
   },
   "site": {
     "tagline": "Tes objets, les bonnes mains.",
-    "description": "Photographie ce dont tu veux te débarrasser, fais voter tes proches façon Tinder, et attribue chaque objet à la personne qui le récupèrera."
+    "description": "Photographie ce dont tu veux te débarrasser, fais dire à ta famille ce qui l’intéresse, et attribue chaque objet à la bonne personne."
   },
   "home": {
     "eyebrow": "Pour vider la maison, le garage ou une succession",
@@ -48,9 +48,9 @@
     "step3Title": "Tu partages un seul lien",
     "step3Body": "Copie le lien ou envoie-le sur WhatsApp, par SMS ou par mail. Tout le monde arrive sur la même page, sur téléphone ou ordinateur.",
     "step4Title": "Chacun dit oui ou non",
-    "step4Body": "Comme sur une appli de rencontre : glisser à droite = « ça m’intéresse », à gauche = non. Pas d’inscription obligatoire pour voter.",
+    "step4Body": "Sur chaque objet, tes proches tapent « Oui » ou « Non ». Pas d’inscription obligatoire pour voter.",
     "step5Title": "Tu vois qui veut quoi",
-    "step5Body": "Les matchs s’affichent pour toi. Tu attribues chaque objet à la bonne personne — fini les « qui prend le canapé ? » en boucle.",
+    "step5Body": "Tu vois qui a dit oui. Tu attribues chaque objet à la bonne personne — fini les « qui prend le canapé ? » en boucle.",
     "shareMockTitle": "Ton lien à partager",
     "shareMockHint": "Même lien pour toute la famille — pas besoin d’inviter une par une.",
     "shareMockCopy": "Copier le lien",
@@ -73,7 +73,7 @@
     "reassure3": "🔒 Tu décides qui récupère quoi ; les votes aident, ils ne remplacent pas ton choix.",
     "imgAltNewList": "Écran de création d’une nouvelle liste",
     "imgAltPhoto": "Ajout d’un objet avec photo et emojis",
-    "imgAltVote": "Écran de vote : glisser pour dire oui ou non",
+    "imgAltVote": "Écran de vote : boutons Oui et Non",
     "imgAltLists": "Vue des listes et des objets"
   },
   "login": {
@@ -84,7 +84,7 @@
     "google": "Continuer avec Google",
     "apple": "Continuer avec Apple",
     "voterTitle": "Tu as reçu un lien pour voter ?",
-    "voterBody": "Ouvre-le directement, aucun compte n’est requis pour swiper."
+    "voterBody": "Ouvre-le directement, aucun compte n’est requis pour voter."
   },
   "offline": {
     "title": "Tu es hors ligne",
@@ -140,7 +140,7 @@
     "filterAll": "Tous",
     "filterUnassigned": "Non assignés",
     "filterAssigned": "Dans une liste",
-    "advancedFilters": "Filtres avancés",
+    "advancedFilters": "Filtrer par pièce ou type",
     "filterRoom": "Pièce",
     "filterType": "Type",
     "select": "Sélectionner",
@@ -151,8 +151,9 @@
     "addToList": "Ajouter à une liste ({count})",
     "addToListTarget": "Ajouter {count} objet(s) → liste",
     "unassign": "Retirer des listes",
+    "unassignConfirm": "Retirer {count} objet(s) de leur liste ? Les réponses des proches sur ces objets seront effacées.",
     "deleteSelected": "Supprimer",
-    "backToLists": "← Mes listes",
+    "backToLists": "Retour aux listes",
     "editTitle": "Modifier l’objet",
     "editPhoto": "Photo",
     "editCamera": "📸 Photo",
@@ -174,6 +175,7 @@
     "moveNoLists": "Aucune autre liste."
   },
   "listDetail": {
+    "backToLists": "Retour aux listes",
     "tabItems": "Objets",
     "tabResults": "Résultats",
     "tabShare": "Partager",
@@ -186,10 +188,13 @@
     "deleteList": "Supprimer la liste",
     "emptyItems": "Aucun objet dans cette liste.",
     "match": "Attribuer",
-    "unmatch": "Retirer",
+    "unmatch": "Annuler",
+    "assignedTo": "Attribué à {name}",
+    "assignedBadge": "Attribué",
+    "resultsEmpty": "Ajoute des objets pour voir les réponses.",
     "move": "Déplacer",
     "edit": "Modifier",
-    "noMatches": "Aucun match pour l’instant."
+    "noMatches": "Personne n’a encore reçu d’objet."
   },
   "wizard": {
     "photoTitle": "Une photo de l’objet",
@@ -251,8 +256,9 @@
     "letsGo": "C’est parti",
     "googleSecure": "ou plus sécurisé",
     "googleHint": "Connexion Google : même compte sur tous tes appareils.",
-    "tabSwipe": "Swipe",
-    "tabMatches": "Matchs",
+    "tabVote": "Voir les objets",
+    "tabForMe": "Pour moi",
+    "forMeBadge": "Pour toi",
     "history": "Historique",
     "account": "Compte",
     "allDone": "Tu as tout vu !",
@@ -261,6 +267,7 @@
     "no": "NON",
     "voteYes": "Oui",
     "voteNo": "Non",
+    "voteHint": "Tape le bouton vert ou rouge — pas besoin de faire glisser la photo.",
     "historyTitle": "Mon historique",
     "historyAll": "Tout ({count})",
     "historyYes": "✓ Oui ({count})",
@@ -268,6 +275,7 @@
     "historyEmpty": "Tu n’as pas encore voté.",
     "historyFilterEmpty": "Aucun vote dans ce filtre.",
     "clearVotes": "Effacer tous mes votes",
+    "clearVotesConfirm": "Effacer tous tes votes sur cette liste ? Les objets qui t’étaient attribués pourront disparaître de « Pour moi ».",
     "clearingVotes": "Effacement…",
     "matchesEmpty": "Aucun objet pour l’instant",
     "matchesEmptyBody": "Quand l’organisateur t’attribue un objet, il apparaît ici.",

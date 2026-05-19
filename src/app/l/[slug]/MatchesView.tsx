@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { EmojiBadge } from "@/components/EmojiBadge";
+import { AnimateIn } from "@/components/ui/AnimateIn";
 
 type Match = {
   itemId: string;
@@ -34,8 +35,8 @@ export function MatchesView({ matches }: { matches: Match[] }) {
   return (
     <div className="flex-1 overflow-y-auto px-5 py-4">
       <div className="mx-auto max-w-md">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-neutral-500">{t("tabMatches")}</h2>
-        <ul className="mt-3 grid grid-cols-2 gap-3">
+        <h2 className="text-sm font-semibold text-neutral-700">{t("tabForMe")}</h2>
+        <AnimateIn as="ul" className="mt-3 grid grid-cols-2 gap-3">
           {matches.map((m) => (
             <li
               key={m.itemId}
@@ -50,7 +51,7 @@ export function MatchesView({ matches }: { matches: Match[] }) {
                   className="object-cover"
                 />
                 <div className="absolute left-2 top-2 rounded-full bg-brand-500 px-2 py-0.5 text-xs font-semibold text-white">
-                  🤝 {t("tabMatches")}
+                  🎁 {t("forMeBadge")}
                 </div>
               </div>
               <div className="space-y-1 p-2.5">
@@ -62,7 +63,7 @@ export function MatchesView({ matches }: { matches: Match[] }) {
               </div>
             </li>
           ))}
-        </ul>
+        </AnimateIn>
       </div>
     </div>
   );

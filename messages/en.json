@@ -26,7 +26,7 @@
   },
   "site": {
     "tagline": "Your stuff, the right hands.",
-    "description": "Snap what you want to let go, let friends vote Tinder-style, and assign each item to whoever takes it."
+    "description": "Snap what you want to let go, let family say what they want, and assign each item to the right person."
   },
   "home": {
     "eyebrow": "For clearing a home, garage, or estate",
@@ -47,10 +47,10 @@
     "step2Body": "One photo, room, and type — that’s it. No long descriptions: people see the picture right away.",
     "step3Title": "Share one link",
     "step3Body": "Copy the link or send it on WhatsApp, SMS, or email. Everyone lands on the same page, phone or computer.",
-    "step4Title": "Everyone swipes yes or no",
-    "step4Body": "Like a dating app: swipe right if you’re interested, left if not. No sign-up required to vote.",
+    "step4Title": "Everyone says yes or no",
+    "step4Body": "On each item, people tap Yes or No. No sign-up required to vote.",
     "step5Title": "See who wants what",
-    "step5Body": "Matches show up for you. Assign each item to the right person — no more endless “who wants the sofa?”",
+    "step5Body": "You see who said yes. Assign each item to the right person — no more endless “who wants the sofa?”",
     "shareMockTitle": "Your link to share",
     "shareMockHint": "Same link for everyone — no need to invite people one by one.",
     "shareMockCopy": "Copy link",
@@ -73,7 +73,7 @@
     "reassure3": "🔒 You decide who gets what; votes help, they don’t replace your choice.",
     "imgAltNewList": "New list creation screen",
     "imgAltPhoto": "Adding an item with photo and emojis",
-    "imgAltVote": "Voting screen: swipe yes or no",
+    "imgAltVote": "Voting screen: Yes and No buttons",
     "imgAltLists": "Lists and items view"
   },
   "login": {
@@ -84,7 +84,7 @@
     "google": "Continue with Google",
     "apple": "Continue with Apple",
     "voterTitle": "Received a link to vote?",
-    "voterBody": "Open it directly — no account needed to swipe."
+    "voterBody": "Open it directly — no account needed to vote."
   },
   "offline": {
     "title": "You’re offline",
@@ -140,7 +140,7 @@
     "filterAll": "All",
     "filterUnassigned": "Unassigned",
     "filterAssigned": "In a list",
-    "advancedFilters": "Advanced filters",
+    "advancedFilters": "Filter by room or type",
     "filterRoom": "Room",
     "filterType": "Type",
     "select": "Select",
@@ -151,8 +151,9 @@
     "addToList": "Add to list ({count})",
     "addToListTarget": "Add {count} item(s) → list",
     "unassign": "Remove from lists",
+    "unassignConfirm": "Remove {count} item(s) from their list? People's answers on these items will be cleared.",
     "deleteSelected": "Delete",
-    "backToLists": "← My lists",
+    "backToLists": "Back to lists",
     "editTitle": "Edit item",
     "editPhoto": "Photo",
     "editCamera": "📸 Photo",
@@ -174,6 +175,7 @@
     "moveNoLists": "No other list."
   },
   "listDetail": {
+    "backToLists": "Back to lists",
     "tabItems": "Items",
     "tabResults": "Results",
     "tabShare": "Share",
@@ -186,10 +188,13 @@
     "deleteList": "Delete list",
     "emptyItems": "No items in this list.",
     "match": "Assign",
-    "unmatch": "Remove",
+    "unmatch": "Cancel",
+    "assignedTo": "Assigned to {name}",
+    "assignedBadge": "Assigned",
+    "resultsEmpty": "Add items to see responses.",
     "move": "Move",
     "edit": "Edit",
-    "noMatches": "No matches yet."
+    "noMatches": "No one has been assigned an item yet."
   },
   "wizard": {
     "photoTitle": "A photo of the item",
@@ -251,8 +256,9 @@
     "letsGo": "Let’s go",
     "googleSecure": "or more secure",
     "googleHint": "Google sign-in: same account on all your devices.",
-    "tabSwipe": "Swipe",
-    "tabMatches": "Matches",
+    "tabVote": "See items",
+    "tabForMe": "For me",
+    "forMeBadge": "For you",
     "history": "History",
     "account": "Account",
     "allDone": "You’ve seen everything!",
@@ -261,6 +267,7 @@
     "no": "NO",
     "voteYes": "Yes",
     "voteNo": "No",
+    "voteHint": "Tap the green or red button — you don’t need to drag the photo.",
     "historyTitle": "My history",
     "historyAll": "All ({count})",
     "historyYes": "✓ Yes ({count})",
@@ -268,6 +275,7 @@
     "historyEmpty": "You haven’t voted yet.",
     "historyFilterEmpty": "No votes in this filter.",
     "clearVotes": "Clear all my votes",
+    "clearVotesConfirm": "Clear all your votes on this list? Items assigned to you may disappear from “For me”.",
     "clearingVotes": "Clearing…",
     "matchesEmpty": "No items yet",
     "matchesEmptyBody": "When the organizer assigns you an item, it shows up here.",

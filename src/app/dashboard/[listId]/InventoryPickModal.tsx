@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useDashboardFetch } from "@/lib/client";
 import { LoadingButton } from "@/components/ui/LoadingButton";
+import { AnimateIn } from "@/components/ui/AnimateIn";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { EmojiBadge } from "@/components/EmojiBadge";
 import { getListKind } from "@/lib/list-kinds";
@@ -99,7 +100,7 @@ export function InventoryPickModal({ listId, onClose, onDone }: Props) {
           )}
 
           {items && items.length > 0 && (
-            <ul className="grid grid-cols-2 gap-3">
+            <AnimateIn as="ul" className="grid grid-cols-2 gap-3">
               {items.map((item) => {
                 const isSelected = selected.has(item.id);
                 const kind = item.listKind ? getListKind(item.listKind) : null;
@@ -151,7 +152,7 @@ export function InventoryPickModal({ listId, onClose, onDone }: Props) {
                   </li>
                 );
               })}
-            </ul>
+            </AnimateIn>
           )}
         </div>
 

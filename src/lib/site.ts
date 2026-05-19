@@ -4,7 +4,7 @@ export const SITE_NAME = "Share Items";
 export const SITE_SHORT_NAME = "Share";
 export const SITE_TAGLINE = "Tes objets, les bonnes mains.";
 export const SITE_DESCRIPTION =
-  "Photographie ce dont tu veux te débarrasser, fais voter tes proches façon Tinder, et attribue chaque objet à la personne qui le récupèrera.";
+  "Photographie ce dont tu veux te débarrasser, fais dire à ta famille ce qui l’intéresse, et attribue chaque objet à la bonne personne.";
 
 /** URL publique (OG, partage). Définir NEXT_PUBLIC_SITE_URL ou AUTH_URL en prod. */
 export const SITE_URL =
@@ -47,7 +47,6 @@ export const rootMetadata: Metadata = {
     "vente",
     "objets",
     "vote",
-    "swipe",
     "liste",
     "partage",
   ],
@@ -90,7 +89,7 @@ export const rootMetadata: Metadata = {
 
 export function listShareMetadata(listTitle: string, slug: string): Metadata {
   const title = `Vote : ${listTitle}`;
-  const description = `Swipe oui ou non sur « ${listTitle} » — ${SITE_TAGLINE}`;
+  const description = `Dis oui ou non sur les objets de « ${listTitle} » — ${SITE_TAGLINE}`;
   return {
     title,
     description,

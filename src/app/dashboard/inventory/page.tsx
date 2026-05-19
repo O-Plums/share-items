@@ -16,8 +16,12 @@ import {
 } from "@/lib/i18n-labels";
 import { AssignDialog } from "./AssignDialog";
 import { InventoryEditSheet } from "./InventoryEditSheet";
+import { BackButton } from "@/components/ui/BackButton";
+import { FilterChip } from "@/components/ui/FilterChip";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { AnimateIn } from "@/components/ui/AnimateIn";
+import { TextActionButton } from "@/components/ui/TextActionButton";
 
 type InventoryItem = {
   id: string;
@@ -87,7 +91,7 @@ export default function InventoryPage() {
 
   async function unassign() {
     if (selected.size === 0) return;
-    if (!confirm(`Retirer ${selected.size} objet(s) de leur liste ? Les votes et matchs seront perdus.`)) return;
+    if (!confirm(t("unassignConfirm", { count: selected.size }))) return;
     setBulkAction("unassign");
     try {
       await authedFetch("/api/inventory/unassign", {
@@ -148,9 +152,7 @@ export default function InventoryPage() {
     <main className="min-h-screen safe-top safe-bottom">
       <div className="mx-auto w-full max-w-md px-5 pb-40 pt-6">
         <header>
-          <Link href="/dashboard/lists" className="text-sm text-neutral-500">
-            {t("backToLists")}
-          </Link>
+          <BackButton href="/dashboard/lists">{t("backToLists")}</BackButton>
           <p className="mt-3 text-xs uppercase tracking-widest text-neutral-500">{t("label")}</p>
           <h1 className="mt-1 text-2xl font-bold">{t("title")}</h1>
           <p className="mt-1 text-sm text-neutral-600">{t("subtitle")}</p>
@@ -177,7 +179,7 @@ export default function InventoryPage() {
           </p>
         )}
 
-        <div className="mt-5 -mx-1 flex gap-2 overflow-x-auto px-1 no-scrollbar">
+        <AnimateIn className="mt-5 -mx-1 flex gap-2 overflow-x-auto px-1 no-scrollbar">
           <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
             {t("filterAll")}
           </FilterChip>
@@ -193,10 +195,15 @@ export default function InventoryPage() {
           >
             {t("filterAssigned")}
           </FilterChip>
-        </div>
+        </AnimateIn>
 
-        <details className="mt-3 text-sm">
-          <summary className="cursor-pointer text-neutral-500">{t("advancedFilters")}</summary>
+        <details className="group mt-3">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-neutral-800 shadow-sm ring-2 ring-neutral-200 marker:content-none active:bg-neutral-50 [&::-webkit-details-marker]:hidden">
+            <span>{t("advancedFilters")}</span>
+            <span className="text-neutral-400 transition group-open:rotate-180" aria-hidden>
+              ▼
+            </span>
+          </summary>
           <div className="mt-3 space-y-3">
             <div>
               <p className="text-xs font-medium text-neutral-500">{t("filterRoom")}</p>
@@ -245,16 +252,14 @@ export default function InventoryPage() {
         </details>
 
         <div className="mt-4 flex items-center justify-between">
-          <button
-            type="button"
+          <TextActionButton
             onClick={() => {
               setSelectionMode((v) => !v);
               setSelected(new Set());
             }}
-            className="text-sm font-medium text-brand-500"
           >
             {selectionMode ? t("cancelSelect") : t("select")}
-          </button>
+          </TextActionButton>
           {selectionMode && (
             <span className="text-sm text-neutral-500">{t("selected", { count: selected.size })}</span>
           )}
@@ -283,7 +288,7 @@ export default function InventoryPage() {
         )}
 
         {items && items.length > 0 && (
-          <ul className="mt-4 grid grid-cols-2 gap-3">
+          <AnimateIn as="ul" className="mt-4 grid grid-cols-2 gap-3">
             {items.map((item) => {
               const k =
                 item.listKind
@@ -314,7 +319,7 @@ export default function InventoryPage() {
                 </li>
               );
             })}
-          </ul>
+          </AnimateIn>
         )}
       </div>
 
@@ -389,30 +394,6 @@ export default function InventoryPage() {
         />
       )}
     </main>
-  );
-}
-
-function FilterChip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-1 transition ${
-        active
-          ? "bg-brand-500 text-white ring-brand-500"
-          : "bg-white text-neutral-700 ring-neutral-200"
-      }`}
-    >
-      {children}
-    </button>
   );
 }
 

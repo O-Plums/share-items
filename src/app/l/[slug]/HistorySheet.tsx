@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
 import { EmojiBadge } from "@/components/EmojiBadge";
+import { AnimateIn } from "@/components/ui/AnimateIn";
+import { FilterChip } from "@/components/ui/FilterChip";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { Spinner } from "@/components/ui/Spinner";
 
@@ -114,7 +116,7 @@ export function HistorySheet({ open, onClose, votes, onToggle, onClearAll, clear
                     {tVoter("historyFilterEmpty")}
                   </p>
                 ) : (
-                  <ul className="space-y-2 pb-3">
+                  <AnimateIn as="ul" className="space-y-2 pb-3">
                     {filtered.map((vote) => (
                       <li key={vote.itemId}>
                         <button
@@ -161,7 +163,7 @@ export function HistorySheet({ open, onClose, votes, onToggle, onClearAll, clear
                         </button>
                       </li>
                     ))}
-                  </ul>
+                  </AnimateIn>
                 )}
               </div>
 
@@ -186,24 +188,3 @@ export function HistorySheet({ open, onClose, votes, onToggle, onClearAll, clear
   );
 }
 
-function FilterChip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-        active ? "bg-brand-500 text-white" : "bg-neutral-100 text-neutral-600"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
