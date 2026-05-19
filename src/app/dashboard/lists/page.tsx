@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useDashboardFetch } from "@/lib/client";
-import { getListKind } from "@/lib/list-kinds";
+import { useTranslatedListKinds } from "@/lib/i18n-labels";
 import { PageLoader } from "@/components/ui/PageLoader";
 
 type ListSummary = {
@@ -18,6 +19,10 @@ type ListSummary = {
 };
 
 export default function ListsPage() {
+  const t = useTranslations("lists");
+  const tDash = useTranslations("dashboard");
+  const tCommon = useTranslations("common");
+  const translatedKinds = useTranslatedListKinds();
   const authedFetch = useDashboardFetch();
   const [lists, setLists] = useState<ListSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,11 +43,9 @@ export default function ListsPage() {
     <main className="min-h-screen safe-top safe-bottom">
       <div className="mx-auto w-full max-w-md px-5 pb-32 pt-6">
         <header>
-          <p className="text-xs uppercase tracking-widest text-neutral-500">Listes</p>
-          <h1 className="mt-1 text-2xl font-bold">Tes campagnes</h1>
-          <p className="mt-1 text-sm text-neutral-600">
-            Crée une liste, ajoute des objets, partage le lien aux votants.
-          </p>
+          <p className="text-xs uppercase tracking-widest text-neutral-500">{tDash("navLists")}</p>
+          <h1 className="mt-1 text-2xl font-bold">{t("title")}</h1>
+          <p className="mt-1 text-sm text-neutral-600">{t("subtitle")}</p>
         </header>
 
         <Link
@@ -50,7 +53,7 @@ export default function ListsPage() {
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-500 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-brand-600"
         >
           <span className="text-lg leading-none">＋</span>
-          Nouvelle liste
+          {t("newList")}
         </Link>
 
         {error && (
@@ -58,20 +61,20 @@ export default function ListsPage() {
         )}
 
         <section className="mt-6">
-          <p className="text-sm font-medium text-neutral-700">Mes listes</p>
+          <p className="text-sm font-medium text-neutral-700">{tDash("navLists")}</p>
           {lists === null ? (
-            <PageLoader label="Listes…" className="mt-6" />
+            <PageLoader label={tCommon("loading")} className="mt-6" />
           ) : lists.length === 0 ? (
             <div className="mt-3 rounded-2xl bg-white p-6 text-center ring-1 ring-neutral-200">
               <p className="text-3xl">📭</p>
               <p className="mt-2 text-sm text-neutral-600">
-                Aucune liste pour l’instant. Crée ta première campagne ci-dessus.
+                {t("empty")} {t("createFirst")}
               </p>
             </div>
           ) : (
             <ul className="mt-3 space-y-3">
               {lists.map((list) => {
-                const kind = getListKind(list.kind);
+                const kind = translatedKinds.find((k) => k.key === list.kind) ?? translatedKinds[3];
                 return (
                   <li key={list.id}>
                     <Link
@@ -101,7 +104,7 @@ export default function ListsPage() {
                           >
                             {kind.emoji} {kind.label}
                           </span>
-                          <span>{list._count.items} obj.</span>
+                          <span>{t("itemsCount", { count: list._count.items })}</span>
                         </p>
                       </div>
                       <span className="text-neutral-400">›</span>
@@ -114,13 +117,11 @@ export default function ListsPage() {
         </section>
 
         <section className="mt-8 border-t border-neutral-200 pt-6">
-          <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-            Créer par type
-          </p>
-          <p className="mt-0.5 text-sm text-neutral-600">Raccourcis pour démarrer vite.</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">{t("newTitle")}</p>
+          <p className="mt-0.5 text-sm text-neutral-600">{t("newSubtitle")}</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             {(["keep", "donate", "sell", "custom"] as const).map((k) => {
-              const kind = getListKind(k);
+              const kind = translatedKinds.find((kk) => kk.key === k) ?? translatedKinds[3];
               return (
                 <Link
                   key={k}

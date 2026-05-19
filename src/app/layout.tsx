@@ -1,4 +1,6 @@
 import type { Viewport } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { SerwistProvider } from "@serwist/next/react";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
@@ -20,15 +22,20 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="fr">
+    <html lang={locale}>
       <body className="min-h-screen">
-        <SerwistProvider swUrl="/sw.js" disable={process.env.NODE_ENV === "development"}>
-          <Providers>
-            <IdentityProvider>{children}</IdentityProvider>
-          </Providers>
-        </SerwistProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <SerwistProvider swUrl="/sw.js" disable={process.env.NODE_ENV === "development"}>
+            <Providers>
+              <IdentityProvider>{children}</IdentityProvider>
+            </Providers>
+          </SerwistProvider>
+        </NextIntlClientProvider>
         <Analytics />
       </body>
     </html>

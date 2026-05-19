@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useDashboardFetch } from "@/lib/client";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Spinner } from "@/components/ui/Spinner";
-import { getListKind } from "@/lib/list-kinds";
+import { useTranslatedListKinds } from "@/lib/i18n-labels";
 
 type SimpleList = { id: string; title: string; kind: string };
 
@@ -16,6 +17,9 @@ type Props = {
 };
 
 export function MoveDialog({ itemId, currentListId, onClose, onDone }: Props) {
+  const t = useTranslations("inventory");
+  const tCommon = useTranslations("common");
+  const translatedKinds = useTranslatedListKinds();
   const authedFetch = useDashboardFetch();
   const [lists, setLists] = useState<SimpleList[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -50,8 +54,10 @@ export function MoveDialog({ itemId, currentListId, onClose, onDone }: Props) {
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 sm:items-center">
       <div className="w-full max-w-md rounded-t-3xl bg-white p-5 ring-1 ring-neutral-200 sm:rounded-3xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold">Déplacer vers…</h2>
-          <button type="button" onClick={onClose} className="text-neutral-500" aria-label="Fermer">✕</button>
+          <h2 className="text-lg font-bold">{t("moveTitle")}</h2>
+          <button type="button" onClick={onClose} className="text-neutral-500" aria-label={tCommon("close")}>
+            ✕
+          </button>
         </div>
 
         {error && (
@@ -66,18 +72,16 @@ export function MoveDialog({ itemId, currentListId, onClose, onDone }: Props) {
             className="flex w-full items-center gap-3 rounded-2xl bg-neutral-50 px-3 py-3 text-left ring-1 ring-dashed ring-neutral-300 active:scale-[0.98] disabled:opacity-50"
           >
             <span className="text-xl">📦</span>
-            <span className="flex-1 truncate font-medium">Retirer de la liste (inventaire)</span>
+            <span className="flex-1 truncate font-medium">{t("moveInventory")}</span>
             {busyTarget === "inventory" && <Spinner size="sm" />}
           </button>
 
-          {lists === null && <PageLoader label="Listes…" className="py-6" />}
+          {lists === null && <PageLoader label={tCommon("loading")} className="py-6" />}
           {lists?.length === 0 && (
-            <p className="rounded-2xl bg-neutral-50 p-3 text-sm text-neutral-600">
-              Aucune autre liste.
-            </p>
+            <p className="rounded-2xl bg-neutral-50 p-3 text-sm text-neutral-600">{t("moveNoLists")}</p>
           )}
           {lists?.map((l) => {
-            const k = getListKind(l.kind);
+            const k = translatedKinds.find((kk) => kk.key === l.kind) ?? translatedKinds[3];
             return (
               <button
                 key={l.id}

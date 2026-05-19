@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ROOMS } from "@/lib/taxonomies";
+import { useTranslations } from "next-intl";
 import type { Taxonomy } from "@/lib/taxonomies";
+import { useTranslatedRooms } from "@/lib/i18n-labels";
 import { EmojiGrid } from "./EmojiGrid";
 import { useUserRooms } from "./UserRoomsProvider";
 import { LoadingButton } from "@/components/ui/LoadingButton";
@@ -34,6 +35,9 @@ type Props = {
 };
 
 export function RoomPicker({ selected, onSelect }: Props) {
+  const tRooms = useTranslations("rooms");
+  const tCommon = useTranslations("common");
+  const roomTaxonomies = useTranslatedRooms();
   const authedFetch = useDashboardFetch();
   const { rooms, loaded, addRoom } = useUserRooms();
   const [creating, setCreating] = useState(false);
@@ -76,16 +80,16 @@ export function RoomPicker({ selected, onSelect }: Props) {
   }
 
   if (!loaded) {
-    return <PageLoader label="Pièces…" className="py-4" />;
+    return <PageLoader label={tRooms("loading")} className="py-4" />;
   }
 
   return (
     <div className="space-y-6">
-      <EmojiGrid items={ROOMS} selected={selected} onSelect={onSelect} />
+      <EmojiGrid items={roomTaxonomies} selected={selected} onSelect={onSelect} />
 
       {customItems.length > 0 && (
         <div>
-          <p className="mb-3 text-sm font-medium text-neutral-600">Mes pièces</p>
+          <p className="mb-3 text-sm font-medium text-neutral-600">{tRooms("myRooms")}</p>
           <EmojiGrid items={customItems} selected={selected} onSelect={onSelect} />
         </div>
       )}
@@ -96,13 +100,13 @@ export function RoomPicker({ selected, onSelect }: Props) {
           onClick={() => setCreating(true)}
           className="w-full rounded-2xl border border-dashed border-neutral-300 bg-white py-3 text-sm font-medium text-neutral-600 active:scale-[0.99]"
         >
-          + Nouvelle pièce
+          {tRooms("new")}
         </button>
       ) : (
         <div className="rounded-2xl border border-neutral-200 bg-white p-3">
-          <p className="text-sm font-medium text-neutral-700">Créer une pièce</p>
+          <p className="text-sm font-medium text-neutral-700">{tRooms("createTitle")}</p>
 
-          <p className="mt-3 text-xs font-medium text-neutral-500">Emoji</p>
+          <p className="mt-3 text-xs font-medium text-neutral-500">{tRooms("emoji")}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {ROOM_EMOJI_OPTIONS.map((emoji) => {
               const active = newEmoji === emoji;
@@ -125,13 +129,13 @@ export function RoomPicker({ selected, onSelect }: Props) {
             })}
           </div>
 
-          <p className="mt-3 text-xs font-medium text-neutral-500">Nom</p>
+          <p className="mt-3 text-xs font-medium text-neutral-500">{tRooms("name")}</p>
           <div className="mt-2 flex gap-2">
             <input
               type="text"
               value={newLabel}
               onChange={(e) => setNewLabel(e.target.value)}
-              placeholder="Ex. Bureau, Cave…"
+              placeholder={tRooms("namePlaceholder")}
               maxLength={24}
               enterKeyHint="done"
               autoFocus
@@ -153,11 +157,11 @@ export function RoomPicker({ selected, onSelect }: Props) {
               className="shrink-0 rounded-xl px-4 py-2.5 text-sm"
               disabled={!newLabel.trim()}
             >
-              OK
+              {tCommon("ok")}
             </LoadingButton>
           </div>
           <button type="button" onClick={resetCreateForm} className="mt-2 text-xs text-neutral-500">
-            Annuler
+            {tCommon("cancel")}
           </button>
         </div>
       )}

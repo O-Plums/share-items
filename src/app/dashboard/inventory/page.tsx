@@ -3,13 +3,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDashboardFetch } from "@/lib/client";
-import { CATEGORIES, ROOMS } from "@/lib/taxonomies";
 import { EmojiBadge } from "@/components/EmojiBadge";
 import { useUserRooms } from "@/components/UserRoomsProvider";
 import type { RoomMeta } from "@/lib/user-room";
-import { getListKind } from "@/lib/list-kinds";
+import {
+  useTranslatedCategories,
+  useTranslatedListKinds,
+  useTranslatedRooms,
+} from "@/lib/i18n-labels";
 import { AssignDialog } from "./AssignDialog";
 import { InventoryEditSheet } from "./InventoryEditSheet";
 import { LoadingButton } from "@/components/ui/LoadingButton";
@@ -34,6 +38,11 @@ export default function InventoryPage() {
   const router = useRouter();
   const search = useSearchParams();
   const assignTargetListId = search.get("assign");
+  const t = useTranslations("inventory");
+  const tCommon = useTranslations("common");
+  const translatedRooms = useTranslatedRooms();
+  const translatedCategories = useTranslatedCategories();
+  const translatedKinds = useTranslatedListKinds();
   const authedFetch = useDashboardFetch();
   const { rooms: customRooms } = useUserRooms();
   const [items, setItems] = useState<InventoryItem[] | null>(null);
@@ -140,17 +149,14 @@ export default function InventoryPage() {
       <div className="mx-auto w-full max-w-md px-5 pb-40 pt-6">
         <header>
           <Link href="/dashboard/lists" className="text-sm text-neutral-500">
-            ← Mes listes
+            {t("backToLists")}
           </Link>
-          <p className="mt-3 text-xs uppercase tracking-widest text-neutral-500">Inventaire</p>
-          <h1 className="mt-1 text-2xl font-bold">Bibliothèque d’objets</h1>
-          <p className="mt-1 text-sm text-neutral-600">
-            Stocke tes photos ici, puis ajoute-les à une liste quand tu es prêt.
-          </p>
+          <p className="mt-3 text-xs uppercase tracking-widest text-neutral-500">{t("label")}</p>
+          <h1 className="mt-1 text-2xl font-bold">{t("title")}</h1>
+          <p className="mt-1 text-sm text-neutral-600">{t("subtitle")}</p>
           {stats && (
             <p className="mt-2 text-sm text-neutral-500">
-              {stats.total} objet{stats.total > 1 ? "s" : ""} ·{" "}
-              {stats.unassigned} non assigné{stats.unassigned > 1 ? "s" : ""}
+              {t("stats", { total: stats.total, unassigned: stats.unassigned })}
             </p>
           )}
         </header>
@@ -161,44 +167,44 @@ export default function InventoryPage() {
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-500 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-brand-600"
           >
             <span className="text-lg leading-none">＋</span>
-            Nouvel objet
+            {t("newItem")}
           </Link>
         )}
 
         {assignTargetListId && (
           <p className="mt-5 rounded-2xl bg-brand-50 px-4 py-3 text-sm text-brand-800 ring-1 ring-brand-200">
-            Sélectionne les objets à ajouter à ta liste, puis valide en bas.
+            {t("assignHint")}
           </p>
         )}
 
         <div className="mt-5 -mx-1 flex gap-2 overflow-x-auto px-1 no-scrollbar">
           <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
-            Tous
+            {t("filterAll")}
           </FilterChip>
           <FilterChip
             active={filter === "unassigned"}
             onClick={() => setFilter("unassigned")}
           >
-            Non assignés
+            {t("filterUnassigned")}
           </FilterChip>
           <FilterChip
             active={filter === "assigned"}
             onClick={() => setFilter("assigned")}
           >
-            Dans une liste
+            {t("filterAssigned")}
           </FilterChip>
         </div>
 
         <details className="mt-3 text-sm">
-          <summary className="cursor-pointer text-neutral-500">Filtres avancés</summary>
+          <summary className="cursor-pointer text-neutral-500">{t("advancedFilters")}</summary>
           <div className="mt-3 space-y-3">
             <div>
-              <p className="text-xs font-medium text-neutral-500">Pièce</p>
+              <p className="text-xs font-medium text-neutral-500">{t("filterRoom")}</p>
               <div className="mt-1 flex flex-wrap gap-2">
                 <FilterChip active={!roomFilter} onClick={() => setRoomFilter(null)}>
-                  Toutes
+                  {tCommon("allF")}
                 </FilterChip>
-                {ROOMS.map((r) => (
+                {translatedRooms.map((r) => (
                   <FilterChip
                     key={r.key}
                     active={roomFilter === r.key}
@@ -219,12 +225,12 @@ export default function InventoryPage() {
               </div>
             </div>
             <div>
-              <p className="text-xs font-medium text-neutral-500">Type</p>
+              <p className="text-xs font-medium text-neutral-500">{t("filterType")}</p>
               <div className="mt-1 flex flex-wrap gap-2">
                 <FilterChip active={!categoryFilter} onClick={() => setCategoryFilter(null)}>
-                  Tous
+                  {tCommon("all")}
                 </FilterChip>
-                {CATEGORIES.map((c) => (
+                {translatedCategories.map((c) => (
                   <FilterChip
                     key={c.key}
                     active={categoryFilter === c.key}
@@ -247,10 +253,10 @@ export default function InventoryPage() {
             }}
             className="text-sm font-medium text-brand-500"
           >
-            {selectionMode ? "Annuler" : "Sélectionner"}
+            {selectionMode ? t("cancelSelect") : t("select")}
           </button>
           {selectionMode && (
-            <span className="text-sm text-neutral-500">{selected.size} choisi(s)</span>
+            <span className="text-sm text-neutral-500">{t("selected", { count: selected.size })}</span>
           )}
         </div>
 
@@ -258,21 +264,19 @@ export default function InventoryPage() {
           <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
         )}
 
-        {items === null && <PageLoader label="Inventaire…" className="mt-10" />}
+        {items === null && <PageLoader label={tCommon("loading")} className="mt-10" />}
 
         {items && items.length === 0 && (
           <div className="mt-10 rounded-2xl bg-white p-6 text-center ring-1 ring-neutral-200">
             <p className="text-4xl">📦</p>
-            <h2 className="mt-3 font-semibold">Aucun objet</h2>
-            <p className="mt-1 text-sm text-neutral-600">
-              Ajoute ton premier objet à l’inventaire, puis assigne-le à une liste.
-            </p>
+            <h2 className="mt-3 font-semibold">{t("emptyTitle")}</h2>
+            <p className="mt-1 text-sm text-neutral-600">{t("emptyBody")}</p>
             {!assignTargetListId && (
               <Link
                 href="/dashboard/inventory/new"
                 className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white"
               >
-                ＋ Nouvel objet
+                ＋ {t("newItem")}
               </Link>
             )}
           </div>
@@ -281,7 +285,10 @@ export default function InventoryPage() {
         {items && items.length > 0 && (
           <ul className="mt-4 grid grid-cols-2 gap-3">
             {items.map((item) => {
-              const k = item.listKind ? getListKind(item.listKind) : null;
+              const k =
+                item.listKind
+                  ? translatedKinds.find((kk) => kk.key === item.listKind) ?? translatedKinds[3]
+                  : null;
               const isSelected = selected.has(item.id);
               return (
                 <li key={item.id}>
@@ -318,12 +325,12 @@ export default function InventoryPage() {
               {assignTargetListId ? (
                 <LoadingButton
                   loading={assigningToList}
-                  loadingText="Ajout…"
+                  loadingText={t("assignAdding")}
                   variant="primary"
                   className="w-full rounded-xl px-3 py-2.5 text-sm"
                   onClick={assignToTargetList}
                 >
-                  {`Ajouter ${selected.size} objet${selected.size > 1 ? "s" : ""} → liste`}
+                  {t("addToListTarget", { count: selected.size })}
                 </LoadingButton>
               ) : (
                 <LoadingButton
@@ -332,29 +339,29 @@ export default function InventoryPage() {
                   onClick={() => setShowAssign(true)}
                   disabled={!!bulkAction}
                 >
-                  Ajouter à une liste ({selected.size})
+                  {t("addToList", { count: selected.size })}
                 </LoadingButton>
               )}
               <div className="grid grid-cols-2 gap-2">
                 <LoadingButton
                   loading={bulkAction === "unassign"}
-                  loadingText="…"
+                  loadingText={tCommon("loading")}
                   variant="secondary"
                   className="rounded-xl px-3 py-2 text-sm font-medium"
                   onClick={unassign}
                   disabled={!!bulkAction && bulkAction !== "unassign"}
                 >
-                  Retirer des listes
+                  {t("unassign")}
                 </LoadingButton>
                 <LoadingButton
                   loading={bulkAction === "delete"}
-                  loadingText="…"
+                  loadingText={tCommon("loading")}
                   variant="danger"
                   className="rounded-xl px-3 py-2 text-sm font-medium"
                   onClick={deleteSelected}
                   disabled={!!bulkAction && bulkAction !== "delete"}
                 >
-                  Supprimer
+                  {t("deleteSelected")}
                 </LoadingButton>
               </div>
             </div>
@@ -415,16 +422,17 @@ function ItemCardInner({
   selected,
 }: {
   item: InventoryItem;
-  kind: ReturnType<typeof getListKind> | null;
+  kind: { emoji: string; label: string; color: string; key: string } | null;
   selected?: boolean;
 }) {
+  const t = useTranslations("inventory");
   return (
     <>
       <div className="relative aspect-square bg-neutral-100">
         <Image src={item.imageUrl} alt={item.label ?? ""} fill sizes="50vw" className="object-cover" />
         {!item.listId && (
           <span className="absolute right-1.5 top-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-neutral-700 ring-1 ring-neutral-200">
-            Non assigné
+            {t("unassigned")}
           </span>
         )}
         {item.listKind && kind && (

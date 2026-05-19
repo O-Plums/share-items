@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth, signIn } from "@/auth";
 import { AppLogo } from "@/components/AppLogo";
+import { PublicLanguageBar } from "@/components/PublicLanguageBar";
 
 type SearchParams = Promise<{ callbackUrl?: string; error?: string }>;
 
@@ -13,6 +15,7 @@ export default async function LoginPage({
   const session = await auth();
   const params = await searchParams;
   const callbackUrl = params.callbackUrl ?? "/dashboard/lists";
+  const t = await getTranslations("login");
 
   if (session?.user) {
     redirect(callbackUrl);
@@ -26,34 +29,26 @@ export default async function LoginPage({
   );
 
   return (
-    <main className="flex min-h-screen flex-col safe-top safe-bottom">
+    <main className="relative flex min-h-screen flex-col safe-top safe-bottom">
+      <PublicLanguageBar />
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-10">
         <header className="text-center">
           <div className="flex justify-center">
             <AppLogo size={72} href="/" />
           </div>
-          <h1 className="mt-4 text-3xl font-bold leading-tight text-neutral-900">
-            Connexion
-          </h1>
-          <p className="mt-2 text-neutral-600">
-            Connecte-toi pour retrouver tes listes sur tous tes appareils.
-          </p>
+          <h1 className="mt-4 text-3xl font-bold leading-tight text-neutral-900">{t("title")}</h1>
+          <p className="mt-2 text-neutral-600">{t("subtitle")}</p>
         </header>
 
         {params.error && (
           <div className="mt-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-            Une erreur s’est produite ({params.error}). Réessaie.
+            {t("error", { error: params.error })}
           </div>
         )}
 
         {!googleEnabled && !appleEnabled && (
           <div className="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Aucun fournisseur OAuth n’est configuré. Ajoute{" "}
-            <code className="font-mono">AUTH_GOOGLE_ID</code>/
-            <code className="font-mono">AUTH_GOOGLE_SECRET</code> ou{" "}
-            <code className="font-mono">AUTH_APPLE_ID</code>/
-            <code className="font-mono">AUTH_APPLE_SECRET</code> dans{" "}
-            <code className="font-mono">.env</code>.
+            {t("noProviders")}
           </div>
         )}
 
@@ -70,7 +65,7 @@ export default async function LoginPage({
                 className="flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-4 py-4 text-base font-semibold text-neutral-900 ring-1 ring-neutral-200 transition active:bg-neutral-50"
               >
                 <GoogleLogo />
-                Continuer avec Google
+                {t("google")}
               </button>
             </form>
           )}
@@ -87,19 +82,15 @@ export default async function LoginPage({
                 className="flex w-full items-center justify-center gap-3 rounded-2xl bg-black px-4 py-4 text-base font-semibold text-white transition active:bg-neutral-800"
               >
                 <AppleLogo />
-                Continuer avec Apple
+                {t("apple")}
               </button>
             </form>
           )}
         </div>
 
         <div className="mt-10 rounded-2xl bg-white p-4 ring-1 ring-neutral-200">
-          <p className="text-sm font-medium text-neutral-900">
-            Tu as reçu un lien pour voter ?
-          </p>
-          <p className="mt-1 text-sm text-neutral-600">
-            Ouvre-le directement, aucun compte n’est requis pour swiper.
-          </p>
+          <p className="text-sm font-medium text-neutral-900">{t("voterTitle")}</p>
+          <p className="mt-1 text-sm text-neutral-600">{t("voterBody")}</p>
         </div>
       </div>
     </main>

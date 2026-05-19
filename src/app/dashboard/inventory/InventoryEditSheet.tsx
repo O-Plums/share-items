@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDashboardFetch, uploadImage } from "@/lib/client";
-import { CATEGORIES } from "@/lib/taxonomies";
+import { useTranslatedCategories } from "@/lib/i18n-labels";
 import { EmojiGrid } from "@/components/EmojiGrid";
 import { RoomPicker } from "@/components/RoomPicker";
 import { TagPicker } from "@/components/TagPicker";
@@ -31,6 +32,10 @@ type Props = {
 };
 
 export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props) {
+  const t = useTranslations("inventory");
+  const tWizard = useTranslations("wizard");
+  const tCommon = useTranslations("common");
+  const categories = useTranslatedCategories();
   const authedFetch = useDashboardFetch();
   const galleryRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -40,7 +45,7 @@ export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props)
   const [room, setRoom] = useState<string | null>(preview?.room ?? null);
   const [category, setCategory] = useState<string | null>(preview?.category ?? null);
   const [label, setLabel] = useState(preview?.label ?? "");
-  const [tagIds, setTagIds] = useState<string[]>(preview?.tags.map((t) => t.id) ?? []);
+  const [tagIds, setTagIds] = useState<string[]>(preview?.tags.map((tag) => tag.id) ?? []);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -58,7 +63,7 @@ export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props)
       setRoom(preview.room);
       setCategory(preview.category);
       setLabel(preview.label ?? "");
-      setTagIds(preview.tags.map((t) => t.id));
+      setTagIds(preview.tags.map((tag) => tag.id));
     }
     authedFetch<{ item: ItemData }>(`/api/items/${itemId}`)
       .then((d) => {
@@ -67,7 +72,7 @@ export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props)
         setRoom(d.item.room);
         setCategory(d.item.category);
         setLabel(d.item.label ?? "");
-        setTagIds(d.item.tags.map((t) => t.id));
+        setTagIds(d.item.tags.map((tag) => tag.id));
       })
       .catch((e: Error) => alive && setError(e.message))
       .finally(() => alive && setLoading(false));
@@ -165,14 +170,14 @@ export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props)
                 <div className="h-1.5 w-10 rounded-full bg-neutral-300" />
               </div>
               <div className="flex items-center justify-between px-5 py-3">
-                <h2 className="text-lg font-bold">Modifier l’objet</h2>
+                <h2 className="text-lg font-bold">{t("editTitle")}</h2>
                 <button
                   type="button"
                   onClick={onClose}
                   disabled={busy}
                   className="rounded-full px-3 py-1 text-sm text-neutral-500 active:bg-neutral-100 disabled:opacity-50"
                 >
-                  Fermer
+                  {tCommon("close")}
                 </button>
               </div>
 
@@ -184,11 +189,11 @@ export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props)
 
               <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4">
                 {loading && !preview ? (
-                  <PageLoader label="Chargement…" className="py-10" />
+                  <PageLoader label={tCommon("loading")} className="py-10" />
                 ) : (
                   <div className="space-y-6 pb-2">
                     <section>
-                      <p className="text-sm font-medium text-neutral-600">Photo</p>
+                      <p className="text-sm font-medium text-neutral-600">{t("editPhoto")}</p>
                       <input
                         ref={cameraRef}
                         type="file"
@@ -213,39 +218,39 @@ export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props)
                       <div className="mt-2 grid grid-cols-2 gap-2">
                         <LoadingButton
                           loading={uploading}
-                          loadingText="…"
+                          loadingText={tCommon("loading")}
                           variant="secondary"
                           className="rounded-xl py-2.5 text-sm"
                           disabled={busy}
                           onClick={() => cameraRef.current?.click()}
                         >
-                          📸 Photo
+                          {t("editCamera")}
                         </LoadingButton>
                         <LoadingButton
                           loading={uploading}
-                          loadingText="…"
+                          loadingText={tCommon("loading")}
                           variant="secondary"
                           className="rounded-xl py-2.5 text-sm"
                           disabled={busy}
                           onClick={() => galleryRef.current?.click()}
                         >
-                          🖼️ Galerie
+                          {t("editGallery")}
                         </LoadingButton>
                       </div>
                     </section>
 
                     <section>
-                      <p className="text-sm font-medium text-neutral-600">Pièce</p>
+                      <p className="text-sm font-medium text-neutral-600">{t("editRoom")}</p>
                       <div className="mt-2">
                         <RoomPicker selected={room} onSelect={setRoom} />
                       </div>
                     </section>
 
                     <section>
-                      <p className="text-sm font-medium text-neutral-600">Type</p>
+                      <p className="text-sm font-medium text-neutral-600">{t("editType")}</p>
                       <div className="mt-2">
                         <EmojiGrid
-                          items={CATEGORIES}
+                          items={categories}
                           selected={category}
                           onSelect={setCategory}
                         />
@@ -253,7 +258,7 @@ export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props)
                     </section>
 
                     <section>
-                      <p className="text-sm font-medium text-neutral-600">Tags (optionnel)</p>
+                      <p className="text-sm font-medium text-neutral-600">{t("editTags")}</p>
                       <div className="mt-2">
                         <TagPicker selected={tagIds} onChange={setTagIds} />
                       </div>
@@ -261,14 +266,14 @@ export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props)
 
                     <section>
                       <label htmlFor="inv-edit-label" className="text-sm font-medium text-neutral-600">
-                        Nom (optionnel)
+                        {t("editName")}
                       </label>
                       <input
                         id="inv-edit-label"
                         type="text"
                         value={label}
                         onChange={(e) => setLabel(e.target.value)}
-                        placeholder="Ex. Frigo Samsung"
+                        placeholder={tWizard("namePlaceholder")}
                         maxLength={60}
                         enterKeyHint="done"
                         disabled={busy}
@@ -282,23 +287,23 @@ export function InventoryEditSheet({ itemId, preview, onClose, onSaved }: Props)
               <div className="shrink-0 space-y-2 border-t border-neutral-100 px-5 py-3">
                 <LoadingButton
                   loading={saving}
-                  loadingText="Enregistrement…"
+                  loadingText={tCommon("saving")}
                   variant="primary"
                   className="w-full rounded-2xl py-3.5 text-base"
                   disabled={!canSave || busy}
                   onClick={save}
                 >
-                  Enregistrer
+                  {t("editSave")}
                 </LoadingButton>
                 <LoadingButton
                   loading={deleting}
-                  loadingText="Suppression…"
+                  loadingText={tCommon("deleting")}
                   variant="danger"
                   className="w-full rounded-2xl py-2.5 text-sm"
                   disabled={busy}
                   onClick={remove}
                 >
-                  Supprimer l’objet
+                  {t("editDelete")}
                 </LoadingButton>
               </div>
             </div>

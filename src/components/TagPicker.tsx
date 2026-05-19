@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useDashboardFetch } from "@/lib/client";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { PageLoader } from "@/components/ui/PageLoader";
@@ -16,6 +17,8 @@ type Props = {
 const DEFAULT_MAX = 3;
 
 export function TagPicker({ selected, onChange, max = DEFAULT_MAX }: Props) {
+  const tTags = useTranslations("tags");
+  const tCommon = useTranslations("common");
   const authedFetch = useDashboardFetch();
   const createInputRef = useRef<HTMLInputElement>(null);
   const [tags, setTags] = useState<Tag[] | null>(null);
@@ -71,7 +74,7 @@ export function TagPicker({ selected, onChange, max = DEFAULT_MAX }: Props) {
   }
 
   if (tags === null) {
-    return <PageLoader label="Tags…" className="py-4" />;
+    return <PageLoader label={tTags("loading")} className="py-4" />;
   }
 
   return (
@@ -103,7 +106,7 @@ export function TagPicker({ selected, onChange, max = DEFAULT_MAX }: Props) {
             }}
             className="rounded-full bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 ring-1 ring-dashed ring-neutral-300 active:scale-95"
           >
-            + Nouveau tag
+            {tTags("new")}
           </button>
         )}
       </div>
@@ -115,7 +118,7 @@ export function TagPicker({ selected, onChange, max = DEFAULT_MAX }: Props) {
             type="text"
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
-            placeholder="Ex. chambre Camille"
+            placeholder={tTags("placeholder")}
             maxLength={24}
             enterKeyHint="done"
             autoFocus
@@ -141,14 +144,14 @@ export function TagPicker({ selected, onChange, max = DEFAULT_MAX }: Props) {
             className="shrink-0 rounded-2xl px-3 py-2.5 text-sm"
             disabled={!newLabel.trim()}
           >
-            OK
+            {tCommon("ok")}
           </LoadingButton>
         </div>
       )}
 
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
       <p className="mt-2 text-xs text-neutral-500">
-        {selected.length}/{max} sélectionnés
+        {tTags("selected", { count: selected.length, max })}
       </p>
     </div>
   );

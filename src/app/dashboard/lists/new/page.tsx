@@ -1,21 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
 import { useDashboardFetch } from "@/lib/client";
 import { LoadingButton } from "@/components/ui/LoadingButton";
-import { getListKind, isValidListKind } from "@/lib/list-kinds";
-
-const DEFAULT_TITLES: Record<string, string> = {
-  keep: "À garder",
-  donate: "À donner",
-  sell: "À vendre",
-  custom: "",
-};
+import { useTranslatedListKinds } from "@/lib/i18n-labels";
+import { isValidListKind } from "@/lib/list-kinds";
 
 export default function NewListPage() {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("lists");
+  const tCommon = useTranslations("common");
+  const translatedKinds = useTranslatedListKinds();
   const authedFetch = useDashboardFetch();
   const search = useSearchParams();
   const kindParam = search.get("kind");
@@ -24,10 +23,22 @@ export default function NewListPage() {
   const itemsParam = search.get("items") ?? "";
   const presetItems = itemsParam ? itemsParam.split(",").filter(Boolean) : [];
 
+  const labelForKey = (key: string) =>
+    translatedKinds.find((k) => k.key === key)?.label ?? "";
+  const defaultLabels = useMemo(
+    () => translatedKinds.map((k) => k.label),
+    [translatedKinds],
+  );
+
   const [kind, setKind] = useState(initialKind);
-  const [title, setTitle] = useState(DEFAULT_TITLES[initialKind] ?? "");
+  const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setKind(initialKind);
+    setTitle(labelForKey(initialKind));
+  }, [initialKind, locale]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,18 +67,16 @@ export default function NewListPage() {
     <main className="min-h-screen safe-top safe-bottom">
       <div className="mx-auto w-full max-w-md px-5 pt-6">
         <Link href={fromInventory ? "/dashboard/inventory" : "/dashboard/lists"} className="text-sm text-neutral-500">
-          ← Retour
+          {tCommon("back")}
         </Link>
-        <h1 className="mt-4 text-2xl font-bold">Nouvelle liste</h1>
+        <h1 className="mt-4 text-2xl font-bold">{t("newTitle")}</h1>
         <p className="mt-1 text-neutral-600">
-          {presetItems.length > 0
-            ? `${presetItems.length} objet${presetItems.length > 1 ? "s" : ""} sera${presetItems.length > 1 ? "ont" : ""} ajouté${presetItems.length > 1 ? "s" : ""}.`
-            : "Donne un nom à ta liste."}
+          {presetItems.length > 0 ? t("itemsCount", { count: presetItems.length }) : t("newSubtitle")}
         </p>
 
         <div className="mt-6 grid grid-cols-2 gap-2">
           {(["keep", "donate", "sell", "custom"] as const).map((k) => {
-            const kk = getListKind(k);
+            const kk = translatedKinds.find((tk) => tk.key === k) ?? translatedKinds[3];
             const active = kind === k;
             return (
               <button
@@ -75,8 +84,9 @@ export default function NewListPage() {
                 type="button"
                 onClick={() => {
                   setKind(k);
-                  if (!title || Object.values(DEFAULT_TITLES).includes(title)) {
-                    setTitle(DEFAULT_TITLES[k] ?? "");
+                  const next = labelForKey(k);
+                  if (!title || defaultLabels.includes(title)) {
+                    setTitle(next);
                   }
                 }}
                 className={`flex items-center gap-2 rounded-2xl px-3 py-3 text-left ring-1 transition ${
@@ -95,7 +105,7 @@ export default function NewListPage() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder={kind === "custom" ? "Ex. Débarras appart" : DEFAULT_TITLES[kind]}
+            placeholder={kind === "custom" ? t("listTitlePlaceholder") : labelForKey(kind)}
             maxLength={80}
             autoFocus
             className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-lg text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
@@ -106,12 +116,12 @@ export default function NewListPage() {
           <LoadingButton
             type="submit"
             loading={loading}
-            loadingText="Création…"
+            loadingText={tCommon("saving")}
             variant="primary"
             className="w-full rounded-2xl px-4 py-4 text-lg"
             disabled={!title.trim()}
           >
-            Créer
+            {t("create")}
           </LoadingButton>
         </form>
       </div>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { IdentityGate } from "@/components/IdentityGate";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useIdentity } from "@/lib/identity";
 import { useAuthedFetch } from "@/lib/client";
 import { SwipeView } from "./SwipeView";
@@ -57,6 +59,7 @@ export function VoterApp({ slug, googleEnabled = false }: VoterAppProps) {
 }
 
 function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: boolean }) {
+  const t = useTranslations("voter");
   const { identity } = useIdentity();
   const authedFetch = useAuthedFetch();
   const [list, setList] = useState<ListResponse | null>(null);
@@ -180,10 +183,11 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
+            <LanguageSwitcher compact />
             <button
               type="button"
               onClick={() => setAccountOpen(true)}
-              aria-label="Mon compte"
+              aria-label={t("account")}
               className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-xl ring-1 ring-neutral-200 active:bg-neutral-100"
             >
               👤
@@ -191,7 +195,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
             <button
               type="button"
               onClick={() => setHistoryOpen(true)}
-              aria-label="Mon historique"
+              aria-label={t("history")}
               className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-2xl ring-1 ring-neutral-200 active:bg-neutral-100"
             >
               📖
@@ -216,11 +220,13 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
 
       <footer className="safe-bottom border-t border-neutral-200 bg-white">
         <div className="mx-auto grid w-full max-w-md grid-cols-2">
-          <TabButton active={tab === "swipe"} onClick={() => setTab("swipe")} label="Swipe" icon="🔥" />
+          <TabButton active={tab === "swipe"} onClick={() => setTab("swipe")} label={t("tabSwipe")} icon="🔥" />
           <TabButton
             active={tab === "matches"}
             onClick={() => setTab("matches")}
-            label={matches.length > 0 ? `Matchs (${matches.length})` : "Matchs"}
+            label={
+              matches.length > 0 ? `${t("tabMatches")} (${matches.length})` : t("tabMatches")
+            }
             icon="🤝"
           />
         </div>

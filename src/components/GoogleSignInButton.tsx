@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
 type Props = {
   callbackUrl: string;
@@ -11,9 +12,11 @@ type Props = {
 
 export function GoogleSignInButton({
   callbackUrl,
-  label = "Continuer avec Google",
+  label,
   className = "flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-base font-semibold text-neutral-900 ring-1 ring-neutral-200 transition active:bg-neutral-50 disabled:opacity-60",
 }: Props) {
+  const tLogin = useTranslations("login");
+  const tVoter = useTranslations("voter");
   const [loading, setLoading] = useState(false);
 
   function handleClick() {
@@ -21,10 +24,12 @@ export function GoogleSignInButton({
     void signIn("google", { redirectTo: callbackUrl });
   }
 
+  const resolvedLabel = label ?? tLogin("google");
+
   return (
     <button type="button" onClick={handleClick} disabled={loading} className={className}>
       <GoogleLogo />
-      {loading ? "Redirection…" : label}
+      {loading ? tVoter("googleRedirect") : resolvedLabel}
     </button>
   );
 }

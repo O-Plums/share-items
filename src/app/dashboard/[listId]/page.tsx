@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import Link from "next/link";
 import Image from "next/image";
@@ -38,6 +39,7 @@ export default function ListDetailPage() {
   const params = useParams<{ listId: string }>();
   const searchParams = useSearchParams();
   const tabParam = (searchParams.get("tab") as Tab | null) ?? "items";
+  const tList = useTranslations("listDetail");
   const authedFetch = useDashboardFetch();
   const [data, setData] = useState<ResultsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -264,16 +266,20 @@ export default function ListDetailPage() {
         </div>
 
         <nav className="mt-5 grid grid-cols-3 gap-1 rounded-2xl bg-neutral-200/60 p-1">
-          {(["items", "results", "share"] as Tab[]).map((t) => (
+          {(["items", "results", "share"] as Tab[]).map((tab) => (
             <button
-              key={t}
+              key={tab}
               type="button"
-              onClick={() => setTab(t)}
+              onClick={() => setTab(tab)}
               className={`rounded-xl py-2 text-sm font-medium transition ${
-                tabParam === t ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-600"
+                tabParam === tab ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-600"
               }`}
             >
-              {t === "items" ? "Objets" : t === "results" ? "Résultats" : "Partager"}
+              {tab === "items"
+                ? tList("tabItems")
+                : tab === "results"
+                  ? tList("tabResults")
+                  : tList("tabShare")}
             </button>
           ))}
         </nav>
@@ -284,14 +290,14 @@ export default function ListDetailPage() {
               href={`/dashboard/${params.listId}/items/new`}
               className="rounded-2xl bg-brand-500 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm"
             >
-              + Nouvel objet
+              + {tList("addItem")}
             </Link>
             <button
               type="button"
               onClick={() => setShowInventoryPick(true)}
               className="rounded-2xl bg-white px-4 py-3 text-center text-sm font-semibold text-neutral-900 ring-1 ring-neutral-200 shadow-sm"
             >
-              📦 Inventaire
+              📦 {tList("fromInventory")}
             </button>
           </div>
         )}

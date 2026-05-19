@@ -2,9 +2,10 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useDashboardFetch, uploadImage } from "@/lib/client";
-import { CATEGORIES } from "@/lib/taxonomies";
+import { useTranslatedCategories } from "@/lib/i18n-labels";
 import { EmojiGrid } from "./EmojiGrid";
 import { RoomPicker } from "./RoomPicker";
 import { TagPicker } from "./TagPicker";
@@ -34,6 +35,10 @@ type PermissionError = "camera" | "gallery" | null;
 
 export function ItemWizard({ mode, initial, redirectTo }: Props) {
   const router = useRouter();
+  const tWizard = useTranslations("wizard");
+  const tCommon = useTranslations("common");
+  const tInventory = useTranslations("inventory");
+  const categories = useTranslatedCategories();
   const authedFetch = useDashboardFetch();
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -146,7 +151,7 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
           className="text-sm text-neutral-500"
           disabled={uploading || saving}
         >
-          ← Retour
+          {tCommon("back")}
         </button>
 
         <div className="mt-4 flex items-center gap-2">
@@ -166,10 +171,8 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
 
         {step === 1 && (
           <section className="mt-6">
-            <h1 className="text-2xl font-bold">Une photo de l’objet</h1>
-            <p className="mt-1 text-neutral-600">
-              Prends une photo ou choisis-en une dans ta galerie.
-            </p>
+            <h1 className="text-2xl font-bold">{tWizard("photoTitle")}</h1>
+            <p className="mt-1 text-neutral-600">{tWizard("photoSubtitle")}</p>
 
             <input
               ref={cameraInputRef}
@@ -190,28 +193,26 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
             <div className="mt-6 space-y-3">
               <LoadingButton
                 loading={uploading}
-                loadingText="Envoi…"
+                loadingText={tCommon("loading")}
                 variant="primary"
                 className="w-full rounded-2xl px-4 py-4 text-lg"
                 onClick={() => openSource("camera")}
               >
-                <span aria-hidden>📸</span> Prendre une photo
+                <span aria-hidden>📸</span> {tWizard("takePhoto")}
               </LoadingButton>
               <LoadingButton
                 loading={uploading}
-                loadingText="Envoi…"
+                loadingText={tCommon("loading")}
                 variant="secondary"
                 className="w-full rounded-2xl px-4 py-4 text-lg"
                 onClick={() => openSource("gallery")}
               >
-                <span aria-hidden>🖼️</span> Choisir dans la galerie
+                <span aria-hidden>🖼️</span> {tWizard("chooseGallery")}
               </LoadingButton>
 
               {permissionDenied && (
                 <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {permissionDenied === "camera"
-                    ? "L’accès à la caméra a été refusé. Autorise la caméra pour ce site dans les réglages du navigateur, puis réessaie."
-                    : "L’accès aux photos a été refusé. Autorise l’accès aux photos pour ce site dans les réglages du navigateur, puis réessaie."}
+                  {permissionDenied === "camera" ? tWizard("cameraDenied") : tWizard("galleryDenied")}
                 </div>
               )}
 
@@ -233,7 +234,7 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
                   disabled={!canNextFrom1}
                   onClick={next}
                 >
-                  Continuer →
+                  {tCommon("continue")}
                 </LoadingButton>
               )}
             </div>
@@ -242,8 +243,8 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
 
         {step === 2 && imageUrl && (
           <section className="mt-6">
-            <h1 className="text-2xl font-bold">Où se trouve l’objet&nbsp;?</h1>
-            <p className="mt-1 text-neutral-600">Choisis une pièce ou crée la tienne.</p>
+            <h1 className="text-2xl font-bold">{tWizard("roomTitle")}</h1>
+            <p className="mt-1 text-neutral-600">{tWizard("roomSubtitle")}</p>
             <div className="mt-6">
               <RoomPicker selected={room} onSelect={(k) => setRoom(k)} />
             </div>
@@ -253,24 +254,22 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
               disabled={!canNextFrom2}
               onClick={next}
             >
-              Suivant
+              {tCommon("next")}
             </LoadingButton>
           </section>
         )}
 
         {step === 3 && imageUrl && (
           <section className="mt-6">
-            <h1 className="text-2xl font-bold">Quel type d’objet&nbsp;?</h1>
-            <p className="mt-1 text-neutral-600">Choisis une catégorie.</p>
+            <h1 className="text-2xl font-bold">{tWizard("categoryTitle")}</h1>
+            <p className="mt-1 text-neutral-600">{tWizard("categorySubtitle")}</p>
             <div className="mt-6">
-              <EmojiGrid items={CATEGORIES} selected={category} onSelect={(k) => setCategory(k)} />
+              <EmojiGrid items={categories} selected={category} onSelect={(k) => setCategory(k)} />
             </div>
 
             <div className="mt-6">
-              <p className="text-sm font-medium text-neutral-600">Tags perso (optionnel)</p>
-              <p className="text-xs text-neutral-500">
-                Pour t’y retrouver : « bureau Florian », « cave », etc.
-              </p>
+              <p className="text-sm font-medium text-neutral-600">{tWizard("tagsTitle")}</p>
+              <p className="text-xs text-neutral-500">{tWizard("tagsHint")}</p>
               <div className="mt-3">
                 <TagPicker selected={tagIds} onChange={setTagIds} />
               </div>
@@ -278,14 +277,14 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
 
             <div className="mt-6">
               <label htmlFor="label" className="text-sm font-medium text-neutral-600">
-                Nom (optionnel)
+                {tWizard("nameLabel")}
               </label>
               <input
                 id="label"
                 type="text"
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
-                placeholder="Ex. Frigo Samsung"
+                placeholder={tWizard("namePlaceholder")}
                 maxLength={60}
                 enterKeyHint="done"
                 disabled={saving}
@@ -294,13 +293,13 @@ export function ItemWizard({ mode, initial, redirectTo }: Props) {
             </div>
             <LoadingButton
               loading={saving}
-              loadingText="Enregistrement…"
+              loadingText={tCommon("saving")}
               variant="primary"
               className="mt-8 w-full rounded-2xl px-4 py-4 text-lg"
               disabled={!canSave}
               onClick={save}
             >
-              {mode.kind === "edit" ? "Mettre à jour" : "Enregistrer"}
+              {mode.kind === "edit" ? tWizard("update") : tInventory("editSave")}
             </LoadingButton>
           </section>
         )}

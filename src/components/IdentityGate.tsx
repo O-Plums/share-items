@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useIdentity } from "@/lib/identity";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import { AppLogo } from "./AppLogo";
@@ -12,17 +13,10 @@ type Props = {
   children: React.ReactNode;
   slug: string;
   googleEnabled?: boolean;
-  title?: string;
-  description?: string;
 };
 
-export function IdentityGate({
-  children,
-  slug,
-  googleEnabled = false,
-  title = "Comment tu t’appelles ?",
-  description = "Un prénom suffit pour voter. L’organisateur te reconnaîtra sur cette liste.",
-}: Props) {
+export function IdentityGate({ children, slug, googleEnabled = false }: Props) {
+  const t = useTranslations("voter");
   const { data: session, status } = useSession();
   const { identity, ready, setDisplayName, setIdentityFromAuth } = useIdentity();
   const [name, setName] = useState("");
@@ -35,7 +29,7 @@ export function IdentityGate({
     const raw =
       session.user.name?.trim() ||
       session.user.email?.split("@")[0]?.trim() ||
-      "Votant";
+      "?";
     setIdentityFromAuth(session.user.id, raw.slice(0, 30));
   }, [session, status, setIdentityFromAuth]);
 
@@ -62,14 +56,14 @@ export function IdentityGate({
             <AppLogo size={64} href={null} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">{title}</h1>
-            <p className="mt-2 text-sm text-neutral-600">{description}</p>
+            <h1 className="text-2xl font-bold text-neutral-900">{t("identityTitle")}</h1>
+            <p className="mt-2 text-sm text-neutral-600">{t("identityBody")}</p>
           </div>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ton prénom"
+            placeholder={t("namePlaceholder")}
             autoFocus
             maxLength={30}
             className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-lg text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
@@ -80,20 +74,18 @@ export function IdentityGate({
             className="w-full rounded-2xl px-4 py-3 text-lg"
             disabled={name.trim().length < 1}
           >
-            C’est parti
+            {t("letsGo")}
           </LoadingButton>
 
           {googleEnabled && (
             <>
               <div className="relative flex items-center gap-3 py-1">
                 <div className="h-px flex-1 bg-neutral-200" />
-                <span className="text-xs font-medium text-neutral-400">ou plus sécurisé</span>
+                <span className="text-xs font-medium text-neutral-400">{t("googleSecure")}</span>
                 <div className="h-px flex-1 bg-neutral-200" />
               </div>
               <GoogleSignInButton callbackUrl={callbackUrl} />
-              <p className="text-center text-xs text-neutral-500">
-                Connexion Google : même compte sur tous tes appareils.
-              </p>
+              <p className="text-center text-xs text-neutral-500">{t("googleHint")}</p>
             </>
           )}
         </form>

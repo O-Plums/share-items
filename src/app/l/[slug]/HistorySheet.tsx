@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
 import { EmojiBadge } from "@/components/EmojiBadge";
 import { LoadingButton } from "@/components/ui/LoadingButton";
@@ -33,6 +34,8 @@ type Props = {
 };
 
 export function HistorySheet({ open, onClose, votes, onToggle, onClearAll, clearingAll }: Props) {
+  const tVoter = useTranslations("voter");
+  const tCommon = useTranslations("common");
   const [filter, setFilter] = useState<Filter>("all");
   const [pendingId, setPendingId] = useState<string | null>(null);
 
@@ -79,35 +82,37 @@ export function HistorySheet({ open, onClose, votes, onToggle, onClearAll, clear
                 <div className="h-1.5 w-10 rounded-full bg-neutral-300" />
               </div>
               <div className="flex items-center justify-between px-5 py-3">
-                <h2 className="text-lg font-bold">Mon historique</h2>
+                <h2 className="text-lg font-bold">{tVoter("historyTitle")}</h2>
                 <button
                   type="button"
                   onClick={onClose}
                   className="rounded-full px-3 py-1 text-sm text-neutral-500 active:bg-neutral-100"
                 >
-                  Fermer
+                  {tCommon("close")}
                 </button>
               </div>
 
               <div className="flex gap-1 px-5 pb-3">
                 <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
-                  Tout ({votes.length})
+                  {tVoter("historyAll", { count: votes.length })}
                 </FilterChip>
                 <FilterChip active={filter === "yes"} onClick={() => setFilter("yes")}>
-                  ✓ Oui ({votes.filter((v) => v.value === "YES").length})
+                  {tVoter("historyYes", {
+                    count: votes.filter((v) => v.value === "YES").length,
+                  })}
                 </FilterChip>
                 <FilterChip active={filter === "no"} onClick={() => setFilter("no")}>
-                  ✗ Non ({votes.filter((v) => v.value === "NO").length})
+                  {tVoter("historyNo", { count: votes.filter((v) => v.value === "NO").length })}
                 </FilterChip>
               </div>
 
               <div className="flex-1 overflow-y-auto px-5 pb-2">
                 {votes.length === 0 ? (
-                  <p className="py-10 text-center text-sm text-neutral-500">
-                    Tu n’as pas encore voté.
-                  </p>
+                  <p className="py-10 text-center text-sm text-neutral-500">{tVoter("historyEmpty")}</p>
                 ) : filtered.length === 0 ? (
-                  <p className="py-10 text-center text-sm text-neutral-500">Aucun vote dans ce filtre.</p>
+                  <p className="py-10 text-center text-sm text-neutral-500">
+                    {tVoter("historyFilterEmpty")}
+                  </p>
                 ) : (
                   <ul className="space-y-2 pb-3">
                     {filtered.map((vote) => (
@@ -164,12 +169,12 @@ export function HistorySheet({ open, onClose, votes, onToggle, onClearAll, clear
                 <div className="border-t border-neutral-100 px-5 py-3">
                   <LoadingButton
                     loading={clearingAll}
-                    loadingText="Effacement…"
+                    loadingText={tVoter("clearingVotes")}
                     variant="ghost"
                     className="w-full rounded-xl py-2 text-sm font-medium text-neutral-500 hover:text-red-600"
                     onClick={onClearAll}
                   >
-                    Effacer tous mes votes
+                    {tVoter("clearVotes")}
                   </LoadingButton>
                 </div>
               )}

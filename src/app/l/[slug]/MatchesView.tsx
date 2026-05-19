@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { EmojiBadge } from "@/components/EmojiBadge";
 
 type Match = {
@@ -17,15 +18,14 @@ type Match = {
 };
 
 export function MatchesView({ matches }: { matches: Match[] }) {
+  const t = useTranslations("voter");
   if (matches.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center px-6 py-12">
         <div className="text-center">
           <p className="text-6xl">🎁</p>
-          <h2 className="mt-4 text-xl font-bold">Aucun objet pour l’instant</h2>
-          <p className="mt-2 text-sm text-neutral-600">
-            Continue à swiper&nbsp;: l’organisateur validera les matchs depuis son tableau.
-          </p>
+          <h2 className="mt-4 text-xl font-bold">{t("matchesEmpty")}</h2>
+          <p className="mt-2 text-sm text-neutral-600">{t("matchesEmptyBody")}</p>
         </div>
       </div>
     );
@@ -34,9 +34,7 @@ export function MatchesView({ matches }: { matches: Match[] }) {
   return (
     <div className="flex-1 overflow-y-auto px-5 py-4">
       <div className="mx-auto max-w-md">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-neutral-500">
-          C’est pour toi
-        </h2>
+        <h2 className="text-sm font-medium uppercase tracking-wider text-neutral-500">{t("tabMatches")}</h2>
         <ul className="mt-3 grid grid-cols-2 gap-3">
           {matches.map((m) => (
             <li
@@ -52,7 +50,7 @@ export function MatchesView({ matches }: { matches: Match[] }) {
                   className="object-cover"
                 />
                 <div className="absolute left-2 top-2 rounded-full bg-brand-500 px-2 py-0.5 text-xs font-semibold text-white">
-                  🤝 Match
+                  🤝 {t("tabMatches")}
                 </div>
               </div>
               <div className="space-y-1 p-2.5">

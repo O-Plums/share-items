@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function DashboardNav() {
+  const t = useTranslations("dashboard");
   const pathname = usePathname() ?? "";
   const onInventory = pathname.startsWith("/dashboard/inventory");
   const onLists =
@@ -29,7 +31,7 @@ export function DashboardNav() {
               onLists ? "bg-brand-500 text-white" : "text-neutral-700"
             }`}
           >
-            📋 Listes
+            {t("navLists")}
           </Link>
           <Link
             href="/dashboard/inventory"
@@ -37,7 +39,7 @@ export function DashboardNav() {
               onInventory ? "bg-brand-500 text-white" : "text-neutral-700"
             }`}
           >
-            📦 Inventaire
+            {t("navInventory")}
           </Link>
         </div>
       </div>

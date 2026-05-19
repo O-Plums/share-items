@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { signOut, useSession } from "next-auth/react";
 import { useIdentity } from "@/lib/identity";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
@@ -17,6 +18,8 @@ type Props = {
 };
 
 export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props) {
+  const t = useTranslations("voter");
+  const tCommon = useTranslations("common");
   const { data: session } = useSession();
   const { identity, setDisplayName, reset } = useIdentity();
   const [nameDraft, setNameDraft] = useState(identity?.displayName ?? "");
@@ -77,13 +80,13 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
                 <div className="h-1.5 w-10 rounded-full bg-neutral-300" />
               </div>
               <div className="mt-3 flex items-center justify-between">
-                <h2 className="text-lg font-bold">Mon compte</h2>
+                <h2 className="text-lg font-bold">{t("accountTitle")}</h2>
                 <button
                   type="button"
                   onClick={onClose}
                   className="rounded-full px-3 py-1 text-sm text-neutral-500 active:bg-neutral-100"
                 >
-                  Fermer
+                  {tCommon("close")}
                 </button>
               </div>
 
@@ -104,29 +107,29 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-semibold">{session.user.name ?? "Compte Google"}</p>
+                      <p className="truncate font-semibold">{session.user.name ?? t("googleAccount")}</p>
                       {session.user.email && (
                         <p className="truncate text-sm text-neutral-500">{session.user.email}</p>
                       )}
-                      <p className="mt-1 text-xs text-emerald-700">Connecté avec Google</p>
+                      <p className="mt-1 text-xs text-emerald-700">{t("googleConnected")}</p>
                     </div>
                   </div>
                   <LoadingButton
                     loading={signingOut}
-                    loadingText="Déconnexion…"
+                    loadingText={t("signingOut")}
                     variant="secondary"
                     className="w-full rounded-2xl px-4 py-3 text-sm"
                     onClick={handleSignOut}
                   >
-                    Se déconnecter
+                    {t("signOut")}
                   </LoadingButton>
                 </div>
               ) : (
                 <div className="mt-5 space-y-4">
                   <p className="text-sm text-neutral-600">
-                    Tu votes en tant que <strong>{identity?.displayName}</strong> sur cet appareil.
+                    {t("accountVotingAs", { name: identity?.displayName ?? "" })}
                   </p>
-                  <label className="block text-sm font-medium text-neutral-700">Changer de prénom</label>
+                  <label className="block text-sm font-medium text-neutral-700">{t("changeName")}</label>
                   <input
                     type="text"
                     value={nameDraft}
@@ -136,28 +139,26 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
                   />
                   <LoadingButton
                     loading={saving}
-                    loadingText="Enregistrement…"
+                    loadingText={tCommon("saving")}
                     variant="primary"
                     className="w-full rounded-2xl px-4 py-3 text-sm"
                     disabled={nameDraft.trim().length < 1}
                     onClick={handleSaveName}
                   >
-                    Enregistrer
+                    {tCommon("save")}
                   </LoadingButton>
                   {googleEnabled && (
                     <>
                       <div className="relative flex items-center gap-3 py-1">
                         <div className="h-px flex-1 bg-neutral-200" />
-                        <span className="text-xs font-medium text-neutral-400">ou</span>
+                        <span className="text-xs font-medium text-neutral-400">{tCommon("or")}</span>
                         <div className="h-px flex-1 bg-neutral-200" />
                       </div>
                       <GoogleSignInButton
                         callbackUrl={callbackUrl}
-                        label="Se connecter avec Google"
+                        label={t("signInGoogle")}
                       />
-                      <p className="text-xs text-neutral-500">
-                        Garde tes votes sur tous tes appareils.
-                      </p>
+                      <p className="text-xs text-neutral-500">{t("googleVotesHint")}</p>
                     </>
                   )}
                 </div>
@@ -169,7 +170,7 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
                   onClick={onClose}
                   className="block text-center text-sm font-medium text-brand-600 underline-offset-2 hover:underline"
                 >
-                  Besoin de créer tes propres listes ?
+                  {t("createLists")}
                 </Link>
               </div>
             </div>
