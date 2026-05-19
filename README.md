@@ -7,15 +7,117 @@
 </p>
 
 <p align="center">
-  <strong>Démo en ligne : <a href="https://share-items.vercel.app/">share-items.vercel.app</a></strong>
+  <strong>Démo : <a href="https://share-items.vercel.app/">share-items.vercel.app</a></strong>
 </p>
 
-App **Next.js** mobile-first pour lister des objets, faire voter tes proches façon **Tinder**, et attribuer chaque chose à la bonne personne (débarras, dons, ventes).
+**Share Items** aide les familles à se répartir les objets d’un débarras, d’un déménagement ou d’une succession.  
+Tu photographies ce que tu proposes, tu partages un lien, et chacun dit oui ou non en swipant — comme sur Tinder.  
+Toi, tu vois qui est intéressé et tu attribues chaque chose à la bonne personne.
 
-- **Organisateur** : compte Google/Apple (Auth.js), listes par type, inventaire perso réutilisable, tags, partage natif (WhatsApp, Messenger…).
-- **Votant** : prénom suffit ; connexion Google optionnelle pour plus de sécurité. Swipe, historique, matchs.
+---
 
-Specs : [MVP-v2.md](./MVP-v2.md) (actuel) · [MVP.md](./MVP.md) (v1 historique).
+## Description du produit
+
+### Le problème
+
+Quand on vide un appartement ou qu’on trie des affaires à donner ou à vendre, la coordination passe souvent par des groupes WhatsApp interminables : photos floues, messages « moi je le veux », oublis, doublons. Personne n’a une vue claire de qui veut quoi.
+
+### La solution
+
+Share Items centralise tout autour de **listes partageables** et d’un **inventaire photo** personnel :
+
+1. **Photographier** les objets (caméra ou galerie), les classer par pièce, type et tags perso.
+2. **Répartir** dans des listes selon l’intention : à garder, à donner, à vendre, ou autre.
+3. **Partager** le lien public d’une liste (`/l/[slug]`).
+4. La famille **swipe** oui / non sur chaque objet, sans créer de compte.
+5. L’organisateur consulte les **résultats** et **attribue** (match) chaque objet à une personne qui a dit oui.
+
+### Deux expériences, deux identités
+
+| Rôle | Connexion | Où |
+|------|-----------|-----|
+| **Organisateur** | Compte Google ou Apple (Auth.js) | `/dashboard/*` — listes, inventaire, résultats, partage |
+| **Votant** | Prénom seulement (+ identifiant anonyme en local) | `/l/[slug]` — swipe, historique, matchs reçus |
+
+Un même utilisateur peut organiser ses listes avec son compte et voter sur le lien d’un autre avec le flux « votant », sans mélanger les deux.
+
+### Parcours organisateur (détaillé)
+
+**Inventaire** (`/dashboard/inventory`)
+
+- Wizard en 3 étapes : photo → pièce (emojis) → type + tags optionnels + nom.
+- Grille de vignettes, filtres par pièce / type / tag, sélection multiple.
+- Assignation vers une liste existante ou création d’une nouvelle campagne.
+- Édition en bottom sheet, pièces personnalisées (« Mes pièces »).
+
+**Listes** (`/dashboard/lists`)
+
+- Types suggérés : à garder, à donner, à vendre, liste perso.
+- Détail d’une liste : onglets **Objets**, **Résultats**, **Partager**.
+- Ajout d’objets depuis l’inventaire ou création directe sur la liste.
+- Partage natif (WhatsApp, SMS, mail…) via l’API Web Share quand disponible.
+- Visite guidée (Driver.js) à la première liste, avec enchaînement optionnel vers l’ajout du premier objet.
+
+**Résultats & attribution**
+
+- Pour chaque objet : liste des personnes qui ont voté **Oui** ou **Non**.
+- Bouton **Attribuer** (match) : un seul receveur par objet, choisi parmi les Oui.
+- Déplacer un objet vers une autre liste ou le retirer (retour inventaire) supprime votes et matchs sur cette liste.
+
+### Parcours votant (détaillé)
+
+**Entrée** (`/l/[slug]`)
+
+- Saisie du prénom ou « Continuer avec Google » (optionnel, pour lier les votes au compte).
+- Identité stockée localement (`visitorId`) pour retrouver son historique.
+
+**Swipe**
+
+- Cartes plein écran, une photo à la fois.
+- Gestes ou boutons **Oui** / **Non**, barre de progression.
+- Un vote par objet, modifiable ensuite.
+
+**Historique** (icône livre)
+
+- Tous ses votes sur la liste, modification en un tap ou effacement global.
+
+**Matchs** (onglet)
+
+- Objets que l’organisateur lui a attribués (« C’est pour toi »).
+
+### Glossaire
+
+| Terme | Signification |
+|-------|----------------|
+| **Vote** | Choix du votant : oui ou non sur un objet. |
+| **Swipe** | Mode découverte objet par objet. |
+| **Match** | Décision de l’organisateur : « cet objet est pour cette personne » (pas un like mutuel). |
+| **Inventaire** | Bibliothèque perso de tous tes objets photographiés. |
+| **Liste** | Campagne partageable (slug, votes, matchs) — un objet n’est que dans **une** liste à la fois. |
+| **Tag perso** | Libellé réutilisable (ex. « bureau Florian », « cave »). |
+
+### Règles métier
+
+- **1 vote** par objet et par votant (modifiable).
+- **1 match** par objet, réservé à un votant qui a dit **Oui**.
+- Si un votant repasse en **Non**, son match sur cet objet est annulé.
+- Déplacer ou retirer un objet d’une liste **efface** votes et matchs pour cette liste.
+- Objet sans liste : en inventaire (`listId` null) jusqu’à assignation.
+- Images : redimensionnement Sharp (512 px), JPEG ≤ 500 Ko ; Vercel Blob en prod, `public/uploads/` en dev local.
+
+### Fonctionnalités transverses
+
+- **Mobile-first** : navigation basse, zones tactiles larges, safe areas.
+- **i18n** : français par défaut, anglais via sélecteur (next-intl).
+- **PWA** : installable sur l’écran d’accueil (Serwist), invite sur le dashboard mobile.
+- **Admin** (`/admin`, emails autorisés) : statistiques d’usage et graphiques.
+
+### Hors périmètre actuel
+
+- Un objet dans plusieurs listes simultanément.
+- Paiement, enchères, messagerie intégrée.
+- Notifications push « tu es matché ».
+- Scan code-barres, reconnaissance IA d’objets.
 
 ---
 
@@ -33,7 +135,7 @@ Specs : [MVP-v2.md](./MVP-v2.md) (actuel) · [MVP.md](./MVP.md) (v1 historique).
   <img src="promo/5.jpg" width="45%" alt="Share Items — présentation 5" />
 </p>
 
-> Images haute résolution dans le dossier [`promo/`](./promo/) (`1.jpg` … `5.jpg`).
+> Images haute résolution : dossier [`promo/`](./promo/) (`1.jpg` … `5.jpg`).
 
 ---
 
@@ -42,10 +144,12 @@ Specs : [MVP-v2.md](./MVP-v2.md) (actuel) · [MVP.md](./MVP.md) (v1 historique).
 | Couche | Techno |
 |--------|--------|
 | Framework | Next.js 15 (App Router) + TypeScript |
-| UI | Tailwind CSS, Framer Motion (swipe + modales) |
+| UI | Tailwind CSS, Framer Motion, Driver.js (onboarding) |
+| i18n | next-intl (FR / EN) |
 | Base | Prisma + **PostgreSQL** |
-| Auth organisateur | Auth.js v5 (NextAuth) — Google, Apple |
-| Images | Sharp (512 px, JPEG ≤ 500 Ko) · Vercel Blob (prod) · `public/uploads/` (dev local) |
+| Auth organisateur | Auth.js v5 — Google, Apple |
+| Images | Sharp · Vercel Blob (prod) · `public/uploads/` (dev) |
+| PWA | Serwist |
 
 ---
 
@@ -68,48 +172,37 @@ npx prisma migrate dev
 npm run dev
 ```
 
-L’app tourne sur **http://localhost:3000**.
+L’app tourne sur **http://localhost:8080**.
 
-En dev, sans `BLOB_READ_WRITE_TOKEN`, les photos sont enregistrées dans `public/uploads/` (dossier ignoré par git).
+Sans `BLOB_READ_WRITE_TOKEN`, les photos sont enregistrées dans `public/uploads/` (ignoré par git).
 
 ---
 
-## Parcours
+## Routes principales
 
 ### Organisateur (connecté)
 
 | Route | Rôle |
 |-------|------|
 | `/login` | Connexion Google / Apple |
-| `/dashboard/lists` | **Listes** — accueil, créer une campagne (à garder / donner / vendre / autre) |
-| `/dashboard/[listId]` | Détail liste : **Objets** · **Résultats** · **Partager** (lien + menu natif) |
-| `/dashboard/inventory` | Bibliothèque d’objets (photos réutilisables entre listes) |
-| `/dashboard/inventory/new` | Wizard **Nouvel objet** (caméra ou galerie) |
+| `/dashboard/lists` | Listes — créer une campagne |
+| `/dashboard/[listId]` | Détail : Objets · Résultats · Partager |
+| `/dashboard/inventory` | Inventaire perso |
+| `/dashboard/inventory/new` | Nouvel objet (wizard photo) |
+| `/dashboard/[listId]/items/new` | Ajouter un objet à une liste |
 
-### Votant (lien public `/l/[slug]`)
+### Votant (lien public)
 
-| Écran | Rôle |
+| Route | Rôle |
 |-------|------|
-| Gate | Prénom **ou** « Continuer avec Google » |
-| Swipe | Oui / Non sur chaque objet |
-| 📖 | Historique des votes (modifier / tout effacer) |
-| 👤 | Compte : changer de prénom, Google + déconnexion, lien vers le dashboard |
-| Matchs | Objets que l’organisateur t’a attribués |
+| `/l/[slug]` | Swipe, historique, matchs, compte votant |
 
-### Landing
+### Autres
 
-- [https://share-items.vercel.app/](https://share-items.vercel.app/) — présentation + liens dashboard / exemple
-
----
-
-## Règles métier (résumé)
-
-- **1 vote** par objet et par votant (modifiable).
-- **1 match** par objet, posé par l’organisateur sur un votant qui a dit **Oui**.
-- Déplacer ou retirer un objet d’une liste **supprime** votes et matchs sur cette liste.
-- Inventaire : objet sans liste (`listId` null) jusqu’à assignation.
-
-Détail : [MVP-v2.md](./MVP-v2.md) §13.
+| Route | Rôle |
+|-------|------|
+| `/` | Landing |
+| `/admin` | Stats (emails `ADMIN_EMAILS`) |
 
 ---
 
@@ -119,12 +212,13 @@ Copie [`.env.example`](./.env.example) vers `.env` — **ne commite jamais** `.e
 
 | Variable | Obligatoire | Usage |
 |----------|-------------|-------|
-| `DATABASE_URL` | Oui | PostgreSQL (`postgresql://…`) |
-| `AUTH_SECRET` | Oui | Secret session Auth.js (`openssl rand -base64 32`) |
+| `DATABASE_URL` | Oui | PostgreSQL |
+| `AUTH_SECRET` | Oui | Session Auth.js (`openssl rand -base64 32`) |
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Recommandé | Login organisateur + option votant |
 | `AUTH_APPLE_ID` / `AUTH_APPLE_SECRET` | Optionnel | Sign in with Apple |
 | `BLOB_READ_WRITE_TOKEN` | Prod Vercel | Upload images (Blob) |
-| `AUTH_URL` | Optionnel | URL publique si proxy / domaine custom |
+| `AUTH_URL` | Optionnel | URL publique si domaine custom |
+| `ADMIN_EMAILS` | Optionnel | Accès `/admin` (virgules) |
 
 Redirect OAuth : `{ORIGIN}/api/auth/callback/google` (et `/apple`).
 
@@ -134,9 +228,9 @@ Redirect OAuth : `{ORIGIN}/api/auth/callback/google` (et `/apple`).
 
 Guide détaillé : **[DEPLOY.md](./DEPLOY.md)**
 
-1. Base **PostgreSQL** + variables ci-dessus sur le projet Vercel.
-2. **Blob** connecté au projet (`BLOB_READ_WRITE_TOKEN`).
-3. Import du repo — le build exécute `prisma migrate deploy` (`vercel.json` / `scripts/vercel-build.sh`).
+1. Base **PostgreSQL** + variables sur le projet Vercel.
+2. **Blob** connecté (`BLOB_READ_WRITE_TOKEN`).
+3. Import du repo — build avec `prisma migrate deploy` (`vercel.json` / `scripts/vercel-build.sh`).
 
 ---
 
@@ -144,9 +238,10 @@ Guide détaillé : **[DEPLOY.md](./DEPLOY.md)**
 
 | Commande | Action |
 |----------|--------|
-| `npm run dev` | Serveur de développement |
-| `npm run build` | Prisma generate + migrate deploy + build Next |
-| `npm start` | Sert le build production |
+| `npm run dev` | Dev sur le port **8080** |
+| `npm run dev:pwa` | Dev + rebuild service worker |
+| `npm run build` | Prisma + migrate deploy + build Next + Serwist |
+| `npm start` | Serveur production |
 | `npm run db:migrate` | Migration Prisma en dev |
 | `npm run db:studio` | Prisma Studio |
 
@@ -155,30 +250,25 @@ Guide détaillé : **[DEPLOY.md](./DEPLOY.md)**
 ## Structure du projet
 
 ```
-promo/                    # Captures d’écran pour README / présentation
+promo/                    # Captures pour README
+messages/                 # fr.json, en.json (next-intl)
 src/
   app/
-    api/
-      auth/               # Auth.js + claim listes v1
-      inventory/          # CRUD inventaire, assign, move
-      tags/               # Tags perso organisateur
-      lists/              # Listes + résultats + slug public
-      votes/ matches/ upload/
+    api/                  # auth, lists, inventory, votes, matches, upload, admin
     dashboard/            # Espace organisateur
-    l/[slug]/             # Expérience votant (swipe)
+    l/[slug]/             # Expérience votant
+    admin/
     login/
   components/
-    ItemWizard.tsx        # Photo (caméra / galerie) → pièce → type → tags
-    IdentityGate.tsx      # Prénom + Google (votant)
-    TagPicker.tsx
+    ItemWizard.tsx
+    onboarding/           # FirstListTour, ItemWizardTour
+    IdentityGate.tsx
+  i18n/
   lib/
-    identity.tsx          # visitorId localStorage (votant)
-    list-kinds.ts         # keep | donate | sell | custom
-    auth.ts               # requireUser / requireVisitor
 prisma/
   schema.prisma
   migrations/
-MVP-v2.md                 # Spécification produit v2
+DEPLOY.md
 ```
 
 ---
