@@ -11,6 +11,7 @@ import { EmojiBadge } from "@/components/EmojiBadge";
 import { getListKind, LIST_KINDS } from "@/lib/list-kinds";
 import { MoveDialog } from "./MoveDialog";
 import { InventoryPickModal } from "./InventoryPickModal";
+import { InventoryEditSheet } from "@/app/dashboard/inventory/InventoryEditSheet";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { AnimateIn } from "@/components/ui/AnimateIn";
 import { BackButton } from "@/components/ui/BackButton";
@@ -54,6 +55,7 @@ export default function ListDetailPage() {
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState("");
   const [pending, setPending] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -320,11 +322,11 @@ export default function ListDetailPage() {
 
         {tabParam === "items" && (
           <ItemsTab
-            listId={params.listId}
             items={data.items}
             pending={pending}
             onDelete={deleteItem}
             onMove={(id) => setMoveItemId(id)}
+            onEdit={setEditingItem}
           />
         )}
         {tabParam === "results" && (
@@ -379,22 +381,29 @@ export default function ListDetailPage() {
           }}
         />
       )}
+
+      <InventoryEditSheet
+        itemId={editingItem?.id ?? null}
+        preview={editingItem}
+        onClose={() => setEditingItem(null)}
+        onSaved={refresh}
+      />
     </main>
   );
 }
 
 function ItemsTab({
-  listId,
   items,
   pending,
   onDelete,
   onMove,
+  onEdit,
 }: {
-  listId: string;
   items: Item[];
   pending: string | null;
   onDelete: (itemId: string) => void;
   onMove: (itemId: string) => void;
+  onEdit: (item: Item) => void;
 }) {
   if (items.length === 0) {
     return (
@@ -411,7 +420,11 @@ function ItemsTab({
     <AnimateIn as="ul" className="mt-5 grid grid-cols-2 gap-3">
       {items.map((item) => (
         <li key={item.id} className="overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-200">
-          <Link href={`/dashboard/${listId}/items/${item.id}/edit`} className="block">
+          <button
+            type="button"
+            onClick={() => onEdit(item)}
+            className="block w-full text-left"
+          >
             <div className="relative aspect-square bg-neutral-100">
               <Image src={item.imageUrl} alt={item.label ?? ""} fill sizes="50vw" className="object-cover" />
             </div>
@@ -434,7 +447,7 @@ function ItemsTab({
                 </div>
               )}
             </div>
-          </Link>
+          </button>
           <div className="grid grid-cols-2 border-t border-neutral-100 text-xs">
             <button
               type="button"
