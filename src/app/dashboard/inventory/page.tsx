@@ -179,7 +179,7 @@ export default function InventoryPage() {
           </p>
         )}
 
-        <AnimateIn className="mt-5 -mx-1 flex gap-2 overflow-x-auto px-1 no-scrollbar">
+        <AnimateIn className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 py-2 no-scrollbar">
           <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
             {t("filterAll")}
           </FilterChip>
