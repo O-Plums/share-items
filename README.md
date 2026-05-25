@@ -255,6 +255,21 @@ Guide détaillé : **[DEPLOY.md](./DEPLOY.md)**
 | `npm start` | Serveur production |
 | `npm run db:migrate` | Migration Prisma en dev |
 | `npm run db:studio` | Prisma Studio |
+| `npm test` | Tests unitaires (Vitest) |
+| `npm run test:watch` | Tests unitaires en watch |
+
+---
+
+## Tests
+
+Tests unitaires sur les helpers purs de `src/lib` et `src/i18n` (admin allowlist, slugs, taxonomies, kinds de listes, tour state, SEO, i18n…).
+
+```bash
+npm test           # run une fois
+npm run test:watch # mode watch
+```
+
+Stack : Vitest + happy-dom. Les tests vivent dans `tests/unit/*.test.ts` et utilisent l'alias `@/*` (résolu via `tsconfigPaths`).
 
 ---
 
