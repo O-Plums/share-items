@@ -11,6 +11,7 @@ import { HistorySheet } from "./HistorySheet";
 import { MatchesView } from "./MatchesView";
 import { VoterAccountModal } from "./VoterAccountModal";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { PullToRefresh } from "@/components/PullToRefresh";
 import { track } from "@/lib/analytics";
 
 type RoomMeta = { emoji: string; label: string };
@@ -105,6 +106,10 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
     loadMatches();
   }, [loadList, loadVotes, loadMatches]);
 
+  const refreshAll = useCallback(async () => {
+    await Promise.all([loadList(), loadVotes(), loadMatches()]);
+  }, [loadList, loadVotes, loadMatches]);
+
   const voteMap = useMemo(() => {
     const map = new Map<string, "YES" | "NO">();
     for (const v of votes) map.set(v.itemId, v.value);
@@ -168,6 +173,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
 
   return (
     <main className="flex min-h-screen flex-col bg-neutral-50">
+      <PullToRefresh onRefresh={refreshAll} />
       <header className="safe-top px-5 pb-3 pt-3">
         <div className="mx-auto flex w-full max-w-md items-center justify-between gap-3">
           <div className="min-w-0">

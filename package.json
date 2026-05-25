@@ -37,7 +37,8 @@
     "react-dom": "^19.0.0",
     "recharts": "^3.8.1",
     "serwist": "^9.5.11",
-    "sharp": "^0.33.5"
+    "sharp": "^0.33.5",
+    "use-pull-to-refresh": "^3.0.3"
   },
   "devDependencies": {
     "@serwist/cli": "^9.5.11",
