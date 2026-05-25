@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { isAdminEmail } from "@/lib/admin-access";
 import { AppLogo } from "@/components/AppLogo";
+import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Administration",
@@ -27,7 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <AppLogo size={36} href="/" />
             <div>
               <p className="text-xs font-medium uppercase tracking-widest text-brand-500">Admin</p>
-              <p className="text-sm font-semibold text-neutral-900">Share Items</p>
+              <p className="text-sm font-semibold text-neutral-900">{SITE_NAME}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 text-sm">

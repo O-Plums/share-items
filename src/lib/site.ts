@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 
-export const SITE_NAME = "Share Items";
-export const SITE_SHORT_NAME = "Share";
+/**
+ * App name (visible in UI, OG tags, manifest…). Override at build with
+ * NEXT_PUBLIC_APP_NAME / NEXT_PUBLIC_APP_SHORT_NAME if you ever rename.
+ */
+export const SITE_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Sort your life";
+export const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_APP_SHORT_NAME || "Sort";
 export const SITE_TAGLINE = "Tes objets, les bonnes mains.";
 export const SITE_DESCRIPTION =
   "Photographie ce dont tu veux te débarrasser, fais dire à ta famille ce qui l’intéresse, et attribue chaque objet à la bonne personne.";

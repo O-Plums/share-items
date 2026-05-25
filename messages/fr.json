@@ -60,7 +60,7 @@
     "shareSpotlightPoint1": "Un seul lien pour tout le monde",
     "shareSpotlightPoint2": "Pas d’application à installer pour voter",
     "shareSpotlightPoint3": "Tu gardes le contrôle : c’est toi qui attribues à la fin",
-    "pathsTitle": "Deux façons d’utiliser Share Items",
+    "pathsTitle": "Deux façons d’utiliser {name}",
     "pathOrganizerTitle": "Je m’organise",
     "pathOrganizerBody": "Tu crées la liste, tu ajoutes les photos, tu partages le lien et tu répartis les objets à la fin.",
     "pathOrganizerCta": "Commencer →",
@@ -88,7 +88,7 @@
   },
   "offline": {
     "title": "Tu es hors ligne",
-    "body": "Reconnecte-toi pour continuer à utiliser Share Items.",
+    "body": "Reconnecte-toi pour continuer à utiliser {name}.",
     "retry": "Réessayer"
   },
   "dashboard": {
@@ -135,7 +135,7 @@
   "pwa": {
     "title": "Ajoute l’app sur ton écran d’accueil",
     "subtitle": "Accès en un tap, comme une vraie application — sans repasser par le navigateur.",
-    "iosStep1": "Ouvre Share Items dans Safari (pas dans Chrome ni dans une app de messagerie).",
+    "iosStep1": "Ouvre {name} dans Safari (pas dans Chrome ni dans une app de messagerie).",
     "iosStep2": "Tape le bouton Partager en bas de l’écran (icône carré avec une flèche vers le haut).",
     "iosStep3": "Choisis « Sur l’écran d’accueil », puis confirme avec « Ajouter ».",
     "iosHint": "Tu retrouveras {name} comme une app sur ton téléphone.",

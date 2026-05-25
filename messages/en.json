@@ -60,7 +60,7 @@
     "shareSpotlightPoint1": "One link for everyone",
     "shareSpotlightPoint2": "No app to install for voters",
     "shareSpotlightPoint3": "You stay in control: you assign at the end",
-    "pathsTitle": "Two ways to use Share Items",
+    "pathsTitle": "Two ways to use {name}",
     "pathOrganizerTitle": "I’m organizing",
     "pathOrganizerBody": "You create the list, add photos, share the link, and assign items when voting is done.",
     "pathOrganizerCta": "Get started →",
@@ -88,7 +88,7 @@
   },
   "offline": {
     "title": "You’re offline",
-    "body": "Reconnect to keep using Share Items.",
+    "body": "Reconnect to keep using {name}.",
     "retry": "Try again"
   },
   "dashboard": {
@@ -135,7 +135,7 @@
   "pwa": {
     "title": "Add the app to your home screen",
     "subtitle": "One tap to open — like a real app, without going through the browser each time.",
-    "iosStep1": "Open Share Items in Safari (not Chrome or a messaging app).",
+    "iosStep1": "Open {name} in Safari (not Chrome or a messaging app).",
     "iosStep2": "Tap the Share button at the bottom (square icon with an arrow pointing up).",
     "iosStep3": "Choose “Add to Home Screen”, then confirm with “Add”.",
     "iosHint": "You’ll find {name} as an app on your phone.",

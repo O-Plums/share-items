@@ -1,4 +1,4 @@
-# Déploiement Vercel — Share Items
+# Déploiement Vercel — Sort your life
 
 ## 1. Base PostgreSQL
 

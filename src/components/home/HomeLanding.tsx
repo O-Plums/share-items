@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { HomeLandingClient } from "@/components/home/HomeLandingClient";
 import type { HomeCopy } from "@/components/home/types";
+import { SITE_NAME } from "@/lib/site";
 
 export async function HomeLanding() {
   const t = await getTranslations("home");
@@ -67,7 +68,7 @@ export async function HomeLanding() {
       t("shareSpotlightPoint2"),
       t("shareSpotlightPoint3"),
     ],
-    pathsTitle: t("pathsTitle"),
+    pathsTitle: t("pathsTitle", { name: SITE_NAME }),
     pathOrganizerTitle: t("pathOrganizerTitle"),
     pathOrganizerBody: t("pathOrganizerBody"),
     pathOrganizerCta: t("pathOrganizerCta"),

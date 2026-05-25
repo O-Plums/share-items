@@ -1,8 +1,8 @@
-# Share Items
+# Sort your life
 
 <p align="center">
   <a href="https://share-items.vercel.app/">
-    <img src="public/logo.png" width="120" alt="Share Items — logo" />
+    <img src="public/logo.png" width="120" alt="Sort your life — logo" />
   </a>
 </p>
 
@@ -10,7 +10,7 @@
   <strong>Démo : <a href="https://share-items.vercel.app/">share-items.vercel.app</a></strong>
 </p>
 
-**Share Items** aide les familles à se répartir les objets d’un débarras, d’un déménagement ou d’une succession.  
+**Sort your life** aide les familles à se répartir les objets d’un débarras, d’un déménagement ou d’une succession.  
 Tu photographies ce que tu proposes, tu partages un lien, et chacun dit oui ou non en swipant — comme sur Tinder.  
 Toi, tu vois qui est intéressé et tu attribues chaque chose à la bonne personne.
 
@@ -24,7 +24,7 @@ Quand on vide un appartement ou qu’on trie des affaires à donner ou à vendre
 
 ### La solution
 
-Share Items centralise tout autour de **listes partageables** et d’un **inventaire photo** personnel :
+Sort your life centralise tout autour de **listes partageables** et d’un **inventaire photo** personnel :
 
 1. **Photographier** les objets (caméra ou galerie), les classer par pièce, type et tags perso.
 2. **Répartir** dans des listes selon l’intention : à garder, à donner, à vendre, ou autre.
@@ -124,15 +124,15 @@ Un même utilisateur peut organiser ses listes avec son compte et voter sur le l
 ## Aperçu
 
 <p align="center">
-  <img src="promo/1.jpg" width="45%" alt="Share Items — présentation 1" />
-  <img src="promo/2.jpg" width="45%" alt="Share Items — présentation 2" />
+  <img src="promo/1.jpg" width="45%" alt="Sort your life — présentation 1" />
+  <img src="promo/2.jpg" width="45%" alt="Sort your life — présentation 2" />
 </p>
 <p align="center">
-  <img src="promo/3.jpg" width="45%" alt="Share Items — présentation 3" />
-  <img src="promo/4.jpg" width="45%" alt="Share Items — présentation 4" />
+  <img src="promo/3.jpg" width="45%" alt="Sort your life — présentation 3" />
+  <img src="promo/4.jpg" width="45%" alt="Sort your life — présentation 4" />
 </p>
 <p align="center">
-  <img src="promo/5.jpg" width="45%" alt="Share Items — présentation 5" />
+  <img src="promo/5.jpg" width="45%" alt="Sort your life — présentation 5" />
 </p>
 
 > Images haute résolution : dossier [`promo/`](./promo/) (`1.jpg` … `5.jpg`).
@@ -219,6 +219,8 @@ Copie [`.env.example`](./.env.example) vers `.env` — **ne commite jamais** `.e
 | `BLOB_READ_WRITE_TOKEN` | Prod Vercel | Upload images (Blob) |
 | `AUTH_URL` | Optionnel | URL publique si domaine custom |
 | `ADMIN_EMAILS` | Optionnel | Accès `/admin` (virgules) |
+| `NEXT_PUBLIC_APP_NAME` | Optionnel | Nom affiché du produit (défaut « Sort your life ») |
+| `NEXT_PUBLIC_APP_SHORT_NAME` | Optionnel | Nom court PWA (défaut « Sort ») |
 
 Redirect OAuth : `{ORIGIN}/api/auth/callback/google` (et `/apple`).
 

@@ -77,7 +77,7 @@ export function PwaInstallPrompt() {
 
   const steps =
     platform === "ios"
-      ? [t("iosStep1"), t("iosStep2"), t("iosStep3")]
+      ? [t("iosStep1", { name: SITE_NAME }), t("iosStep2"), t("iosStep3")]
       : [t("androidStep1"), t("androidStep2"), t("androidStep3")];
 
   return (

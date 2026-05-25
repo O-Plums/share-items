@@ -1,4 +1,4 @@
-// Share Items — PostgreSQL (Vercel Postgres, Neon, Supabase, Docker local)
+// Sort your life — PostgreSQL (Vercel Postgres, Neon, Supabase, Docker local)
 
 generator client {
   provider = "prisma-client-js"

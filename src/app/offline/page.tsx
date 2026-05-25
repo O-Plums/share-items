@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AppLogo } from "@/components/AppLogo";
 import { PublicLanguageBar } from "@/components/PublicLanguageBar";
+import { SITE_NAME } from "@/lib/site";
 
 export async function generateMetadata() {
   const t = await getTranslations("offline");
@@ -19,7 +20,7 @@ export default async function OfflinePage() {
       <AppLogo size={72} href="/" />
       <div>
         <h1 className="text-2xl font-bold text-neutral-900">{t("title")}</h1>
-        <p className="mt-2 max-w-sm text-sm text-neutral-600">{t("body")}</p>
+        <p className="mt-2 max-w-sm text-sm text-neutral-600">{t("body", { name: SITE_NAME })}</p>
       </div>
       <Link
         href="/"
