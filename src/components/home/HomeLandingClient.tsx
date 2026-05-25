@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion, useScroll } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { AppLogo } from "@/components/AppLogo";
 import { PublicLanguageBar } from "@/components/PublicLanguageBar";
 import { HomeStep } from "@/components/home/HomeStep";
@@ -9,6 +10,7 @@ import { Reveal } from "@/components/home/Reveal";
 import { AnimateIn } from "@/components/ui/AnimateIn";
 import type { HomeCopy } from "@/components/home/types";
 import { easeOut, fadeUp, fadeUpReduced } from "@/components/home/motion";
+import { GITHUB_URL } from "@/lib/site";
 
 type Props = {
   copy: HomeCopy;
@@ -17,6 +19,7 @@ type Props = {
 export function HomeLandingClient({ copy }: Props) {
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll();
+  const tLegal = useTranslations("legal.common");
 
   const heroVariants = reduced ? fadeUpReduced : fadeUp;
 
@@ -274,6 +277,28 @@ export function HomeLandingClient({ copy }: Props) {
             {copy.createList}
           </Link>
         </Reveal>
+
+        <footer className="mt-12 pb-32 text-center text-xs text-neutral-500 sm:pb-10">
+          <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+            <Link href="/legal/cgu" className="hover:text-neutral-700 hover:underline">
+              {tLegal("cguLink")}
+            </Link>
+            <span aria-hidden>·</span>
+            <Link href="/legal/cgv" className="hover:text-neutral-700 hover:underline">
+              {tLegal("cgvLink")}
+            </Link>
+            <span aria-hidden>·</span>
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 hover:text-neutral-700 hover:underline"
+            >
+              <GitHubMark />
+              <span>{tLegal("sourceCode")}</span>
+            </a>
+          </nav>
+        </footer>
       </div>
 
       {/* Mobile sticky CTA */}
@@ -291,5 +316,20 @@ export function HomeLandingClient({ copy }: Props) {
         </Link>
       </motion.div>
     </main>
+  );
+}
+
+function GitHubMark() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+      className="-mt-px"
+    >
+      <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.1c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.68 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.47.11-3.06 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.77.11 3.06.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .3.21.65.79.54A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+    </svg>
   );
 }

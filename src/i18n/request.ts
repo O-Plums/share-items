@@ -9,8 +9,15 @@ export default getRequestConfig(async () => {
   // French by default; English only when the user picks it (LanguageSwitcher cookie).
   const locale = isLocale(cookieLocale) ? cookieLocale : defaultLocale;
 
+  // Legal wording lives in its own file under messages/legal/ so the doc can
+  // grow without polluting the global namespace. Merged here under "legal".
+  const [base, legal] = await Promise.all([
+    import(`../../messages/${locale}.json`),
+    import(`../../messages/legal/${locale}.json`),
+  ]);
+
   return {
     locale,
-    messages: (await import(`../../messages/${locale}.json`)).default,
+    messages: { ...base.default, legal: legal.default },
   };
 });

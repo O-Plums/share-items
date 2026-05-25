@@ -1,0 +1,133 @@
+{
+  "common": {
+    "back": "Back",
+    "lastUpdated": "Last updated: {lastUpdated}",
+    "editor": "Publisher",
+    "contact": "Contact",
+    "seeAlso": "See also",
+    "cguLink": "Terms of Service",
+    "cgvLink": "Terms of Sale",
+    "sourceCode": "Source code",
+    "noticeMissing": "{appName} is in beta. A full privacy policy and detailed legal notice will be published before public launch. For any question in the meantime, contact us at {email}."
+  },
+  "cgu": {
+    "title": "Terms of Service",
+    "subtitle": "Rules governing the use of {appName}.",
+    "sections": [
+      {
+        "title": "1. Purpose",
+        "body": "These Terms of Service (\"ToS\") govern access to and use of the {appName} service, available at {siteUrl} and operated by {owner} (the \"Publisher\"). By accessing the Service, the User acknowledges having read and accepted the ToS without reservation."
+      },
+      {
+        "title": "2. Definitions",
+        "body": "Service: the {appName} web platform and progressive web app (PWA).\n\nUser: any natural person accessing the Service, whether as an organizer (list creator) or an invited voter.\n\nAccount: personal space created through federated sign-in (Google), used to create and manage lists and items.\n\nContent: photos, labels, tags, rooms and any other data added by the User."
+      },
+      {
+        "title": "3. Description of the service",
+        "body": "{appName} is a free service that lets you inventory the items of a household (moving, inheritance, decluttering), classify them into lists (\"keep\", \"donate\", \"sell\", \"other\") and invite people close to you to vote Yes/No on each item via a shared link. The Publisher reserves the right to evolve the features at any time."
+      },
+      {
+        "title": "4. Access and account",
+        "body": "Access to the Service is free of charge. An organizer account is created through Google authentication. The User warrants that the information provided is accurate and remains solely responsible for keeping their credentials secure. The voting experience (public link of a list) does not require an account; an anonymous visitor identifier is generated locally."
+      },
+      {
+        "title": "5. Acceptable use",
+        "body": "The User undertakes to use the Service only for personal or family purposes, and shall not:\n\n– upload unlawful, defamatory, infringing content, or any content harming third parties;\n\n– upload photographs of identifiable persons without their consent;\n\n– bypass, overload or disrupt the technical operation of the Service;\n\n– automatically collect data other than their own.\n\nThe Publisher may suspend access in case of breach."
+      },
+      {
+        "title": "6. User Content",
+        "body": "The User retains full ownership of the Content they add. By uploading it, they grant the Publisher a non-exclusive, free-of-charge license, limited to the duration necessary for hosting, displaying and processing such Content strictly within the operation of the Service. The User warrants that they hold the necessary rights to the Content uploaded and agrees to indemnify the Publisher in case of third-party claim."
+      },
+      {
+        "title": "7. Intellectual property",
+        "body": "The source code of {appName} is made available under the MIT License (see the LICENSE file in the public repository). Anyone may use, modify and redistribute it under the terms of that license, including for commercial purposes, provided that the copyright notice is preserved.\n\nThe {appName} brand, its logo, its visual identity, its marketing content, its illustrations and the demonstration photographs, however, remain the exclusive property of the Publisher (or their respective rights holders) and are protected by copyright and trademark law. Any reproduction, imitation or use of these elements not expressly authorized is prohibited, including in case of fork of the source code: a fork must be renamed and use its own visual identity."
+      },
+      {
+        "title": "8. Personal data",
+        "body": "Personal data processing is governed by a separate privacy policy that will be published before public launch of the Service. The data currently processed includes: Google profile (name, email, image), uploaded photos, technical identifiers and usage analytics. To exercise your rights (access, rectification, objection, erasure, portability), write to {email}."
+      },
+      {
+        "title": "9. Liability",
+        "body": "The Service is provided \"as is\", without any guarantee of uninterrupted availability or error-free operation. The Publisher implements reasonable means to ensure continuity of the Service but cannot be held liable for interruptions, data losses or indirect damages, in particular those caused by third-party providers (hosting, authentication, storage)."
+      },
+      {
+        "title": "10. Evolution of the Service and the ToS",
+        "body": "The Publisher may evolve the Service at any time, add or remove features, suspend or discontinue it with reasonable notice. The ToS may be amended; amendments are signaled on the website and apply from the update date shown at the top of the document."
+      },
+      {
+        "title": "11. Termination",
+        "body": "The User may stop using the Service at any time and request deletion of their account by email at {email}. The Publisher may terminate access in case of serious breach of the ToS."
+      },
+      {
+        "title": "12. Governing law and jurisdiction",
+        "body": "The ToS are governed by French law. In the absence of an amicable resolution, any dispute shall fall within the jurisdiction of the French courts, without prejudice to mandatory consumer protection provisions."
+      },
+      {
+        "title": "13. Contact",
+        "body": "For any question regarding the ToS or the Service: {email}."
+      }
+    ]
+  },
+  "cgv": {
+    "title": "Terms of Sale",
+    "subtitle": "Framework for future paid offers of {appName}.",
+    "sections": [
+      {
+        "title": "1. Preamble — Service currently free",
+        "body": "As of the last update of these terms ({lastUpdated}), {appName} is entirely free. No sale contract is concluded between the Publisher and Users. These Terms of Sale (\"ToS-Sale\") are intended to apply as soon as paid offers are introduced (subscription, premium features or other). As long as no paid offer is proposed, no provision of these ToS-Sale creates any payment obligation on Users."
+      },
+      {
+        "title": "2. Seller",
+        "body": "The seller of future paid offers will be {owner} (the \"Seller\"). Contact: {email}."
+      },
+      {
+        "title": "3. Scope",
+        "body": "These ToS-Sale will apply to any order placed from the introduction of a paid offer onwards. Acceptance will be obtained clearly and unambiguously during the order process. Any order will entail full acceptance of the ToS-Sale in force at that date."
+      },
+      {
+        "title": "4. Offers and prices",
+        "body": "The characteristics of the offers (content, duration, usage limits) as well as the prices expressed in euros, including all taxes (where applicable), will be detailed on the order page at the time of subscription. The Publisher reserves the right to modify prices at any time, it being understood that ongoing offers will keep the price accepted at the time of subscription."
+      },
+      {
+        "title": "5. Order and contract formation",
+        "body": "The contract is deemed concluded upon email confirmation of the order. Before validation, the User will be presented with a summary allowing them to check the details of their order and correct any errors."
+      },
+      {
+        "title": "6. Payment",
+        "body": "Payment will be made by credit card or any other payment method offered, through a secure third-party payment provider. The Publisher does not retain any banking data. The exact provider will be specified on the order page."
+      },
+      {
+        "title": "7. Service delivery",
+        "body": "As a digital service, access to paid features will be opened immediately upon payment confirmation, unless otherwise stated at the time of order."
+      },
+      {
+        "title": "8. Right of withdrawal",
+        "body": "Pursuant to articles L.221-18 et seq. of the French Consumer Code, the consumer has a 14-day period to exercise their right of withdrawal, without having to justify their decision. However, pursuant to article L.221-28, 13° of the same code, this right cannot be exercised when execution of the service has started with the express prior consent of the consumer and their express waiver of the right of withdrawal. The order form will allow expression of this consent."
+      },
+      {
+        "title": "9. Legal warranties",
+        "body": "Consumer Users benefit from the legal warranty of conformity (articles L.217-3 et seq. of the French Consumer Code) and from the warranty against hidden defects (articles 1641 et seq. of the French Civil Code)."
+      },
+      {
+        "title": "10. Termination and refund",
+        "body": "Termination and refund conditions will be specified for each offer on the order page, in compliance with mandatory consumer protection provisions."
+      },
+      {
+        "title": "11. Complaint and mediation",
+        "body": "Any complaint may be sent to {email}. In case of unresolved dispute, the consumer may resort to the consumer mediator who will be designated upon launch of paid offers, in accordance with articles L.611-1 et seq. of the French Consumer Code."
+      },
+      {
+        "title": "12. Personal data",
+        "body": "Data collected as part of an order is processed in accordance with the Service's privacy policy, which will be published before launch of paid offers."
+      },
+      {
+        "title": "13. Governing law",
+        "body": "These ToS-Sale are governed by French law. In the absence of an amicable resolution, any dispute shall fall within the jurisdiction of the French courts, without prejudice to mandatory consumer protection provisions."
+      },
+      {
+        "title": "14. Contact",
+        "body": "For any question regarding the ToS-Sale or the offers: {email}."
+      }
+    ]
+  }
+}

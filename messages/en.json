@@ -91,6 +91,21 @@
     "body": "Reconnect to keep using {name}.",
     "retry": "Try again"
   },
+  "errors": {
+    "notFound": {
+      "title": "Page not found",
+      "body": "This page doesn’t exist anymore. You’ll be redirected to the home.",
+      "redirecting": "Redirecting in {seconds}s…",
+      "goHome": "Back to home"
+    },
+    "serverError": {
+      "title": "Something went wrong",
+      "body": "An unexpected error occurred. You can retry or go back to home.",
+      "retry": "Try again",
+      "goHome": "Back to home",
+      "details": "Technical details"
+    }
+  },
   "dashboard": {
     "navLists": "📋 Lists",
     "navInventory": "📦 Inventory",

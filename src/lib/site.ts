@@ -26,6 +26,10 @@ export const SITE_LOCALE = "fr_FR";
 /** Google Search Console verification (optional). */
 export const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
 
+/** Public source repository — surfaced in the home footer. */
+export const GITHUB_URL =
+  process.env.NEXT_PUBLIC_GITHUB_URL || "https://github.com/O-Plums/share-items";
+
 export const LOGO_PATH = "/logo.png";
 export const OG_IMAGE_PATH = "/logo.png";
 export const PWA_ICONS = {

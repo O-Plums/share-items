@@ -1,0 +1,133 @@
+{
+  "common": {
+    "back": "Retour",
+    "lastUpdated": "Dernière mise à jour : {lastUpdated}",
+    "editor": "Éditeur",
+    "contact": "Contact",
+    "seeAlso": "À consulter aussi",
+    "cguLink": "Conditions générales d'utilisation",
+    "cgvLink": "Conditions générales de vente",
+    "sourceCode": "Code source",
+    "noticeMissing": "{appName} est en phase de bêta. La politique de confidentialité et les mentions légales détaillées seront publiées avant l'ouverture au grand public. Pour toute question dès aujourd'hui, contacte-nous à {email}."
+  },
+  "cgu": {
+    "title": "Conditions générales d'utilisation",
+    "subtitle": "Règles applicables à l'utilisation de {appName}.",
+    "sections": [
+      {
+        "title": "1. Objet",
+        "body": "Les présentes Conditions générales d'utilisation (« CGU ») encadrent l'accès et l'utilisation du service {appName}, accessible à l'adresse {siteUrl} et édité par {owner} (ci-après l'« Éditeur »). En accédant au service, l'Utilisateur reconnaît avoir pris connaissance des CGU et les accepter sans réserve."
+      },
+      {
+        "title": "2. Définitions",
+        "body": "Service : la plateforme web et application web progressive (PWA) {appName}.\n\nUtilisateur : toute personne physique accédant au Service, qu'elle soit organisateur (créateur de listes) ou votant invité.\n\nCompte : espace personnel créé via une connexion fédérée (Google) permettant à l'Utilisateur de créer et gérer ses listes et objets.\n\nContenu : photographies, libellés, étiquettes, pièces et toute autre donnée ajoutée par l'Utilisateur."
+      },
+      {
+        "title": "3. Description du service",
+        "body": "{appName} est un service gratuit qui permet d'inventorier les objets d'un foyer (déménagement, succession, désencombrement), de les classer en listes (« à garder », « à donner », « à vendre », « autre ») et d'inviter ses proches à voter Oui/Non sur chacun d'eux via un lien partagé. L'Éditeur se réserve le droit de faire évoluer les fonctionnalités à tout moment."
+      },
+      {
+        "title": "4. Accès et création de compte",
+        "body": "L'accès au Service est gratuit. La création d'un compte d'organisateur s'effectue par authentification via Google. L'Utilisateur garantit la véracité des informations transmises et reste seul responsable de la confidentialité de ses identifiants. L'expérience de vote (lien public d'une liste) ne nécessite pas de compte ; un identifiant visiteur anonyme est généré localement."
+      },
+      {
+        "title": "5. Utilisation conforme",
+        "body": "L'Utilisateur s'engage à n'utiliser le Service que pour un usage personnel ou familial, et à ne pas :\n\n– téléverser de contenu illicite, diffamatoire, contrefaisant ou portant atteinte à des tiers ;\n\n– téléverser des photographies de personnes sans leur consentement ;\n\n– contourner, surcharger ou perturber le fonctionnement technique du Service ;\n\n– collecter automatiquement des données autres que les siennes.\n\nL'Éditeur peut suspendre l'accès en cas de manquement constaté."
+      },
+      {
+        "title": "6. Contenu de l'Utilisateur",
+        "body": "L'Utilisateur conserve l'entière propriété des Contenus qu'il ajoute. En les téléversant, il concède à l'Éditeur une licence non exclusive, gratuite et limitée à la durée nécessaire à l'hébergement, à l'affichage et au traitement de ces Contenus dans le cadre strict du fonctionnement du Service. L'Utilisateur garantit disposer des droits nécessaires sur les Contenus qu'il dépose et s'engage à indemniser l'Éditeur en cas de réclamation d'un tiers."
+      },
+      {
+        "title": "7. Propriété intellectuelle",
+        "body": "Le code source de {appName} est mis à disposition sous licence MIT (voir le fichier LICENSE du dépôt public). Toute personne peut l'utiliser, le modifier et le redistribuer dans les conditions de cette licence, y compris à des fins commerciales, sous réserve de conserver la mention de copyright.\n\nEn revanche, la marque {appName}, son logo, son identité visuelle, ses contenus marketing, ses illustrations et les photographies de démonstration restent la propriété exclusive de l'Éditeur (ou de leurs ayants droit respectifs) et sont protégés par le droit d'auteur et le droit des marques. Toute reproduction, imitation ou exploitation non expressément autorisée de ces éléments est interdite, y compris en cas de fork du code source : un fork doit être renommé et utiliser sa propre identité visuelle."
+      },
+      {
+        "title": "8. Données personnelles",
+        "body": "Le traitement des données personnelles est régi par une politique de confidentialité distincte qui sera publiée avant l'ouverture publique du Service. Les données traitées à ce jour incluent : profil Google (nom, e-mail, image), photographies téléversées, identifiants techniques et données d'analyse d'usage. Pour exercer vos droits (accès, rectification, opposition, effacement, portabilité), écrivez à {email}."
+      },
+      {
+        "title": "9. Responsabilité",
+        "body": "Le Service est fourni « en l'état », sans garantie de disponibilité ininterrompue ni d'absence d'erreur. L'Éditeur met en œuvre les moyens raisonnables pour assurer la continuité du Service mais ne saurait être tenu responsable des interruptions, pertes de données ou dommages indirects, notamment ceux résultant de prestataires tiers (hébergeur, fournisseur d'authentification, fournisseur de stockage)."
+      },
+      {
+        "title": "10. Évolution du Service et des CGU",
+        "body": "L'Éditeur peut faire évoluer le Service à tout moment, ajouter ou retirer des fonctionnalités, le suspendre ou y mettre fin avec un préavis raisonnable. Les CGU peuvent être modifiées ; les modifications sont signalées sur le site et applicables à compter de la date de mise à jour indiquée en tête du document."
+      },
+      {
+        "title": "11. Résiliation",
+        "body": "L'Utilisateur peut cesser à tout moment d'utiliser le Service et demander la suppression de son compte par e-mail à {email}. L'Éditeur peut résilier l'accès en cas de manquement grave aux CGU."
+      },
+      {
+        "title": "12. Droit applicable et juridiction",
+        "body": "Les CGU sont régies par le droit français. À défaut de résolution amiable, tout litige relèvera de la compétence des juridictions françaises, sans préjudice des dispositions impératives applicables aux consommateurs."
+      },
+      {
+        "title": "13. Contact",
+        "body": "Pour toute question relative aux CGU ou au Service : {email}."
+      }
+    ]
+  },
+  "cgv": {
+    "title": "Conditions générales de vente",
+    "subtitle": "Encadrement des offres payantes futures de {appName}.",
+    "sections": [
+      {
+        "title": "1. Préambule — Service actuellement gratuit",
+        "body": "À la date de dernière mise à jour des présentes ({lastUpdated}), {appName} est entièrement gratuit. Aucun contrat de vente n'est conclu entre l'Éditeur et les Utilisateurs. Les présentes Conditions générales de vente (« CGV ») ont vocation à s'appliquer dès l'introduction d'offres payantes (abonnement, fonctionnalités premium ou autres). Tant qu'aucune offre payante n'est proposée, aucune disposition des CGV ne fait naître d'obligation de paiement à la charge des Utilisateurs."
+      },
+      {
+        "title": "2. Vendeur",
+        "body": "Le vendeur des futures offres payantes sera {owner} (ci-après le « Vendeur »). Contact : {email}."
+      },
+      {
+        "title": "3. Champ d'application",
+        "body": "Les CGV s'appliqueront à toute commande passée à compter de la mise en service d'une offre payante. L'acceptation des CGV interviendra de manière claire et non équivoque au moment du processus de commande. Toute commande vaudra acceptation pleine et entière des CGV en vigueur à cette date."
+      },
+      {
+        "title": "4. Offres et prix",
+        "body": "Les caractéristiques des offres (contenu, durée, limites d'usage) ainsi que les prix exprimés en euros et toutes taxes comprises (si applicables) seront détaillés sur la page de commande au moment de la souscription. L'Éditeur se réserve le droit de modifier ses prix à tout moment, étant entendu que les offres en cours conserveront le prix accepté lors de la souscription."
+      },
+      {
+        "title": "5. Commande et conclusion du contrat",
+        "body": "Le contrat sera réputé conclu à compter de la confirmation de la commande par e-mail. Avant validation, l'Utilisateur disposera d'un récapitulatif lui permettant de vérifier le détail de sa commande et de corriger d'éventuelles erreurs."
+      },
+      {
+        "title": "6. Paiement",
+        "body": "Le paiement s'effectuera par carte bancaire ou tout autre moyen de paiement proposé, via un prestataire de paiement sécurisé tiers. L'Éditeur ne conserve aucune donnée bancaire. La désignation précise du prestataire sera mentionnée sur la page de commande."
+      },
+      {
+        "title": "7. Livraison du service",
+        "body": "S'agissant d'un service numérique, l'accès aux fonctionnalités payantes sera ouvert sans délai après confirmation du paiement, sauf indication contraire au moment de la commande."
+      },
+      {
+        "title": "8. Droit de rétractation",
+        "body": "Conformément aux articles L.221-18 et suivants du Code de la consommation, le consommateur dispose d'un délai de 14 jours pour exercer son droit de rétractation, sans avoir à motiver sa décision. Toutefois, conformément à l'article L.221-28, 13° du même code, ce droit ne pourra pas être exercé lorsque l'exécution du service aura commencé, avec l'accord exprès et préalable du consommateur, et la renonciation expresse à son droit de rétractation. Le formulaire de commande permettra d'exprimer ce consentement."
+      },
+      {
+        "title": "9. Garanties légales",
+        "body": "L'Utilisateur consommateur bénéficie des garanties légales de conformité (articles L.217-3 et suivants du Code de la consommation) et contre les vices cachés (articles 1641 et suivants du Code civil)."
+      },
+      {
+        "title": "10. Résiliation et remboursement",
+        "body": "Les conditions de résiliation et de remboursement seront précisées pour chaque offre dans la page de commande, dans le respect des dispositions impératives applicables aux consommateurs."
+      },
+      {
+        "title": "11. Réclamation et médiation",
+        "body": "Toute réclamation peut être adressée à {email}. En cas de litige non résolu, le consommateur pourra recourir au médiateur de la consommation qui sera désigné lors de la mise en service des offres payantes, conformément aux articles L.611-1 et suivants du Code de la consommation."
+      },
+      {
+        "title": "12. Données personnelles",
+        "body": "Les données collectées dans le cadre d'une commande sont traitées conformément à la politique de confidentialité du Service, qui sera publiée avant la mise en service des offres payantes."
+      },
+      {
+        "title": "13. Droit applicable",
+        "body": "Les CGV sont régies par le droit français. À défaut de résolution amiable, tout litige relèvera de la compétence des juridictions françaises, sans préjudice des dispositions impératives applicables aux consommateurs."
+      },
+      {
+        "title": "14. Contact",
+        "body": "Pour toute question relative aux CGV ou aux offres : {email}."
+      }
+    ]
+  }
+}
