@@ -11,6 +11,7 @@ import { HistorySheet } from "./HistorySheet";
 import { MatchesView } from "./MatchesView";
 import { VoterAccountModal } from "./VoterAccountModal";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { track } from "@/lib/analytics";
 
 type RoomMeta = { emoji: string; label: string };
 
@@ -127,6 +128,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
             value,
           }),
         });
+        track("vote_cast", { value });
         await Promise.all([loadVotes(), loadMatches()]);
       } catch (e) {
         setError((e as Error).message);

@@ -18,6 +18,7 @@ import { BackButton } from "@/components/ui/BackButton";
 import { Spinner } from "@/components/ui/Spinner";
 import { FirstListTour } from "@/components/onboarding/FirstListTour";
 import { WELCOME_QUERY_PARAM } from "@/lib/first-list-tour";
+import { track } from "@/lib/analytics";
 
 type Item = {
   id: string;
@@ -78,6 +79,7 @@ export default function ListDetailPage() {
     if (!shareUrl) return;
     try {
       await navigator.clipboard.writeText(shareUrl);
+      track("invite_sent", { method: "copy" });
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {}
@@ -91,6 +93,7 @@ export default function ListDetailPage() {
         method: "POST",
         body: JSON.stringify({ itemId, visitorId }),
       });
+      track("match_reached");
       await refresh();
     } catch (e) {
       setError((e as Error).message);
@@ -615,6 +618,7 @@ function ShareTab({
         text: `Vote sur ma liste « ${listTitle} » (${kindLabel.toLowerCase()})`,
         url: shareUrl,
       });
+      track("invite_sent", { method: "native_share" });
     } catch (e) {
       const err = e as Error;
       if (err.name !== "AbortError") {

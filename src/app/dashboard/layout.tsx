@@ -6,6 +6,7 @@ import { UserRoomsProvider } from "@/components/UserRoomsProvider";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardNav } from "./DashboardNav";
 import { ClaimVisitorListsTrigger } from "./ClaimVisitorListsTrigger";
+import { PostSignupSync } from "@/components/PostSignupSync";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <DashboardNav />
       </div>
       <ClaimVisitorListsTrigger />
+      <PostSignupSync />
       <PwaInstallPrompt />
     </UserRoomsProvider>
   );

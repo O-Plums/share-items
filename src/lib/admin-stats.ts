@@ -4,6 +4,17 @@ export type DateRange = { from: Date; to: Date };
 
 export type DailyPoint = { date: string; label: string; count: number };
 
+export type FunnelStep = {
+  key: "signups" | "list_created" | "invite_received" | "match_reached";
+  label: string;
+  count: number;
+};
+
+export type AttributionRow = {
+  source: string;
+  count: number;
+};
+
 export type AdminStats = {
   range: { from: string; to: string };
   period: {
@@ -30,6 +41,14 @@ export type AdminStats = {
     matches: DailyPoint[];
   };
   listsByKind: { kind: string; count: number }[];
+  funnel: FunnelStep[];
+  attribution: {
+    topSources: AttributionRow[];
+    topCampaigns: AttributionRow[];
+    topReferrers: AttributionRow[];
+    captured: number;
+    missing: number;
+  };
 };
 
 type DailyRow = { day: Date; count: bigint | number };
@@ -108,6 +127,106 @@ async function dailyCounts(
   );
 }
 
+/**
+ * Funnel cohorte : combien d'utilisateurs créés sur la période ont franchi
+ * chaque étape (cumulatif décroissant — chaque étape inclut la suivante).
+ *  - signups            : compte créé
+ *  - list_created       : ≥ 1 liste créée par l'utilisateur
+ *  - invite_received    : ≥ 1 vote externe (visitorId distinct) sur une de ses listes
+ *  - match_reached      : ≥ 1 match sur une de ses listes
+ */
+async function computeFunnel(range: DateRange): Promise<FunnelStep[]> {
+  const usersInPeriod = await prisma.user.findMany({
+    where: { createdAt: { gte: range.from, lte: range.to } },
+    select: { id: true },
+  });
+  const userIds = usersInPeriod.map((u) => u.id);
+  const signups = userIds.length;
+
+  if (signups === 0) {
+    return [
+      { key: "signups", label: "Inscriptions", count: 0 },
+      { key: "list_created", label: "A créé une liste", count: 0 },
+      { key: "invite_received", label: "A reçu un vote", count: 0 },
+      { key: "match_reached", label: "A obtenu un match", count: 0 },
+    ];
+  }
+
+  const withList = await prisma.list.findMany({
+    where: { userId: { in: userIds } },
+    select: { id: true, userId: true },
+  });
+  const usersWithList = new Set(withList.map((l) => l.userId).filter(Boolean) as string[]);
+  const listIds = withList.map((l) => l.id);
+
+  let usersWithVote = new Set<string>();
+  let usersWithMatch = new Set<string>();
+
+  if (listIds.length > 0) {
+    const votedItems = await prisma.item.findMany({
+      where: { listId: { in: listIds }, votes: { some: {} } },
+      select: { userId: true },
+    });
+    usersWithVote = new Set(votedItems.map((i) => i.userId).filter(Boolean) as string[]);
+
+    const matchedItems = await prisma.item.findMany({
+      where: { listId: { in: listIds }, match: { isNot: null } },
+      select: { userId: true },
+    });
+    usersWithMatch = new Set(matchedItems.map((i) => i.userId).filter(Boolean) as string[]);
+  }
+
+  return [
+    { key: "signups", label: "Inscriptions", count: signups },
+    { key: "list_created", label: "A créé une liste", count: usersWithList.size },
+    { key: "invite_received", label: "A reçu un vote", count: usersWithVote.size },
+    { key: "match_reached", label: "A obtenu un match", count: usersWithMatch.size },
+  ];
+}
+
+function topGroupBy(
+  rows: { value: string | null; _count: { _all: number } }[],
+  limit = 8,
+): AttributionRow[] {
+  return rows
+    .filter((r) => r.value)
+    .map((r) => ({ source: r.value as string, count: r._count._all }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+}
+
+async function computeAttribution(range: DateRange) {
+  const createdWhere = { createdAt: { gte: range.from, lte: range.to } };
+
+  const [bySource, byCampaign, byReferrer, captured, signups] = await Promise.all([
+    prisma.signupAttribution.groupBy({
+      by: ["utmSource"],
+      where: createdWhere,
+      _count: { _all: true },
+    }),
+    prisma.signupAttribution.groupBy({
+      by: ["utmCampaign"],
+      where: createdWhere,
+      _count: { _all: true },
+    }),
+    prisma.signupAttribution.groupBy({
+      by: ["referrer"],
+      where: createdWhere,
+      _count: { _all: true },
+    }),
+    prisma.signupAttribution.count({ where: createdWhere }),
+    prisma.user.count({ where: createdWhere }),
+  ]);
+
+  return {
+    topSources: topGroupBy(bySource.map((r) => ({ value: r.utmSource, _count: r._count }))),
+    topCampaigns: topGroupBy(byCampaign.map((r) => ({ value: r.utmCampaign, _count: r._count }))),
+    topReferrers: topGroupBy(byReferrer.map((r) => ({ value: r.referrer, _count: r._count }))),
+    captured,
+    missing: Math.max(0, signups - captured),
+  };
+}
+
 export async function fetchAdminStats(range: DateRange): Promise<AdminStats> {
   const createdWhere = { createdAt: { gte: range.from, lte: range.to } };
 
@@ -130,6 +249,8 @@ export async function fetchAdminStats(range: DateRange): Promise<AdminStats> {
     votesSeries,
     matchesSeries,
     listsByKind,
+    funnel,
+    attribution,
   ] = await Promise.all([
     prisma.user.count({ where: createdWhere }),
     prisma.list.count({ where: createdWhere }),
@@ -157,6 +278,8 @@ export async function fetchAdminStats(range: DateRange): Promise<AdminStats> {
       where: createdWhere,
       _count: { _all: true },
     }),
+    computeFunnel(range),
+    computeAttribution(range),
   ]);
 
   return {
@@ -193,5 +316,7 @@ export async function fetchAdminStats(range: DateRange): Promise<AdminStats> {
         count: r._count._all,
       }))
       .sort((a, b) => b.count - a.count),
+    funnel,
+    attribution,
   };
 }

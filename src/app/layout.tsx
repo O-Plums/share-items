@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { IdentityProvider } from "@/lib/identity";
+import { AttributionCapture } from "@/components/AttributionCapture";
 import { rootMetadata } from "@/lib/site";
 
 export const metadata = rootMetadata;
@@ -36,6 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </Providers>
           </SerwistProvider>
         </NextIntlClientProvider>
+        <AttributionCapture />
         <Analytics />
       </body>
     </html>

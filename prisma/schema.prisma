@@ -18,12 +18,13 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
 
-  accounts Account[]
-  sessions Session[]
-  lists    List[]
-  items    Item[]
-  tags     UserTag[]
-  rooms    UserRoom[]
+  accounts    Account[]
+  sessions    Session[]
+  lists       List[]
+  items       Item[]
+  tags        UserTag[]
+  rooms       UserRoom[]
+  attribution SignupAttribution?
 }
 
 model Account {
@@ -169,4 +170,26 @@ model Match {
   item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@index([visitorId])
+}
+
+// Phase 2 — Attribution marketing : capture UTM + referrer + landing path
+// au moment du premier signup. Un seul row par user (premier touch).
+model SignupAttribution {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmContent  String?
+  utmTerm     String?
+  referrer    String?
+  landingPath String?
+  gclid       String?
+  fbclid      String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([utmSource])
+  @@index([utmCampaign])
 }

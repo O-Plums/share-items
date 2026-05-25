@@ -273,6 +273,15 @@ Stack : Vitest + happy-dom. Les tests vivent dans `tests/unit/*.test.ts` et util
 
 ---
 
+## Acquisition & tracking
+
+URLs UTM prêtes à copier (Meta, Google, TikTok, Reddit…) + lecture du funnel admin et des sources : **[ACQUISITION.md](./ACQUISITION.md)**.
+
+5 events trackés via Vercel Analytics : `signup`, `list_created`, `invite_sent`, `vote_cast`, `match_reached`.
+Dashboard funnel + top sources : `/admin`.
+
+---
+
 ## Structure du projet
 
 ```

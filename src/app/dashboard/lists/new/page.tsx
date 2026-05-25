@@ -9,6 +9,7 @@ import { useDashboardFetch } from "@/lib/client";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { useTranslatedListKinds } from "@/lib/i18n-labels";
 import { isValidListKind } from "@/lib/list-kinds";
+import { track } from "@/lib/analytics";
 
 export default function NewListPage() {
   const router = useRouter();
@@ -57,6 +58,7 @@ export default function NewListPage() {
           body: JSON.stringify({ itemIds: presetItems, listId: list.id }),
         });
       }
+      track("list_created", { kind });
       router.replace(`/dashboard/${list.id}?welcome=1`);
     } catch (e) {
       setError((e as Error).message);

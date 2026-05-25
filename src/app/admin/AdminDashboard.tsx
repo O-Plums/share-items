@@ -242,7 +242,112 @@ export function AdminDashboard() {
               </ResponsiveContainer>
             </ChartCard>
           </div>
+
+          <FunnelCard funnel={stats.funnel} />
+
+          <AttributionCard attribution={stats.attribution} />
         </>
+      )}
+    </div>
+  );
+}
+
+function FunnelCard({ funnel }: { funnel: AdminStats["funnel"] }) {
+  const top = funnel[0]?.count ?? 0;
+  return (
+    <section className="rounded-2xl bg-white p-4 ring-1 ring-neutral-200">
+      <h2 className="mb-1 text-sm font-semibold text-neutral-800">Funnel d'activation (cohorte période)</h2>
+      <p className="mb-4 text-xs text-neutral-500">
+        Sur les utilisateurs créés pendant la période, combien atteignent chaque étape.
+      </p>
+      <div className="space-y-2">
+        {funnel.map((step, idx) => {
+          const widthPct = top > 0 ? Math.max(4, (step.count / top) * 100) : 0;
+          const conversionFromPrev =
+            idx === 0
+              ? null
+              : funnel[idx - 1].count === 0
+                ? 0
+                : Math.round((step.count / funnel[idx - 1].count) * 100);
+          const conversionFromTop =
+            idx === 0 || top === 0 ? null : Math.round((step.count / top) * 100);
+          return (
+            <div key={step.key} className="space-y-1">
+              <div className="flex items-baseline justify-between gap-2 text-sm">
+                <span className="font-medium text-neutral-800">{step.label}</span>
+                <span className="tabular-nums text-neutral-600">
+                  <span className="font-semibold text-neutral-900">{step.count}</span>
+                  {conversionFromTop !== null && (
+                    <span className="ml-2 text-xs text-neutral-500">
+                      {conversionFromTop}% du top
+                      {conversionFromPrev !== null && ` · ${conversionFromPrev}% vs préc.`}
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
+                <div
+                  className="h-full rounded-full bg-brand-500 transition-all"
+                  style={{ width: `${widthPct}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function AttributionCard({ attribution }: { attribution: AdminStats["attribution"] }) {
+  const total = attribution.captured + attribution.missing;
+  const coverage = total > 0 ? Math.round((attribution.captured / total) * 100) : 0;
+
+  return (
+    <section className="rounded-2xl bg-white p-4 ring-1 ring-neutral-200">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-sm font-semibold text-neutral-800">Sources d'acquisition</h2>
+        <p className="text-xs text-neutral-500">
+          Attribution capturée : <span className="font-medium text-neutral-700">{attribution.captured}</span> /{" "}
+          {total} inscrits ({coverage}%)
+        </p>
+      </div>
+      <p className="mt-1 text-xs text-neutral-500">
+        Premier touch — UTM / referrer enregistré au premier signup de chaque utilisateur.
+      </p>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <SourceList title="utm_source" rows={attribution.topSources} />
+        <SourceList title="utm_campaign" rows={attribution.topCampaigns} />
+        <SourceList title="referrer" rows={attribution.topReferrers} />
+      </div>
+    </section>
+  );
+}
+
+function SourceList({
+  title,
+  rows,
+}: {
+  title: string;
+  rows: AdminStats["attribution"]["topSources"];
+}) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">{title}</p>
+      {rows.length === 0 ? (
+        <p className="mt-2 text-sm text-neutral-400">Aucune donnée</p>
+      ) : (
+        <ul className="mt-2 space-y-1">
+          {rows.map((row) => (
+            <li key={row.source} className="flex justify-between gap-3 text-sm">
+              <span className="min-w-0 truncate text-neutral-700" title={row.source}>
+                {row.source}
+              </span>
+              <span className="shrink-0 tabular-nums font-medium text-neutral-900">{row.count}</span>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
