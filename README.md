@@ -1,13 +1,13 @@
 # Sort your life
 
 <p align="center">
-  <a href="https://share-items.vercel.app/">
+  <a href="https://sortyourlife.fr/">
     <img src="public/logo.png" width="120" alt="Sort your life — logo" />
   </a>
 </p>
 
 <p align="center">
-  <strong>Démo : <a href="https://share-items.vercel.app/">share-items.vercel.app</a></strong>
+  <strong>Démo : <a href="https://sortyourlife.fr/">sortyourlife.fr</a></strong>
 </p>
 
 **Sort your life** aide les familles à se répartir les objets d’un débarras, d’un déménagement ou d’une succession.  
@@ -221,6 +221,15 @@ Copie [`.env.example`](./.env.example) vers `.env` — **ne commite jamais** `.e
 | `ADMIN_EMAILS` | Optionnel | Accès `/admin` (virgules) |
 | `NEXT_PUBLIC_APP_NAME` | Optionnel | Nom affiché du produit (défaut « Sort your life ») |
 | `NEXT_PUBLIC_APP_SHORT_NAME` | Optionnel | Nom court PWA (défaut « Sort ») |
+| `NEXT_PUBLIC_SITE_URL` | Recommandé | URL publique pour OG / sitemap (défaut `https://sortyourlife.fr`) |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Optionnel | Token Google Search Console |
+
+### SEO
+
+- `robots.txt` généré sur `/robots.txt` (autorise `/`, bloque `/dashboard`, `/admin`, `/api`, `/l/`, `/login`).
+- `sitemap.xml` sur `/sitemap.xml`.
+- Open Graph + Twitter Card + JSON-LD (WebSite, Organization, SoftwareApplication) sur la home.
+- Lier la propriété sur **Google Search Console**, mettre le token dans `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` et soumettre le sitemap.
 
 Redirect OAuth : `{ORIGIN}/api/auth/callback/google` (et `/apple`).
 

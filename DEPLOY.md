@@ -1,5 +1,7 @@
 # Déploiement Vercel — Sort your life
 
+Domaine de production : **[sortyourlife.fr](https://sortyourlife.fr)**.
+
 ## 1. Base PostgreSQL
 
 Choisis **une** option :
