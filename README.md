@@ -125,21 +125,34 @@ A single user can organize their own lists with their account and vote on someon
 
 ---
 
-## Preview
+## Screenshots
+
+### Creators — building and sharing a list
 
 <p align="center">
-  <img src="promo/1.jpg" width="45%" alt="Sort your life — preview 1" />
-  <img src="promo/2.jpg" width="45%" alt="Sort your life — preview 2" />
+  <img src="public/promo/creators/new_list.jpg" width="220" alt="Create a new list" />
+  <img src="public/promo/creators/add_first_item.jpg" width="220" alt="Add the first item with a photo" />
+  <img src="public/promo/creators/share_link.jpg" width="220" alt="Share the public link of a list" />
 </p>
-<p align="center">
-  <img src="promo/3.jpg" width="45%" alt="Sort your life — preview 3" />
-  <img src="promo/4.jpg" width="45%" alt="Sort your life — preview 4" />
-</p>
-<p align="center">
-  <img src="promo/5.jpg" width="45%" alt="Sort your life — preview 5" />
-</p>
+<p align="center"><sub>1. Create a list · 2. Add the first item · 3. Share the link</sub></p>
 
-> Hi-res images: [`promo/`](./promo/) folder (`1.jpg` … `5.jpg`).
+<p align="center">
+  <img src="public/promo/creators/menu.jpg" width="220" alt="All your lists at a glance" />
+  <img src="public/promo/creators/see_results_list.jpg" width="220" alt="See who voted yes or no on each item" />
+  <img src="public/promo/creators/attribute_results_to_a_match.jpg" width="220" alt="Assign an item to someone who said yes" />
+</p>
+<p align="center"><sub>4. Browse your lists · 5. See the results · 6. Assign each item to the right person</sub></p>
+
+### Voters — saying yes or no
+
+<p align="center">
+  <img src="public/promo/voters/add_name_for_vote.jpg" width="220" alt="Enter a first name to start voting (no account)" />
+  <img src="public/promo/voters/tinder_example.jpg" width="220" alt="Tinder-style swipe to say yes or no" />
+  <img src="public/promo/voters/see_my_match.jpg" width="220" alt="See the items the organizer assigned to you" />
+</p>
+<p align="center"><sub>1. Enter your name · 2. Swipe yes or no · 3. See your matches</sub></p>
+
+> Full-resolution captures live in [`public/promo/creators/`](./public/promo/creators/) and [`public/promo/voters/`](./public/promo/voters/).
 
 ---
 
@@ -310,7 +323,10 @@ Funnel + top sources dashboard: `/admin`.
 ## Project structure
 
 ```
-promo/                    # README captures
+public/
+  promo/
+    creators/             # Organizer journey screenshots (README + landing)
+    voters/               # Voter journey screenshots
 messages/                 # fr.json, en.json (next-intl)
   legal/                  # Legal wording (separated i18n)
 src/
@@ -345,6 +361,6 @@ ACQUISITION.md
 Two things the MIT license does **not** cover:
 
 - The **"Sort your life" name and logo** (`public/logo.png`, brand colors, marketing copy in `messages/*.json`). Those remain the project's identity — if you fork to build something new, please rename it.
-- Photos used in the demo and promo material (`promo/*.jpg`, `public/uploads/`) — they may belong to third parties.
+- Photos used in the demo and promo material (`public/promo/**/*.jpg`, `public/uploads/`) — they may belong to third parties.
 
 If in doubt, open an issue or email contact@sortyourlife.fr.

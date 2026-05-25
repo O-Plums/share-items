@@ -73,8 +73,9 @@
     "reassure3": "🔒 You decide who gets what; votes help, they don’t replace your choice.",
     "imgAltNewList": "New list creation screen",
     "imgAltPhoto": "Adding an item with photo and emojis",
-    "imgAltVote": "Voting screen: Yes and No buttons",
-    "imgAltLists": "Lists and items view"
+    "imgAltShare": "Sharing the list's public link",
+    "imgAltVote": "Voting on an item: Yes and No buttons, Tinder-style",
+    "imgAltMatch": "Assigning an item to someone who said yes"
   },
   "login": {
     "title": "Sign in",

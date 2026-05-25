@@ -125,21 +125,34 @@ Un même utilisateur peut organiser ses listes avec son compte et voter sur le l
 
 ---
 
-## Aperçu
+## Captures d’écran
+
+### Côté organisateur — construire et partager une liste
 
 <p align="center">
-  <img src="promo/1.jpg" width="45%" alt="Sort your life — présentation 1" />
-  <img src="promo/2.jpg" width="45%" alt="Sort your life — présentation 2" />
+  <img src="public/promo/creators/new_list.jpg" width="220" alt="Création d’une nouvelle liste" />
+  <img src="public/promo/creators/add_first_item.jpg" width="220" alt="Ajout du premier objet avec une photo" />
+  <img src="public/promo/creators/share_link.jpg" width="220" alt="Partage du lien public d’une liste" />
 </p>
-<p align="center">
-  <img src="promo/3.jpg" width="45%" alt="Sort your life — présentation 3" />
-  <img src="promo/4.jpg" width="45%" alt="Sort your life — présentation 4" />
-</p>
-<p align="center">
-  <img src="promo/5.jpg" width="45%" alt="Sort your life — présentation 5" />
-</p>
+<p align="center"><sub>1. Créer une liste · 2. Ajouter le premier objet · 3. Partager le lien</sub></p>
 
-> Images haute résolution : dossier [`promo/`](./promo/) (`1.jpg` … `5.jpg`).
+<p align="center">
+  <img src="public/promo/creators/menu.jpg" width="220" alt="Toutes tes listes en un coup d’œil" />
+  <img src="public/promo/creators/see_results_list.jpg" width="220" alt="Voir qui a voté oui ou non sur chaque objet" />
+  <img src="public/promo/creators/attribute_results_to_a_match.jpg" width="220" alt="Attribuer un objet à quelqu’un qui a dit oui" />
+</p>
+<p align="center"><sub>4. Tes listes · 5. Les résultats · 6. Attribuer chaque objet à la bonne personne</sub></p>
+
+### Côté votant — dire oui ou non
+
+<p align="center">
+  <img src="public/promo/voters/add_name_for_vote.jpg" width="220" alt="Saisie d’un prénom pour commencer à voter (sans compte)" />
+  <img src="public/promo/voters/tinder_example.jpg" width="220" alt="Swipe façon Tinder pour dire oui ou non" />
+  <img src="public/promo/voters/see_my_match.jpg" width="220" alt="Les objets que l’organisateur t’a attribués" />
+</p>
+<p align="center"><sub>1. Saisir son prénom · 2. Swipe oui ou non · 3. Voir ses matchs</sub></p>
+
+> Images haute résolution dans [`public/promo/creators/`](./public/promo/creators/) et [`public/promo/voters/`](./public/promo/voters/).
 
 ---
 
@@ -310,7 +323,10 @@ Dashboard funnel + top sources : `/admin`.
 ## Structure du projet
 
 ```
-promo/                    # Captures pour README
+public/
+  promo/
+    creators/             # Captures du parcours organisateur (README + landing)
+    voters/               # Captures du parcours votant
 messages/                 # fr.json, en.json (next-intl)
   legal/                  # Wording légal (i18n séparé)
 src/
@@ -345,6 +361,6 @@ ACQUISITION.md
 Deux choses que la MIT **ne couvre pas** :
 
 - Le **nom « Sort your life » et le logo** (`public/logo.png`, couleurs de marque, copies marketing dans `messages/*.json`). Ils restent l'identité du projet — si tu forks pour construire autre chose, change le nom.
-- Les photos utilisées dans la démo et le matériel promo (`promo/*.jpg`, `public/uploads/`) — elles peuvent appartenir à des tiers.
+- Les photos utilisées dans la démo et le matériel promo (`public/promo/**/*.jpg`, `public/uploads/`) — elles peuvent appartenir à des tiers.
 
 En cas de doute, ouvre une issue ou écris à contact@sortyourlife.fr.

@@ -73,8 +73,9 @@
     "reassure3": "🔒 Tu décides qui récupère quoi ; les votes aident, ils ne remplacent pas ton choix.",
     "imgAltNewList": "Écran de création d’une nouvelle liste",
     "imgAltPhoto": "Ajout d’un objet avec photo et emojis",
-    "imgAltVote": "Écran de vote : boutons Oui et Non",
-    "imgAltLists": "Vue des listes et des objets"
+    "imgAltShare": "Écran de partage du lien public de la liste",
+    "imgAltVote": "Vote sur un objet : boutons Oui et Non façon Tinder",
+    "imgAltMatch": "Attribution d’un objet à une personne qui a dit oui"
   },
   "login": {
     "title": "Connexion",
