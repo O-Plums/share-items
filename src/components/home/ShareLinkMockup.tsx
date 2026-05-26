@@ -29,7 +29,7 @@ export function ShareLinkMockup({ title, hint, copyLabel, shareLabel }: Props) {
         animate={reduced ? undefined : { boxShadow: ["0 0 0 0 rgba(244,53,104,0)", "0 0 0 4px rgba(244,53,104,0.12)", "0 0 0 0 rgba(244,53,104,0)"] }}
         transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1.5 }}
       >
-        share-items.app/l/maison-papy
+        sortyourlife.fr/l/maison-papy
       </motion.p>
       <p className="mt-2.5 text-sm leading-snug text-neutral-600">{hint}</p>
       <motion.div

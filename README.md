@@ -180,8 +180,8 @@ A single user can organize their own lists with their account and vote on someon
 ### Install
 
 ```bash
-git clone https://github.com/O-Plums/share-items.git
-cd share-items
+git clone https://github.com/O-Plums/sort-your-life.git
+cd sort-your-life
 npm install
 cp .env.example .env
 # Edit .env: DATABASE_URL, AUTH_SECRET, AUTH_GOOGLE_* (see below)

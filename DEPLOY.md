@@ -55,7 +55,7 @@ Coche **Production**, **Preview**, **Development** pour chaque variable.
 ## 3. Importer le repo GitHub
 
 1. [vercel.com/new](https://vercel.com/new)
-2. Import **O-Plums/share-items**
+2. Import **O-Plums/sort-your-life**
 3. Framework : **Next.js** (détecté auto)
 4. Le `vercel.json` applique déjà : `prisma generate && prisma migrate deploy && next build`
 5. **Deploy**
