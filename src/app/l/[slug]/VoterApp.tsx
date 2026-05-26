@@ -7,7 +7,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useIdentity } from "@/lib/identity";
 import { useAuthedFetch } from "@/lib/client";
 import { SwipeView } from "./SwipeView";
-import { HistorySheet } from "./HistorySheet";
+import { HistoryView } from "./HistoryView";
 import { MatchesView } from "./MatchesView";
 import { VoterAccountModal } from "./VoterAccountModal";
 import { PageLoader } from "@/components/ui/PageLoader";
@@ -45,7 +45,7 @@ type Match = {
   item: Omit<Item, "sortOrder">;
 };
 
-type Tab = "swipe" | "matches";
+type Tab = "swipe" | "matches" | "history";
 
 type VoterAppProps = {
   slug: string;
@@ -69,7 +69,6 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
   const [matches, setMatches] = useState<Match[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("swipe");
-  const [historyOpen, setHistoryOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [clearingVotes, setClearingVotes] = useState(false);
 
@@ -148,7 +147,6 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
     try {
       await authedFetch(`/api/lists/by-slug/${slug}/my-votes`, { method: "DELETE" });
       await Promise.all([loadVotes(), loadMatches()]);
-      setHistoryOpen(false);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -173,7 +171,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
 
   return (
     <main className="flex min-h-screen flex-col bg-neutral-50">
-      <PullToRefresh onRefresh={refreshAll} />
+      <PullToRefresh tone="voter" onRefresh={refreshAll} />
       <header className="safe-top px-5 pb-3 pt-3">
         <div className="mx-auto flex w-full max-w-md items-center justify-between gap-3">
           <div className="min-w-0">
@@ -181,7 +179,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
             <div className="mt-1.5 flex items-center gap-2">
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-neutral-200">
                 <div
-                  className="h-full bg-brand-500 transition-all"
+                  className="h-full bg-secondary-500 transition-all"
                   style={{ width: total > 0 ? `${(voted / total) * 100}%` : "0%" }}
                 />
               </div>
@@ -191,7 +189,7 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <LanguageSwitcher compact />
+            <LanguageSwitcher compact tone="voter" />
             <button
               type="button"
               onClick={() => setAccountOpen(true)}
@@ -203,17 +201,6 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
               </span>
               <span className="text-[10px] font-semibold leading-tight text-neutral-700">{t("account")}</span>
             </button>
-            <button
-              type="button"
-              onClick={() => setHistoryOpen(true)}
-              aria-label={t("history")}
-              className="flex min-h-11 min-w-[3.25rem] flex-col items-center justify-center gap-0.5 rounded-2xl bg-white px-2 py-1.5 text-center shadow-sm ring-2 ring-neutral-200 active:scale-[0.98] active:bg-neutral-50"
-            >
-              <span className="text-lg leading-none" aria-hidden>
-                📖
-              </span>
-              <span className="text-[10px] font-semibold leading-tight text-neutral-700">{t("history")}</span>
-            </button>
           </div>
         </div>
       </header>
@@ -224,36 +211,46 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
         </div>
       )}
 
-      <section className="flex flex-1 flex-col">
-        {tab === "swipe" ? (
+      <section className="flex flex-1 flex-col overflow-hidden">
+        {tab === "swipe" && (
           <SwipeView remaining={remaining} totalDone={voted} total={total} onVote={submitVote} />
-        ) : (
-          <MatchesView matches={matches} />
+        )}
+        {tab === "matches" && <MatchesView matches={matches} />}
+        {tab === "history" && (
+          <HistoryView
+            votes={votes}
+            onToggle={(itemId, currentValue) =>
+              submitVote(itemId, currentValue === "YES" ? "NO" : "YES")
+            }
+            onClearAll={clearMyVotes}
+            clearingAll={clearingVotes}
+          />
         )}
       </section>
 
-      <footer className="safe-bottom border-t-2 border-neutral-200 bg-white">
-        <div className="mx-auto grid w-full max-w-md grid-cols-2 gap-2 p-2">
-          <TabButton active={tab === "swipe"} onClick={() => setTab("swipe")} label={t("tabVote")} icon="👀" />
+      <footer className="safe-bottom border-t border-neutral-200 bg-white">
+        <div className="mx-auto flex w-full max-w-md">
+          <TabButton
+            active={tab === "swipe"}
+            onClick={() => setTab("swipe")}
+            emoji="👀"
+            label={t("tabVote")}
+          />
           <TabButton
             active={tab === "matches"}
             onClick={() => setTab("matches")}
-            label={
-              matches.length > 0 ? `${t("tabForMe")} (${matches.length})` : t("tabForMe")
-            }
-            icon="🎁"
+            emoji="🎁"
+            label={t("tabForMe")}
+            badge={matches.length}
+          />
+          <TabButton
+            active={tab === "history"}
+            onClick={() => setTab("history")}
+            emoji="📖"
+            label={t("history")}
           />
         </div>
       </footer>
-
-      <HistorySheet
-        open={historyOpen}
-        onClose={() => setHistoryOpen(false)}
-        votes={votes}
-        onToggle={(itemId, currentValue) => submitVote(itemId, currentValue === "YES" ? "NO" : "YES")}
-        onClearAll={clearMyVotes}
-        clearingAll={clearingVotes}
-      />
 
       <VoterAccountModal
         open={accountOpen}
@@ -268,28 +265,46 @@ function VoterInner({ slug, googleEnabled }: { slug: string; googleEnabled: bool
 function TabButton({
   active,
   onClick,
+  emoji,
   label,
-  icon,
+  badge,
 }: {
   active: boolean;
   onClick: () => void;
+  emoji: string;
   label: string;
-  icon: string;
+  badge?: number;
 }) {
+  const showBadge = badge !== undefined && badge > 0;
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl py-2.5 text-center shadow-sm ring-2 transition active:scale-[0.98] ${
-        active
-          ? "bg-brand-500 text-white ring-brand-600"
-          : "bg-neutral-50 text-neutral-700 ring-neutral-200 active:bg-neutral-100"
+      aria-pressed={active}
+      className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition active:bg-neutral-50 ${
+        active ? "text-secondary-600" : "text-neutral-500"
       }`}
     >
-      <span className="text-xl leading-none" aria-hidden>
-        {icon}
+      {active && (
+        <span
+          aria-hidden
+          className="absolute top-0 h-0.5 w-10 rounded-b-full bg-secondary-500"
+        />
+      )}
+      <span className="relative text-xl leading-none" aria-hidden>
+        {emoji}
+        {showBadge && (
+          <span
+            aria-hidden
+            className="absolute -right-3 -top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-secondary-500 px-1 text-[9px] font-bold text-white"
+          >
+            {badge > 99 ? "99+" : badge}
+          </span>
+        )}
       </span>
-      <span className="text-xs font-semibold leading-tight">{label}</span>
+      <span className={`text-[11px] leading-tight ${active ? "font-semibold" : "font-medium"}`}>
+        {label}
+      </span>
     </button>
   );
 }

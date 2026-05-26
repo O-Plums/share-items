@@ -102,7 +102,7 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
                         className="h-12 w-12 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-lg font-bold text-brand-700">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary-100 text-lg font-bold text-secondary-700">
                         {(session.user.name ?? "?")[0]?.toUpperCase()}
                       </div>
                     )}
@@ -135,12 +135,12 @@ export function VoterAccountModal({ open, onClose, slug, googleEnabled }: Props)
                     value={nameDraft}
                     onChange={(e) => setNameDraft(e.target.value)}
                     maxLength={30}
-                    className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                    className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-secondary-500 focus:ring-2 focus:ring-secondary-200"
                   />
                   <LoadingButton
                     loading={saving}
                     loadingText={tCommon("saving")}
-                    variant="primary"
+                    variant="voter"
                     className="w-full rounded-2xl px-4 py-3 text-sm"
                     disabled={nameDraft.trim().length < 1}
                     onClick={handleSaveName}

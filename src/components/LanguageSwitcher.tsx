@@ -6,12 +6,25 @@ import { useTransition } from "react";
 import type { Locale } from "@/i18n/config";
 import { LOCALE_COOKIE } from "@/i18n/config";
 
+type Tone = "brand" | "voter";
+
 type Props = {
   className?: string;
   compact?: boolean;
+  /** Couleur de l'état actif. `brand` (rose, défaut) ou `voter` (bleu). */
+  tone?: Tone;
 };
 
-export function LanguageSwitcher({ className = "", compact = false }: Props) {
+const activeTone: Record<Tone, string> = {
+  brand: "bg-primary-500 text-white",
+  voter: "bg-secondary-500 text-white",
+};
+
+export function LanguageSwitcher({
+  className = "",
+  compact = false,
+  tone = "brand",
+}: Props) {
   const locale = useLocale() as Locale;
   const t = useTranslations("language");
   const router = useRouter();
@@ -38,9 +51,7 @@ export function LanguageSwitcher({ className = "", compact = false }: Props) {
             disabled={pending}
             onClick={() => setLocale(code)}
             className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase transition disabled:opacity-50 ${
-              active
-                ? "bg-brand-500 text-white"
-                : "text-neutral-600 hover:bg-neutral-50"
+              active ? activeTone[tone] : "text-neutral-600 hover:bg-neutral-50"
             }`}
             aria-pressed={active}
           >

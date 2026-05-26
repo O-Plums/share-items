@@ -40,7 +40,7 @@ export function MatchesView({ matches }: { matches: Match[] }) {
           {matches.map((m) => (
             <li
               key={m.itemId}
-              className="overflow-hidden rounded-2xl bg-white ring-1 ring-brand-200"
+              className="overflow-hidden rounded-2xl bg-white ring-1 ring-secondary-200"
             >
               <div className="relative aspect-square bg-neutral-100">
                 <Image
@@ -50,7 +50,7 @@ export function MatchesView({ matches }: { matches: Match[] }) {
                   sizes="50vw"
                   className="object-cover"
                 />
-                <div className="absolute left-2 top-2 rounded-full bg-brand-500 px-2 py-0.5 text-xs font-semibold text-white">
+                <div className="absolute left-2 top-2 rounded-full bg-secondary-500 px-2 py-0.5 text-xs font-semibold text-white">
                   🎁 {t("forMeBadge")}
                 </div>
               </div>

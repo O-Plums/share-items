@@ -10,14 +10,15 @@ type SpinnerProps = {
   size?: keyof typeof sizes;
   className?: string;
   /** Couleur de l’anneau actif */
-  tone?: "brand" | "white" | "neutral";
+  tone?: "brand" | "white" | "neutral" | "voter";
   label?: string;
 };
 
 const toneClass = {
-  brand: "border-neutral-200 border-t-brand-500",
+  brand: "border-neutral-200 border-t-primary-500",
   white: "border-white/30 border-t-white",
   neutral: "border-neutral-200 border-t-neutral-600",
+  voter: "border-secondary-100 border-t-secondary-500",
 };
 
 export function Spinner({ size = "md", className, tone = "brand", label }: SpinnerProps) {

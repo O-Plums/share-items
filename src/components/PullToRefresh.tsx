@@ -8,6 +8,8 @@ const MAX_PULL = 200;
 const THRESHOLD = 110;
 const MIN_SPIN_MS = 600;
 
+type Tone = "brand" | "voter";
+
 type Props = {
   /**
    * Hook supplémentaire exécuté en parallèle de `router.refresh()`.
@@ -16,9 +18,16 @@ type Props = {
   onRefresh?: () => void | Promise<void>;
   /** Désactive le pull (par exemple pendant qu'un modal est ouvert). */
   disabled?: boolean;
+  /** Couleur du spinner : `brand` (rose, côté créateur) ou `voter` (bleu, côté votant). */
+  tone?: Tone;
 };
 
-export function PullToRefresh({ onRefresh, disabled = false }: Props) {
+const toneClass: Record<Tone, string> = {
+  brand: "text-primary-500",
+  voter: "text-secondary-500",
+};
+
+export function PullToRefresh({ onRefresh, disabled = false, tone = "brand" }: Props) {
   const router = useRouter();
 
   const handle = useCallback(async () => {
@@ -67,7 +76,7 @@ export function PullToRefresh({ onRefresh, disabled = false }: Props) {
         }}
       >
         <svg
-          className={`h-5 w-5 text-brand-500 ${isRefreshing ? "animate-spin" : ""}`}
+          className={`h-5 w-5 ${toneClass[tone]} ${isRefreshing ? "animate-spin" : ""}`}
           viewBox="0 0 24 24"
           fill="none"
           style={

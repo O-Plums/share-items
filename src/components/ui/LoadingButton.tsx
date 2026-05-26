@@ -6,13 +6,15 @@ import { Spinner } from "./Spinner";
 
 const variants = {
   primary:
-    "bg-brand-500 text-white active:bg-brand-600 disabled:opacity-50",
+    "bg-primary-500 text-white active:bg-primary-600 disabled:opacity-50",
+  voter:
+    "bg-secondary-500 text-white active:bg-secondary-600 disabled:opacity-50",
   secondary:
     "bg-white text-neutral-900 ring-1 ring-neutral-200 active:bg-neutral-50 disabled:opacity-50",
   danger:
-    "bg-red-50 text-red-700 active:bg-red-100 disabled:opacity-50",
+    "bg-danger-50 text-danger-700 active:bg-danger-100 disabled:opacity-50",
   success:
-    "bg-emerald-500 text-white active:bg-emerald-600 disabled:opacity-50",
+    "bg-success-500 text-white active:bg-success-600 disabled:opacity-50",
   ghost:
     "bg-transparent text-neutral-700 active:bg-neutral-100 disabled:opacity-50",
 } as const;
@@ -21,7 +23,7 @@ export type LoadingButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean;
   loadingText?: string;
   variant?: keyof typeof variants;
-  spinnerTone?: "brand" | "white" | "neutral";
+  spinnerTone?: "brand" | "white" | "neutral" | "voter";
   children: ReactNode;
 };
 
@@ -36,7 +38,10 @@ export function LoadingButton({
   ...props
 }: LoadingButtonProps) {
   const tone =
-    spinnerTone ?? (variant === "primary" || variant === "success" ? "white" : "brand");
+    spinnerTone ??
+    (variant === "primary" || variant === "success" || variant === "voter"
+      ? "white"
+      : "brand");
   const showSpinner = loading;
   const label = loading && loadingText ? loadingText : children;
 

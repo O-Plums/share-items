@@ -66,11 +66,11 @@ export function IdentityGate({ children, slug, googleEnabled = false }: Props) {
             placeholder={t("namePlaceholder")}
             autoFocus
             maxLength={30}
-            className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-lg text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+            className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-lg text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-secondary-500 focus:ring-2 focus:ring-secondary-200"
           />
           <LoadingButton
             type="submit"
-            variant="primary"
+            variant="voter"
             className="w-full rounded-2xl px-4 py-3 text-lg"
             disabled={name.trim().length < 1}
           >

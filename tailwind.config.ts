@@ -1,23 +1,13 @@
 import type { Config } from "tailwindcss";
+import { tailwindColors } from "./src/lib/colors";
 
 const config: Config = {
   content: ["./src/**/*.{ts,tsx,mdx}"],
   theme: {
     extend: {
-      colors: {
-        brand: {
-          50: "#fff1f4",
-          100: "#ffe1e9",
-          200: "#ffc3d4",
-          300: "#ff95b3",
-          400: "#fc5d8a",
-          500: "#f43568",
-          600: "#e11849",
-          700: "#bd0d3b",
-          800: "#9c0e36",
-          900: "#831033",
-        },
-      },
+      // Couleurs custom — palette + alias sémantiques (primary, secondary,
+      // success, danger, warning, no). Source de vérité : src/lib/colors.ts.
+      colors: tailwindColors,
       fontFamily: {
         sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
       },

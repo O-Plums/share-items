@@ -23,14 +23,8 @@ export const SITE_URL =
 
 export const SITE_LOCALE = "fr_FR";
 
-/**
- * Google Search Console verification token (meta `google-site-verification`).
- * Public by nature — sert juste à prouver à Google qu'on est propriétaire du domaine.
- * Override possible via env si on change de domaine ou si quelqu'un fork le projet.
- */
-export const GOOGLE_SITE_VERIFICATION =
-  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
-  "QkcN2bHuBzWgIHHpzRlMG9of4SzVk2s_a8brfZQvrtk";
+/** Google Search Console verification (optional). */
+export const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
 
 /** Public source repository — surfaced in the home footer. */
 export const GITHUB_URL =

@@ -281,6 +281,27 @@ Guide détaillé : **[DEPLOY.md](./DEPLOY.md)**
 
 ---
 
+## Design tokens
+
+Toutes les couleurs UI vivent dans un seul fichier de conf : [`src/lib/colors.ts`](./src/lib/colors.ts).
+
+Deux niveaux :
+
+- **`palette`** — les échelles brutes 50→900 en hex (`pink`, `sky`, `emerald`, `red`, `amber`, `rose`). La source de vérité — seul endroit où on écrit des hex.
+- **`semantic`** — des alias parlants qui pointent vers une palette : `primary` (le rose de la marque), `secondary` (le bleu côté votant), `success` (emerald), `danger` (red), `warning` (amber), `no` (le rose pâle du swipe).
+
+Tailwind les récupère via [`tailwind.config.ts`](./tailwind.config.ts), donc les classes `bg-primary-500`, `ring-secondary-200`, `text-success-700`, etc. marchent partout. Les anciens noms (`brand`, `voter`) restent fonctionnels pour la rétro-compat — préférer les sémantiques pour le nouveau code.
+
+```ts
+// Un seul endroit pour modifier une couleur
+import { palette, semantic } from "@/lib/colors";
+
+palette.pink[500];      // "#f43568"
+semantic.primary[500];  // pareil — alias
+```
+
+---
+
 ## Tests
 
 Tests unitaires sur les helpers purs de `src/lib` et `src/i18n` (admin allowlist, slugs, taxonomies, kinds de listes, tour state, SEO, i18n, attribution, légal…).

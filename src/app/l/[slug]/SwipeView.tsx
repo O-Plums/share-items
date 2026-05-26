@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { EmojiBadge } from "@/components/EmojiBadge";
-import { LoadingButton } from "@/components/ui/LoadingButton";
 import { Spinner } from "@/components/ui/Spinner";
 
 type Item = {
@@ -28,7 +27,6 @@ type Props = {
 export function SwipeView({ remaining, total, totalDone: _totalDone, onVote }: Props) {
   const tVoter = useTranslations("voter");
   const tListDetail = useTranslations("listDetail");
-  const tCommon = useTranslations("common");
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   if (total === 0) {
@@ -65,8 +63,19 @@ export function SwipeView({ remaining, total, totalDone: _totalDone, onVote }: P
   }
 
   return (
-    <div className="relative flex flex-1 flex-col">
-      <div className="relative mx-auto flex w-full max-w-md flex-1 items-center px-5">
+    <div className="relative flex flex-1 flex-col overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <Image
+          src={current.imageUrl}
+          alt=""
+          fill
+          sizes="100vw"
+          className="scale-125 object-cover opacity-40 blur-3xl"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-neutral-50/70 via-neutral-50/30 to-neutral-50/80" />
+      </div>
+
+      <div className="relative mx-auto flex min-h-0 w-full max-w-md flex-1 items-center px-5 py-2">
         <div className="relative aspect-[3/4] w-full">
           {next && (
             <div className="absolute inset-0 scale-95 opacity-60">
@@ -84,29 +93,29 @@ export function SwipeView({ remaining, total, totalDone: _totalDone, onVote }: P
         </div>
       </div>
 
-      <div className="safe-bottom px-5 pb-4 pt-2">
-        <p className="mx-auto mb-3 max-w-md text-center text-sm font-medium text-neutral-600">
+      <div className="relative px-5 pb-3">
+        <p className="mx-auto mb-2 max-w-md text-center text-xs font-medium text-neutral-500">
           {tVoter("voteHint")}
         </p>
-        <div className="mx-auto flex w-full max-w-md gap-3">
-          <LoadingButton
-            loading={!!pendingId}
-            loadingText={tCommon("saving")}
-            variant="secondary"
-            className="min-h-14 flex-1 rounded-2xl py-4 text-lg font-bold shadow-sm ring-2 ring-neutral-300"
+        <div className="mx-auto flex w-full max-w-md items-center justify-center gap-6">
+          <button
+            type="button"
+            aria-label={tVoter("voteNo")}
+            disabled={!!pendingId}
             onClick={() => handle("NO")}
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-3xl font-bold text-rose-500 shadow-lg ring-2 ring-rose-200 transition active:scale-90 disabled:opacity-50"
           >
-            ✕ {tVoter("voteNo")}
-          </LoadingButton>
-          <LoadingButton
-            loading={!!pendingId}
-            loadingText={tCommon("saving")}
-            variant="success"
-            className="min-h-14 flex-1 rounded-2xl py-4 text-lg font-bold shadow-sm ring-2 ring-emerald-700"
+            {pendingId ? <Spinner size="sm" tone="neutral" /> : "✕"}
+          </button>
+          <button
+            type="button"
+            aria-label={tVoter("voteYes")}
+            disabled={!!pendingId}
             onClick={() => handle("YES")}
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-3xl font-bold text-emerald-500 shadow-lg ring-2 ring-emerald-200 transition active:scale-90 disabled:opacity-50"
           >
-            ✓ {tVoter("voteYes")}
-          </LoadingButton>
+            {pendingId ? <Spinner size="sm" tone="neutral" /> : "✓"}
+          </button>
         </div>
       </div>
     </div>
@@ -148,7 +157,7 @@ function SwipeCard({
     >
       {disabled && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
-          <Spinner size="lg" label={tCommon("saving")} />
+          <Spinner size="lg" tone="voter" label={tCommon("saving")} />
         </div>
       )}
       <div className="relative h-full w-full">
