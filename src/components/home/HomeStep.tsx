@@ -17,8 +17,30 @@ type Props = HomeStepCopy & {
   isLast?: boolean;
 };
 
-export function HomeStep({ step, title, body, kind, imageSrc, imageAlt, shareLabels, isLast }: Props) {
+const accents = {
+  brand: {
+    line: "from-brand-300 to-brand-100",
+    badge: "bg-brand-500 shadow-brand-500/30",
+  },
+  voter: {
+    line: "from-secondary-300 to-secondary-100",
+    badge: "bg-secondary-500 shadow-secondary-500/30",
+  },
+} as const;
+
+export function HomeStep({
+  step,
+  title,
+  body,
+  kind,
+  imageSrc,
+  imageAlt,
+  shareLabels,
+  isLast,
+  tone = "brand",
+}: Props) {
   const reduced = useReducedMotion();
+  const accent = accents[tone];
 
   const visual =
     kind === "share" && shareLabels ? (
@@ -36,7 +58,7 @@ export function HomeStep({ step, title, body, kind, imageSrc, imageAlt, shareLab
     <li className="relative pl-0">
       {!isLast && (
         <motion.div
-          className="absolute left-[15px] top-12 bottom-0 w-0.5 origin-top bg-gradient-to-b from-brand-300 to-brand-100"
+          className={`absolute left-[15px] top-12 bottom-0 w-0.5 origin-top bg-gradient-to-b ${accent.line}`}
           initial={{ scaleY: 0 }}
           whileInView={{ scaleY: 1 }}
           viewport={{ once: true, amount: 0.1 }}
@@ -50,7 +72,7 @@ export function HomeStep({ step, title, body, kind, imageSrc, imageAlt, shareLab
 
         <div className="order-2 flex gap-4">
           <motion.span
-            className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white shadow-md shadow-brand-500/30"
+            className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-md ${accent.badge}`}
             initial={reduced ? false : { scale: 0 }}
             whileInView={{ scale: 1 }}
             viewport={viewport}

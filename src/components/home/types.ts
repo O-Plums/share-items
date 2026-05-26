@@ -5,6 +5,8 @@ export type HomeStepCopy = {
   imageSrc?: string;
   imageAlt?: string;
   kind: "image" | "share";
+  /** Accent color : `brand` (rose, côté créateur) ou `voter` (bleu, côté votant). */
+  tone?: "brand" | "voter";
 };
 
 export type HomeCopy = {

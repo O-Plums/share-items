@@ -49,6 +49,7 @@ export async function HomeLanding() {
         imageSrc: "/promo/voters/tinder_example.jpg",
         imageAlt: t("imgAltVote"),
         kind: "image",
+        tone: "voter",
       },
       {
         step: "5",

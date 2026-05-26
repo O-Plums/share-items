@@ -231,13 +231,13 @@ export function HomeLandingClient({ copy }: Props) {
               </article>
             </Reveal>
             <Reveal delay={0.12}>
-              <article className="flex flex-col rounded-2xl bg-neutral-100/90 p-5 ring-1 ring-neutral-200">
+              <article className="flex flex-col rounded-2xl bg-secondary-50/70 p-5 ring-1 ring-secondary-200/80">
                 <p className="text-2xl" aria-hidden>
                   🔗
                 </p>
                 <h3 className="mt-2 text-lg font-semibold text-neutral-900">{copy.pathGuestTitle}</h3>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-neutral-600">{copy.pathGuestBody}</p>
-                <p className="mt-4 rounded-xl bg-white px-3 py-3 text-center text-sm font-medium text-neutral-700 ring-1 ring-neutral-200">
+                <p className="mt-4 rounded-xl bg-white px-3 py-3 text-center text-sm font-medium text-neutral-700 ring-1 ring-secondary-100">
                   {copy.pathGuestHint}
                 </p>
               </article>
