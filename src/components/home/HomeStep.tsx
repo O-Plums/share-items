@@ -51,7 +51,7 @@ export function HomeStep({
         shareLabel={shareLabels.whatsapp}
       />
     ) : imageSrc && imageAlt ? (
-      <PhoneFrame src={imageSrc} alt={imageAlt} />
+      <PhoneFrame src={imageSrc} alt={imageAlt} tone={tone} />
     ) : null;
 
   return (

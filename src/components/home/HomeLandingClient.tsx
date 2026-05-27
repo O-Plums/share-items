@@ -245,29 +245,6 @@ export function HomeLandingClient({ copy }: Props) {
           </div>
         </section>
 
-        {/* Reassurance */}
-        <Reveal className="mt-14">
-          <section className="rounded-2xl border border-dashed border-neutral-300/80 bg-white/60 p-5 backdrop-blur-sm">
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
-              {copy.reassureTitle}
-            </h2>
-            <ul className="mt-4 space-y-3">
-              {copy.reassurePoints.map((point, i) => (
-                <motion.li
-                  key={point}
-                  className="text-sm leading-snug text-neutral-700"
-                  initial={reduced ? false : { opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.06, duration: 0.35 }}
-                >
-                  {point}
-                </motion.li>
-              ))}
-            </ul>
-          </section>
-        </Reveal>
-
         {/* Desktop bottom CTA */}
         <Reveal className="mt-10 hidden text-center sm:block">
           <Link

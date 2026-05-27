@@ -35,6 +35,4 @@ export type HomeCopy = {
   pathGuestTitle: string;
   pathGuestBody: string;
   pathGuestHint: string;
-  reassureTitle: string;
-  reassurePoints: string[];
 };

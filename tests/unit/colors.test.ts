@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   legacyAliases,
   palette,
+  phoneFrameBoxShadow,
   semantic,
   tailwindColors,
   type ColorScale,
@@ -101,5 +102,17 @@ describe("tailwindColors export", () => {
         ).toMatch(/^#[0-9a-f]{6}$/i);
       }
     }
+  });
+});
+
+describe("phoneFrameBoxShadow", () => {
+  it("derives rgba from primary (brand) and secondary (voter) tokens", () => {
+    expect(phoneFrameBoxShadow("brand")).toBe(
+      `0 24px 48px -12px rgba(244, 53, 104, 0.25)`,
+    );
+    expect(phoneFrameBoxShadow("voter")).toBe(
+      `0 24px 48px -12px rgba(14, 165, 233, 0.25)`,
+    );
+    expect(phoneFrameBoxShadow()).toBe(phoneFrameBoxShadow("brand"));
   });
 });

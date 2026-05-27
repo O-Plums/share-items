@@ -78,8 +78,6 @@ export async function HomeLanding() {
     pathGuestTitle: t("pathGuestTitle"),
     pathGuestBody: t("pathGuestBody"),
     pathGuestHint: t("pathGuestHint"),
-    reassureTitle: t("reassureTitle"),
-    reassurePoints: [t("reassure1"), t("reassure2"), t("reassure3")],
   };
 
   return <HomeLandingClient copy={copy} />;

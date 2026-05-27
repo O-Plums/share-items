@@ -2,15 +2,17 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
+import { phoneFrameBoxShadow, type HomeAccentTone } from "@/lib/colors";
 import { easeOut, scaleIn, fadeUpReduced, viewport } from "./motion";
 
 type Props = {
   src: string;
   alt: string;
   priority?: boolean;
+  tone?: HomeAccentTone;
 };
 
-export function PhoneFrame({ src, alt, priority }: Props) {
+export function PhoneFrame({ src, alt, priority, tone = "brand" }: Props) {
   const reduced = useReducedMotion();
 
   return (
@@ -23,7 +25,8 @@ export function PhoneFrame({ src, alt, priority }: Props) {
       className="relative mx-auto w-full max-w-[min(100%,280px)]"
     >
       <div
-        className="relative aspect-[9/19] overflow-hidden rounded-[2rem] bg-neutral-900 p-1.5 shadow-[0_24px_48px_-12px_rgba(244,53,104,0.25)] ring-1 ring-neutral-900/10"
+        className="relative aspect-[9/19] overflow-hidden rounded-[2rem] bg-neutral-900 p-1.5 ring-1 ring-neutral-900/10"
+        style={{ boxShadow: phoneFrameBoxShadow(tone) }}
         aria-hidden
       >
         <motion.div
