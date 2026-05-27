@@ -314,7 +314,7 @@
     "no": "NON",
     "voteYes": "Oui",
     "voteNo": "Non",
-    "voteHint": "Tape le bouton vert ou rouge — pas besoin de faire glisser la photo.",
+    "voteHint": "Tape le bouton vert ou rouge ou glisse la photo",
     "historyTitle": "Mon historique",
     "historyAll": "Tout ({count})",
     "historyYes": "✓ Oui ({count})",

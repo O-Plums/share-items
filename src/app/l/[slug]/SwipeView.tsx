@@ -75,29 +75,35 @@ export function SwipeView({ remaining, total, totalDone: _totalDone, onVote }: P
         <div className="absolute inset-0 bg-gradient-to-b from-neutral-50/70 via-neutral-50/30 to-neutral-50/80" />
       </div>
 
-      <div className="relative mx-auto flex min-h-0 w-full max-w-md flex-1 items-center px-5 py-2">
-        <div className="relative aspect-[3/4] w-full">
-          {next && (
-            <div className="absolute inset-0 scale-95 opacity-60">
-              <CardStatic item={next} />
-            </div>
-          )}
-          <AnimatePresence mode="popLayout">
-            <SwipeCard
-              key={current.id}
-              item={current}
-              onVote={(v) => handle(v)}
-              disabled={pendingId === current.id}
-            />
-          </AnimatePresence>
-        </div>
-      </div>
+      <div className="relative flex min-h-0 flex-1 flex-col px-5">
+        {/* Equal flex spacers: header → card → actions → footer */}
+        <div className="min-h-3 flex-1" aria-hidden />
 
-      <div className="relative px-5 pb-3">
-        <p className="mx-auto mb-2 max-w-md text-center text-xs font-medium text-neutral-500">
-          {tVoter("voteHint")}
-        </p>
-        <div className="mx-auto flex w-full max-w-md items-center justify-center gap-6">
+        <div className="relative mx-auto w-full max-w-md shrink-0">
+          <div className="relative aspect-[3/4] w-full">
+            {next && (
+              <div className="absolute inset-0 scale-95 opacity-60">
+                <CardStatic item={next} />
+              </div>
+            )}
+            <AnimatePresence mode="popLayout">
+              <SwipeCard
+                key={current.id}
+                item={current}
+                onVote={(v) => handle(v)}
+                disabled={pendingId === current.id}
+              />
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <div className="min-h-3 flex-1" aria-hidden />
+
+        <div className="relative shrink-0">
+          <p className="mx-auto mb-2 max-w-md text-center text-xs font-medium text-neutral-500">
+            {tVoter("voteHint")}
+          </p>
+          <div className="mx-auto flex w-full max-w-md items-center justify-center gap-6">
           <button
             type="button"
             aria-label={tVoter("voteNo")}
@@ -116,7 +122,10 @@ export function SwipeView({ remaining, total, totalDone: _totalDone, onVote }: P
           >
             {pendingId ? <Spinner size="sm" tone="neutral" /> : "✓"}
           </button>
+          </div>
         </div>
+
+        <div className="min-h-3 flex-1" aria-hidden />
       </div>
     </div>
   );

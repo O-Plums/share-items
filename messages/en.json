@@ -314,7 +314,7 @@
     "no": "NO",
     "voteYes": "Yes",
     "voteNo": "No",
-    "voteHint": "Tap the green or red button — you don’t need to drag the photo.",
+    "voteHint": "Tap the green or red button or drag the photo left for No or right for Yes",
     "historyTitle": "My history",
     "historyAll": "All ({count})",
     "historyYes": "✓ Yes ({count})",
