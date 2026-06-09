@@ -19,7 +19,7 @@ export const SITE_HEADLINE_FR = "Répartir les objets de la maison en famille";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   process.env.AUTH_URL?.replace(/\/$/, "") ||
-  "https://sortyourlife.fr";
+  "https://www.sortyourlife.fr";
 
 export const SITE_LOCALE = "fr_FR";
 
